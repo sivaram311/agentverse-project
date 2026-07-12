@@ -2,7 +2,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { Billboard, Html } from "@react-three/drei";
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, Suspense } from "react";
 import type { Group, Mesh } from "three";
 import * as THREE from "three";
 import { greetingFor, type PersonaDef } from "@/lib/orchestrator";
@@ -10,9 +10,10 @@ import { speakPersona, stopSpeaking, type VoicePrefs } from "@/lib/speech";
 import { useVerseStore } from "@/lib/store";
 import type { AgentPose, PersonaId } from "@/lib/types";
 import { isHubSeat } from "@/lib/hex-office";
+import { AVATAR_SCALE } from "@/lib/avatar-catalog";
 import { AgentDesk, MINI_FURNITURE } from "./DeskCluster";
 import { HubChair } from "./HexCollabOffice";
-import { HumanoidFigure } from "./HumanoidFigure";
+import { RpmAvatar } from "./RpmAvatar";
 import { useApproachBehavior } from "./useApproachBehavior";
 
 type Props = {
@@ -115,17 +116,6 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
   const home = useMemo(() => chairHome(deskPos), [deskPos]);
   const hub = isHubSeat(deskPos);
 
-  const look = useMemo(
-    () => ({
-      accent: persona.color,
-      skin: persona.skin ?? "#E8C4A8",
-      hair: persona.hair ?? "#2A1F14",
-      gender: (persona.gender ?? "male") as "male" | "female",
-      lod,
-    }),
-    [persona, lod],
-  );
-
   useLayoutEffect(() => {
     if (!group.current) return;
     group.current.position.set(home[0], 0, home[2]);
@@ -205,10 +195,9 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
   });
 
   const progress = agentState?.progress ?? (activeQuest ? 40 : 0);
-  const labelY = sitting ? 1.35 : 1.75;
+  const labelY = sitting ? 1.15 : 1.55;
   const prominent = isSelected || isFocus;
   const showAgentLabel = showLabels || prominent;
-  const figureScale = 0.85;
 
   function summon(e: { stopPropagation: () => void }) {
     e.stopPropagation();
@@ -259,16 +248,18 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
           document.body.style.cursor = "auto";
         }}
       >
-        <HumanoidFigure
-          look={look}
-          sitting={sitting}
-          active={prominent}
-          wavePhase={wavePhase}
-          phase={(persona.deskIndex ?? 0) * 1.7}
-          working={agentState?.working ?? true}
-          walking={walking}
-          scale={figureScale}
-        />
+        <Suspense fallback={null}>
+          <RpmAvatar
+            personaId={persona.id as PersonaId}
+            sitting={sitting}
+            walking={walking}
+            waving={wavePhase > 0}
+            working={agentState?.working ?? true}
+            active={prominent}
+            reducedMotion={reducedMotion}
+            scale={AVATAR_SCALE}
+          />
+        </Suspense>
 
         <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[0.26, 0.36, 24]} />
