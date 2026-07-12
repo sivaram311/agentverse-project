@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+dist
+.env*.local
+*.log
+.DS_Store
+npm-debug.log*
+tsconfig.tsbuildinfo
+e2e-artifacts
+.cursor
+
+# Local backend junctions (separate repos — do not vendor)
+services/centralized-security-system/
+services/agent-portal/

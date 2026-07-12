@@ -1,0 +1,7 @@
+﻿Persona bundle source of truth:
+E:\machine-docs\personas
+
+Do not duplicate persona definitions here unless a project-specific override is required.
+Read: E:\machine-docs\personas\README.md
+Standards: web-app-standards.md, web-playwright-checklist.md
+Templates: pre-work-templates\

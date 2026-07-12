@@ -1,0 +1,504 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+
+:root {
+  --av-void: #070b10;
+  --av-plate: #121a24;
+  --av-plate-2: #1a2432;
+  --av-accent: #e8a838;
+  --av-mint: #3ddc97;
+  --av-coral: #ff6b4a;
+  --av-ink: #f2f5f7;
+  --av-muted: #9aa7b5;
+  --av-line: rgba(242, 245, 247, 0.12);
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  background: var(--av-void);
+  color: var(--av-ink);
+  font-family: var(--font-display);
+}
+
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.verse-shell {
+  height: 100dvh;
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: calc(0.55rem + var(--safe-top)) 0.85rem 0.55rem;
+  background: linear-gradient(180deg, rgba(7, 11, 16, 0.92), rgba(7, 11, 16, 0.55));
+  border-bottom: 1px solid var(--av-line);
+  backdrop-filter: blur(10px);
+  z-index: 5;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.brand-mark {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.55rem;
+  background: linear-gradient(145deg, #e8a838, #ff6b4a);
+  color: #0b1218;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.brand strong {
+  display: block;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.brand small {
+  color: var(--av-muted);
+  font-size: 0.68rem;
+}
+
+.persona-rail {
+  display: flex;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.persona-rail button {
+  border: 1px solid color-mix(in srgb, var(--p) 55%, transparent);
+  background: color-mix(in srgb, var(--p) 16%, transparent);
+  color: var(--av-ink);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.persona-rail button.on {
+  background: color-mix(in srgb, var(--p) 40%, #000);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--p) 70%, white);
+}
+
+.status-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pill {
+  font-size: 0.68rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--av-line);
+  color: var(--av-muted);
+}
+
+.pill.ok {
+  color: var(--av-mint);
+  border-color: color-mix(in srgb, var(--av-mint) 45%, transparent);
+}
+
+.pill.bad {
+  color: var(--av-coral);
+}
+
+.pill.warn {
+  color: var(--av-accent);
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid var(--av-line);
+  color: var(--av-ink);
+  border-radius: 0.45rem;
+  padding: 0.3rem 0.55rem;
+  cursor: pointer;
+}
+
+.verse-main {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.hub-canvas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hub-canvas.placeholder {
+  background:
+    radial-gradient(ellipse at 50% 30%, #1a2a3d 0%, transparent 55%),
+    linear-gradient(160deg, #070b10, #101820 60%, #0b1218);
+}
+
+.hud-layer {
+  position: absolute;
+  inset: auto 0.75rem calc(0.75rem + var(--safe-bottom));
+  display: grid;
+  grid-template-columns: minmax(0, 16rem) minmax(0, 22rem);
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: end;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.quest-panel,
+.chat-panel {
+  pointer-events: auto;
+  background: color-mix(in srgb, var(--av-plate) 88%, transparent);
+  border: 1px solid var(--av-line);
+  border-radius: 1rem;
+  backdrop-filter: blur(12px);
+  padding: 0.75rem;
+  max-height: min(42dvh, 360px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quest-panel header h2,
+.chat-panel header h2 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.muted {
+  color: var(--av-muted);
+  margin: 0.15rem 0 0;
+  font-size: 0.75rem;
+}
+
+.quest-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.quest-card {
+  width: 100%;
+  text-align: left;
+  background: var(--av-plate-2);
+  border: 1px solid var(--av-line);
+  border-left-width: 3px;
+  border-radius: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.quest-card span {
+  font-size: 0.75rem;
+  color: var(--av-muted);
+}
+
+.quest-card em {
+  font-style: normal;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--av-accent);
+}
+
+.quest-card.status-done em {
+  color: var(--av-mint);
+}
+
+.chat-log {
+  overflow: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-height: 8rem;
+}
+
+.bubble {
+  background: var(--av-plate-2);
+  border-radius: 0.7rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--av-line);
+}
+
+.bubble.user {
+  border-color: color-mix(in srgb, var(--av-accent) 40%, transparent);
+}
+
+.bubble .role {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--av-muted);
+  margin-bottom: 0.2rem;
+}
+
+.bubble p {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.streaming {
+  font-size: 0.75rem;
+  color: var(--av-accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.chat-compose {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem;
+}
+
+.chat-compose input {
+  background: #0c1219;
+  border: 1px solid var(--av-line);
+  border-radius: 0.6rem;
+  color: var(--av-ink);
+  padding: 0.55rem 0.7rem;
+}
+
+.chat-compose button,
+.login-card button {
+  background: linear-gradient(135deg, var(--av-accent), #ff8f5a);
+  color: #14110c;
+  border: 0;
+  border-radius: 0.6rem;
+  padding: 0.55rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chat-compose button:disabled,
+.login-card button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hero-copy {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  z-index: 2;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.65);
+}
+
+.brand-kicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--av-accent);
+}
+
+.hero-copy h1 {
+  margin: 0.35rem 0;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+}
+
+.hero-copy p {
+  margin: 0;
+  color: var(--av-muted);
+}
+
+.persona-tag {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 0.45rem;
+  background: rgba(7, 11, 16, 0.78);
+  border: 1px solid var(--av-line);
+  color: #fff;
+  font-size: 0.65rem;
+  text-align: center;
+  min-width: 4.5rem;
+  max-width: 5.5rem;
+  pointer-events: none;
+}
+
+.persona-tag.active {
+  border-color: var(--av-accent);
+}
+
+.persona-tag span,
+.persona-tag em {
+  color: #b7c2ce;
+  font-style: normal;
+}
+
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(232, 168, 56, 0.18), transparent 50%),
+    rgba(7, 11, 16, 0.72);
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+}
+
+.login-card {
+  width: min(100%, 22rem);
+  background: var(--av-plate);
+  border: 1px solid var(--av-line);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.login-card h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.login-card label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--av-muted);
+}
+
+.login-card input {
+  background: #0c1219;
+  border: 1px solid var(--av-line);
+  border-radius: 0.55rem;
+  color: var(--av-ink);
+  padding: 0.55rem 0.65rem;
+}
+
+.error {
+  color: var(--av-coral);
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1rem + var(--safe-bottom));
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  background: var(--av-plate);
+  border: 1px solid var(--av-coral);
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  max-width: min(92vw, 28rem);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .hud-layer {
+    grid-template-columns: 1fr;
+    inset: auto 0.5rem calc(0.5rem + var(--safe-bottom));
+  }
+
+  .quest-panel {
+    display: none;
+  }
+
+  .chat-panel {
+    max-height: min(38dvh, 320px);
+  }
+
+  .status-cluster .ghost {
+    display: none;
+  }
+
+  .hero-copy {
+    top: 8%;
+  }
+
+  /* Drei Html labels can extend past the canvas; clip on phone */
+  .hub-canvas,
+  .verse-main {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 600px) {
+  .brand small {
+    display: none;
+  }
+
+  .topbar {
+    flex-wrap: wrap;
+  }
+
+  .persona-rail {
+    order: 3;
+    flex-basis: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streaming {
+    animation: none;
+  }
+}
