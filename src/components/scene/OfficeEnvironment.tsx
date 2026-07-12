@@ -1,113 +1,255 @@
 "use client";
 
-import { useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useVerseStore, type OfficeMood } from "@/lib/store";
 
-/** Kolam / mandala-inspired floor with golden neon rings. */
-export function MandalaFloor() {
-  const rings = useMemo(
-    () =>
-      [2.2, 4.0, 6.2, 8.8, 11.5].map((r, i) => ({
-        r,
-        w: 0.08 + (i % 2) * 0.04,
-        opacity: 0.55 - i * 0.06,
-      })),
-    [],
-  );
+/** Soft gold guides under the hex collab carpet (indoor tower L1). */
+export function MandalaFloor({ lod = "full" }: { lod?: "full" | "simple" }) {
+  const spin = useRef<THREE.Group>(null);
 
-  const petals = useMemo(() => {
-    const items: { angle: number; radius: number }[] = [];
-    for (let i = 0; i < 12; i++) {
-      items.push({ angle: (i / 12) * Math.PI * 2, radius: 5.1 });
+  useFrame((_, dt) => {
+    if (spin.current && lod === "full") {
+      spin.current.rotation.y += dt * 0.02;
     }
-    for (let i = 0; i < 8; i++) {
-      items.push({ angle: (i / 8) * Math.PI * 2 + 0.2, radius: 7.4 });
-    }
-    return items;
-  }, []);
+  });
 
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, 0, 0]}>
-        <circleGeometry args={[16, 64]} />
+      {/* Deep void plate beyond the cutaway */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.02, 0]}>
+        <circleGeometry args={[18, lod === "simple" ? 32 : 64]} />
+        <meshStandardMaterial color="#060a10" metalness={0.4} roughness={0.85} />
+      </mesh>
+
+      {/* Soft perimeter ring — hex office sits on carpet above */}
+      <mesh position={[0, 0.02, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[7.4, 7.7, 0.08, lod === "simple" ? 32 : 64]} />
+        <meshStandardMaterial color="#121018" metalness={0.35} roughness={0.65} />
+      </mesh>
+      <mesh position={[0, 0.065, 0]} receiveShadow>
+        <cylinderGeometry args={[7.1, 7.1, 0.02, lod === "simple" ? 32 : 64]} />
         <meshStandardMaterial
-          color="#0c1420"
-          metalness={0.35}
-          roughness={0.72}
+          color="#16141c"
+          emissive="#2a1c08"
+          emissiveIntensity={0.12}
+          metalness={0.25}
+          roughness={0.7}
         />
       </mesh>
-      {/* Soft Tamil Nadu warm wash */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
-        <circleGeometry args={[9.5, 48]} />
-        <meshStandardMaterial
-          color="#1a1520"
-          emissive="#3a2810"
-          emissiveIntensity={0.15}
-          transparent
-          opacity={0.55}
-        />
-      </mesh>
-      {rings.map((ring) => (
-        <mesh
-          key={ring.r}
-          rotation={[-Math.PI / 2, 0, 0]}
-          position={[0, 0.012, 0]}
-        >
-          <ringGeometry args={[ring.r, ring.r + ring.w, 72]} />
-          <meshStandardMaterial
-            color="#E8A838"
-            emissive="#E8A838"
-            emissiveIntensity={0.55}
-            transparent
-            opacity={ring.opacity}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-      ))}
-      {petals.map((p, i) => (
-        <mesh
-          key={`petal-${i}`}
-          rotation={[-Math.PI / 2, 0, p.angle]}
-          position={[
-            Math.cos(p.angle) * p.radius,
-            0.015,
-            Math.sin(p.angle) * p.radius,
-          ]}
-        >
-          <circleGeometry args={[0.35, 3]} />
-          <meshStandardMaterial
-            color="#C4A35A"
-            emissive="#C4A35A"
-            emissiveIntensity={0.35}
-            transparent
-            opacity={0.4}
-          />
-        </mesh>
-      ))}
-      {/* Hub podium */}
-      <mesh position={[0, 0.04, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[1.35, 1.55, 0.08, 32]} />
-        <meshStandardMaterial color="#162030" metalness={0.55} roughness={0.35} />
-      </mesh>
+
+      {/* Subtle gold guide rings under carpet */}
+      <group ref={spin}>
+        {[2.2, 3.65, 5.2].map((r, i) => (
+          <mesh key={r} rotation={[-Math.PI / 2, 0, Math.PI / 6]} position={[0, 0.07, 0]}>
+            <ringGeometry args={[r, r + (i === 1 ? 0.08 : 0.045), i === 1 ? 6 : 64]} />
+            <meshStandardMaterial
+              color="#E8A838"
+              emissive="#E8A838"
+              emissiveIntensity={0.45}
+              transparent
+              opacity={0.35 - i * 0.06}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        ))}
+      </group>
+
+      {/* Soft perimeter pillars aligned to hex vertices */}
+      {lod === "full"
+        ? [0, 1, 2, 3, 4, 5].map((i) => {
+            const a = -Math.PI / 2 + (i / 6) * Math.PI * 2;
+            const x = Math.cos(a) * 8.4;
+            const z = Math.sin(a) * 8.4;
+            return (
+              <group key={`pillar-${i}`} position={[x, 0, z]}>
+                <mesh position={[0, 1.2, 0]} castShadow>
+                  <cylinderGeometry args={[0.12, 0.16, 2.4, 8]} />
+                  <meshStandardMaterial color="#101820" metalness={0.55} roughness={0.4} />
+                </mesh>
+                <mesh position={[0, 2.45, 0]}>
+                  <sphereGeometry args={[0.14, 8, 8]} />
+                  <meshStandardMaterial
+                    color="#E8A838"
+                    emissive="#E8A838"
+                    emissiveIntensity={0.9}
+                  />
+                </mesh>
+                <pointLight position={[0, 2.4, 0]} intensity={0.3} distance={6} color="#E8A838" />
+              </group>
+            );
+          })
+        : null}
     </group>
   );
 }
 
-export function OfficeLighting({ reducedMotion }: { reducedMotion: boolean }) {
+type MoodPalette = {
+  ambient: number;
+  hemiSky: string;
+  hemiGround: string;
+  hemi: number;
+  key: string;
+  keyI: number;
+  fill: string;
+  fillI: number;
+  left: string;
+  leftI: number;
+  right: string;
+  rightI: number;
+  hub: string;
+  hubI: number;
+  spot: string;
+  spotI: number;
+};
+
+const MOOD: Record<OfficeMood, MoodPalette> = {
+  morning: {
+    ambient: 0.48,
+    hemiSky: "#d0e4ff",
+    hemiGround: "#1a1810",
+    hemi: 0.42,
+    key: "#e8f0ff",
+    keyI: 1.05,
+    fill: "#8eb8ff",
+    fillI: 0.55,
+    left: "#b8d4ff",
+    leftI: 0.32,
+    right: "#ffe0b8",
+    rightI: 0.16,
+    hub: "#a8c8ff",
+    hubI: 0.45,
+    spot: "#f0f6ff",
+    spotI: 0.5,
+  },
+  day: {
+    ambient: 0.42,
+    hemiSky: "#d0e4f4",
+    hemiGround: "#1a1810",
+    hemi: 0.38,
+    key: "#fff6e8",
+    keyI: 0.95,
+    fill: "#8eb8ff",
+    fillI: 0.48,
+    left: "#b0d0ff",
+    leftI: 0.28,
+    right: "#ffc898",
+    rightI: 0.24,
+    hub: "#E8A838",
+    hubI: 0.55,
+    spot: "#ffe8c0",
+    spotI: 0.5,
+  },
+  evening: {
+    ambient: 0.28,
+    hemiSky: "#ffc8a0",
+    hemiGround: "#12080a",
+    hemi: 0.28,
+    key: "#ffd0a0",
+    keyI: 0.7,
+    fill: "#6080c0",
+    fillI: 0.28,
+    left: "#8090c8",
+    leftI: 0.14,
+    right: "#ff9060",
+    rightI: 0.38,
+    hub: "#FF8A3D",
+    hubI: 0.7,
+    spot: "#ffc090",
+    spotI: 0.55,
+  },
+};
+
+export function OfficeLighting({
+  reducedMotion,
+  narrow,
+}: {
+  reducedMotion: boolean;
+  narrow?: boolean;
+}) {
+  const mood = useVerseStore((s) => s.officeMood);
+  const palette = useMemo(() => MOOD[mood], [mood]);
+  const flicker = useRef<THREE.PointLight>(null);
+  const keyRef = useRef<THREE.DirectionalLight>(null);
+  const ambientRef = useRef<THREE.AmbientLight>(null);
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    if (flicker.current && !reducedMotion) {
+      flicker.current.intensity = palette.hubI + Math.sin(t * 1.8) * 0.08;
+    }
+    if (ambientRef.current) {
+      ambientRef.current.intensity =
+        palette.ambient + (reducedMotion ? 0 : Math.sin(t * 0.35) * 0.02);
+    }
+    if (keyRef.current) {
+      keyRef.current.intensity =
+        palette.keyI + (reducedMotion ? 0 : Math.sin(t * 0.25) * 0.03);
+    }
+  });
+
   return (
     <>
-      <ambientLight intensity={0.32} />
+      <ambientLight ref={ambientRef} intensity={palette.ambient} />
+      <hemisphereLight args={[palette.hemiSky, palette.hemiGround, palette.hemi]} />
       <directionalLight
-        castShadow={!reducedMotion}
-        position={[7, 12, 5]}
-        intensity={1.05}
-        color="#fff4e6"
-        shadow-mapSize={[1024, 1024]}
+        ref={keyRef}
+        castShadow={!reducedMotion && !narrow}
+        position={[5, 14, 8]}
+        intensity={palette.keyI}
+        color={palette.key}
+        shadow-mapSize={narrow ? [512, 512] : [1024, 1024]}
+        shadow-bias={-0.0002}
       />
-      <pointLight position={[0, 5, 0]} intensity={0.55} color="#E8A838" distance={18} />
-      <pointLight position={[-6, 3.5, -3]} intensity={0.4} color="#4DA3FF" distance={14} />
-      <pointLight position={[6, 3.2, 3]} intensity={0.35} color="#FF6BCB" distance={14} />
-      <pointLight position={[0, 2.5, -7]} intensity={0.3} color="#5EEAD4" distance={12} />
+      <directionalLight position={[0, 6, -14]} intensity={palette.fillI} color={palette.fill} />
+      <directionalLight position={[-10, 8, 2]} intensity={palette.leftI} color={palette.left} />
+      <directionalLight position={[10, 8, 2]} intensity={palette.rightI} color={palette.right} />
+      <pointLight
+        ref={flicker}
+        position={[0, 5.5, 0]}
+        intensity={palette.hubI}
+        color={palette.hub}
+        distance={22}
+      />
+      <spotLight
+        position={[0, 10, 4]}
+        angle={0.7}
+        penumbra={0.55}
+        intensity={palette.spotI}
+        color={palette.spot}
+        castShadow={!narrow}
+      />
     </>
+  );
+}
+
+/** Night exterior beyond the glass — subtle city void, not a game void. */
+export function OfficeBackdrop({ lod = "full" }: { lod?: "full" | "simple" }) {
+  return (
+    <group>
+      <mesh position={[0, 2.5, 0]}>
+        <sphereGeometry args={[22, lod === "simple" ? 16 : 32, lod === "simple" ? 12 : 24]} />
+        <meshStandardMaterial
+          color="#060a12"
+          emissive="#0c1828"
+          emissiveIntensity={0.35}
+          side={THREE.BackSide}
+          roughness={1}
+          metalness={0}
+        />
+      </mesh>
+      <mesh position={[0, 0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[16, 21, lod === "simple" ? 24 : 48]} />
+        <meshStandardMaterial
+          color="#101828"
+          emissive="#1a3048"
+          emissiveIntensity={0.25}
+          side={THREE.DoubleSide}
+          transparent
+          opacity={0.7}
+        />
+      </mesh>
+    </group>
   );
 }

@@ -1,40 +1,55 @@
 "use client";
 
-import { ContactShadows, Environment, OrbitControls, Stars } from "@react-three/drei";
+import {
+  ContactShadows,
+  Environment,
+} from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useState } from "react";
+import { isPortraitView, presetForView, resolveViewMode, type ViewMode } from "@/lib/camera-framing";
 import { personas } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
+import { AmbientWalkers } from "./AmbientWalkers";
 import { DataOrbs } from "./DataOrbs";
 import { ProjectCluster } from "./DeskCluster";
-import { MandalaFloor, OfficeLighting } from "./OfficeEnvironment";
+import { FramingControls } from "./FramingControls";
+import { HexCollabOffice } from "./HexCollabOffice";
+import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
+import { SiruseriOffice } from "./SiruseriOffice";
 
 function SceneInner({
   reducedMotion,
   showLabels,
-  starCount,
   lod,
+  narrow,
+  viewMode,
 }: {
   reducedMotion: boolean;
   showLabels: boolean;
-  starCount: number;
   lod: "full" | "simple";
+  narrow: boolean;
+  viewMode: ViewMode;
 }) {
-  const orbitLocked = useVerseStore((s) => s.orbitLocked);
   const projects = useVerseStore((s) => s.projects);
+  const portrait = isPortraitView(viewMode);
 
   return (
     <>
-      <color attach="background" args={["#070B10"]} />
-      <fog attach="fog" args={["#070B10", 14, 36]} />
-      <OfficeLighting reducedMotion={reducedMotion} />
-      {!reducedMotion && starCount > 0 ? (
-        <Stars radius={70} depth={45} count={starCount} factor={3} fade speed={0.5} />
-      ) : null}
-      <Environment preset="night" />
-      <MandalaFloor />
-      <DataOrbs showLabels={showLabels} />
+      <color attach="background" args={["#0a1218"]} />
+      <fog
+        attach="fog"
+        args={portrait ? ["#0a1218", 16, 36] : ["#0a1218", 18, 40]}
+      />
+      <OfficeLighting reducedMotion={reducedMotion} narrow={narrow} />
+      <OfficeBackdrop lod={lod} />
+      <Environment preset="city" />
+      <SiruseriOffice lod={lod} reducedMotion={reducedMotion} />
+      <HexCollabOffice lod={lod} />
+      {/* Soft project orbs above collab */}
+      <group position={[0, 3.6, 0]}>
+        <DataOrbs showLabels={showLabels && viewMode !== "portrait-compact"} />
+      </group>
       {projects
         .filter((p) => p.id !== "hub")
         .map((p) => (
@@ -55,18 +70,17 @@ function SceneInner({
           lod={lod}
         />
       ))}
-      <ContactShadows opacity={0.4} scale={24} blur={2.6} far={10} />
-      <OrbitControls
-        enabled={!orbitLocked}
-        enablePan={false}
-        minPolarAngle={0.3}
-        maxPolarAngle={Math.PI / 2.2}
-        minDistance={5}
-        maxDistance={22}
-        enableDamping
-        dampingFactor={0.08}
-        makeDefault
+      {lod === "full" ? (
+        <AmbientWalkers lod={lod} reducedMotion={reducedMotion} />
+      ) : null}
+      <ContactShadows
+        opacity={0.5}
+        scale={26}
+        blur={2.4}
+        far={12}
+        color="#000000"
       />
+      <FramingControls viewMode={viewMode} />
     </>
   );
 }
@@ -74,6 +88,7 @@ function SceneInner({
 export function HubScene() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [narrow, setNarrow] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("portrait");
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -84,30 +99,54 @@ export function HubScene() {
   }, []);
 
   useEffect(() => {
-    const sync = () => setNarrow(window.innerWidth <= 360);
+    const sync = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      setNarrow(w <= 360 && h > w);
+      const mode = resolveViewMode(w, h);
+      setViewMode(mode);
+      document.body.dataset.avView = mode;
+      document.body.dataset.avLandscape = isPortraitView(mode) ? "0" : "1";
+    };
     sync();
     window.addEventListener("resize", sync);
-    return () => window.removeEventListener("resize", sync);
+    window.addEventListener("orientationchange", sync);
+    return () => {
+      window.removeEventListener("resize", sync);
+      window.removeEventListener("orientationchange", sync);
+    };
   }, []);
 
-  const dpr: [number, number] = narrow ? [1, 1] : [1, 1.75];
-  const starCount = narrow ? 280 : reducedMotion ? 0 : 900;
-  const lod: "full" | "simple" = narrow ? "simple" : "full";
+  const compact =
+    viewMode === "portrait-compact" || viewMode === "landscape-compact";
+  const dpr: [number, number] = narrow || compact ? [1, 1] : [1, 1.75];
+  const lod: "full" | "simple" = narrow || compact ? "simple" : "full";
+  const cam = presetForView(viewMode);
 
   return (
     <div className="hub-canvas">
       <Canvas
-        shadows={!narrow}
+        shadows={!narrow && viewMode === "portrait"}
         dpr={dpr}
-        camera={{ position: [0, 5.2, 11], fov: 42, near: 0.1, far: 90 }}
-        gl={{ antialias: !narrow, powerPreference: "high-performance" }}
+        camera={{
+          position: cam.position,
+          fov: cam.fov,
+          near: 0.1,
+          far: 100,
+        }}
+        gl={{
+          antialias: !narrow && !compact,
+          powerPreference: "high-performance",
+          toneMappingExposure: 1.28,
+        }}
       >
         <Suspense fallback={null}>
           <SceneInner
             reducedMotion={reducedMotion}
-            showLabels={!narrow}
-            starCount={starCount}
+            showLabels
             lod={lod}
+            narrow={narrow}
+            viewMode={viewMode}
           />
         </Suspense>
       </Canvas>

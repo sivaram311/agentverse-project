@@ -5,8 +5,11 @@ import { useEffect } from "react";
 import { portalApi } from "@/lib/api";
 import { getAccessToken, getStoredUser, verifyPortalAuth } from "@/lib/auth";
 import { ChatPanel } from "@/components/hud/ChatPanel";
+import { CommandStrip } from "@/components/hud/CommandStrip";
 import { LoginOverlay } from "@/components/hud/LoginOverlay";
+import { OfficeSwitch } from "@/components/hud/OfficeSwitch";
 import { QuestPanel } from "@/components/hud/QuestPanel";
+import { TeamMemberBar } from "@/components/hud/TeamMemberBar";
 import { TopBar } from "@/components/hud/TopBar";
 import { useVerseStore } from "@/lib/store";
 
@@ -22,12 +25,18 @@ export function AgentVerseApp() {
   const subtitle = useVerseStore((s) => s.subtitle);
   const focusId = useVerseStore((s) => s.interaction.focusId);
   const interactionMode = useVerseStore((s) => s.interaction.mode);
+  const busy = useVerseStore((s) => s.busy);
+  const officeChromeOpen = useVerseStore((s) => s.officeChromeOpen);
+  const chatOpen = useVerseStore((s) => s.chatOpen);
 
   useEffect(() => {
     document.body.dataset.avFocus = focusId ?? "";
     document.body.dataset.avMode = interactionMode;
     document.body.dataset.avSubtitle = subtitle ? "1" : "0";
-  }, [focusId, interactionMode, subtitle]);
+    document.body.dataset.avBusy = busy ? "1" : "0";
+    document.body.dataset.avChrome = officeChromeOpen ? "1" : "0";
+    document.body.dataset.avChat = chatOpen ? "1" : "0";
+  }, [focusId, interactionMode, subtitle, busy, officeChromeOpen, chatOpen]);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -107,18 +116,38 @@ export function AgentVerseApp() {
   const showLogin = !!authConfig?.cssEnabled && !authenticated;
 
   return (
-    <div className="verse-shell">
-      <TopBar />
+    <div
+      className={`verse-shell${officeChromeOpen ? " chrome-open" : " chrome-closed"}${
+        chatOpen ? " chat-open" : " chat-closed"
+      }`}
+    >
+      <div className="chrome-rail">
+        <OfficeSwitch />
+        {officeChromeOpen ? <TopBar /> : null}
+      </div>
+      <TeamMemberBar />
       <main className="verse-main">
         <HubScene />
-        <div className="hud-layer">
-          <QuestPanel />
-          <ChatPanel />
-        </div>
-        <div className="hero-copy" aria-hidden={showLogin}>
-          <p className="brand-kicker">AgentVerse</p>
+        {showLogin ? null : (
+          <>
+            <div
+              className={`hud-layer${chatOpen ? "" : " dormant"}`}
+              aria-hidden={!chatOpen}
+            >
+              {chatOpen ? <QuestPanel /> : null}
+              <ChatPanel />
+            </div>
+            {!chatOpen ? (
+              <div className="command-layer">
+                <CommandStrip />
+              </div>
+            ) : null}
+          </>
+        )}
+        <div className="hero-copy" aria-hidden="true">
+          <p className="brand-kicker">Siruseri floor</p>
           <h1>Digital office</h1>
-          <p>Tap a desk · Rajesh routes the crew · Tamil by default.</p>
+          <p>Tap a seat to talk</p>
         </div>
         {subtitle && focusId ? (
           <div className="verse-subtitle persona-subtitle" role="status">

@@ -116,9 +116,20 @@ export function ChatPanel() {
 
   useEffect(() => {
     if (chatFocusNonce > 0) {
+      const draft = useVerseStore.getState().consumeComposeDraft();
+      if (draft) setText(draft);
       inputRef.current?.focus();
     }
   }, [chatFocusNonce]);
+
+  function initials(name: string): string {
+    return name
+      .split(/\s+/)
+      .map((p) => p[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  }
 
   useEffect(() => {
     if (!session || !getAccessToken()) return;
@@ -335,8 +346,8 @@ export function ChatPanel() {
 
   if (!authenticated && authConfig?.cssEnabled) {
     return (
-      <aside className="chat-panel">
-        <header>
+      <aside className="chat-panel glass-panel">
+        <header className="chat-head">
           <h2>Office chat</h2>
           <p className="muted">Sign in to talk with the crew.</p>
         </header>
@@ -345,46 +356,90 @@ export function ChatPanel() {
   }
 
   return (
-    <aside className="chat-panel">
-      <header>
-        <h2>Talk to {persona.name}</h2>
-        <p className="muted">
-          {persona.title} · {persona.role}
-        </p>
+    <aside className="chat-panel glass-panel">
+      <header className="chat-head">
+        <div className="chat-title-row">
+          <h2>
+            Talk to {persona.name}
+            <span className="chat-role">
+              {" "}
+              — {persona.title} · {persona.role}
+            </span>
+          </h2>
+          <div className="chat-head-actions">
+            <span className="demo-badge">demo</span>
+            <button
+              type="button"
+              className="chat-close"
+              aria-label="Close chat"
+              onClick={() => useVerseStore.getState().closeChat()}
+            >
+              ×
+            </button>
+          </div>
+        </div>
         <SessionTabs />
         <WorkspacePicker />
       </header>
       <div className="chat-log" role="log" aria-live="polite">
         {messages.length === 0 ? (
-          <p className="muted">
-            Tap an agent at their desk, or ask Rajesh to route a quest / deploy a
-            project.
-          </p>
+          <div className="chat-empty">
+            <p className="muted">
+              Tap a desk or crew card, then ask {persona.name} — or start a new
+              project with Rajesh.
+            </p>
+          </div>
         ) : (
           messages.map((m) => (
             <div key={m.id} className={`bubble ${m.role.toLowerCase()}`}>
-              <span className="role">{m.role}</span>
-              <p>{m.content}</p>
+              {m.role === "SYSTEM" ? (
+                <p className="system-line">{m.content}</p>
+              ) : (
+                <>
+                  <span className="role">{m.role === "USER" ? "You" : persona.name}</span>
+                  <p>{m.content}</p>
+                </>
+              )}
             </div>
           ))
         )}
-        {streamingHint ? <p className="streaming">{streamingHint}</p> : null}
+        {streamingHint ? (
+          <p className="streaming thinking-line">
+            <span className="think-dots" aria-hidden>
+              <i />
+              <i />
+              <i />
+            </span>
+            {streamingHint}
+          </p>
+        ) : null}
         <div ref={endRef} />
       </div>
       <form onSubmit={onSubmit} className="chat-compose">
+        <span
+          className="compose-avatar"
+          style={{ background: persona.color }}
+          aria-hidden
+        >
+          {initials(persona.name)}
+        </span>
         <input
           ref={inputRef}
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={
             selectedPersona === orchestratorId
-              ? "Quest for Rajesh — or “new project: …”"
-              : `Message ${persona.name}…`
+              ? `Ask ${persona.name} or start a new project…`
+              : `Ask ${persona.name}…`
           }
           disabled={busy || !session}
           aria-label="Mission prompt"
         />
-        <button type="submit" disabled={busy || !session || !text.trim()}>
+        <button
+          type="submit"
+          className="send-btn"
+          disabled={busy || !session || !text.trim()}
+        >
           {busy ? "…" : "Send"}
         </button>
       </form>

@@ -17,15 +17,22 @@ description: >-
 
 ## Behavior contract
 
-1. Default pose: **sitting** + work-loop arm animation at desk.
-2. Click/tap → stand → walk to approach spot → greet (SpeechSynthesis) → focus chat → return → sit.
-3. Language: store `language` `ta` | `hi` | `en` → greetings + `ta-IN` / `hi-IN` / `en-IN`.
-4. Projects: Rajesh prompt matching `new project:` → `deployProject` + satellite desk cluster.
-5. Sessions: each workspace path maps to a portal session; switch via SessionTabs / WorkspacePicker.
+1. Default pose: **sitting** + work-loop (typing arms, head look, screen glow) via `HumanoidFigure`.
+2. Click/tap → stand → walk to approach spot → greet (SpeechSynthesis, gender-aware) → focus chat → return → sit.
+3. Language: store `language` `ta` | `hi` | `en`; voice: `voiceGender` `auto` | `male` | `female`.
+4. Projects: Rajesh `new project:` → `deployProject` + satellite desk cluster.
+5. Sessions: each workspace path maps to a portal session; SessionTabs / WorkspacePicker.
+
+## Visual stack
+
+- `OfficeEnvironment` — multi-ring mandala, pillars, warm lighting
+- `DeskCluster` — holo monitors, edge glow, lamps (LOD)
+- `HumanoidFigure` — stylized low-poly humans (skin/hair/gender from personas.json)
+- `DataOrbs` + Sparkles — directory / project crystals
 
 ## Performance
 
-- Narrow (≤360px): `lod=simple`, lower DPR/stars, fewer Html labels.
+- Narrow (≤360px): `lod=simple`, lower DPR/stars, fewer Html labels / pillars / lamps.
 - Prefer Suspense around Canvas; avoid rebuilding `.next` while DEV is running.
 
 ## Crew roles

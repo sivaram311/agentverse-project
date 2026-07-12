@@ -1,14 +1,27 @@
 import personasDoc from "@/prompts/personas.json";
 import type { PersonaId, Quest, UiLanguage } from "./types";
+import { hexSeatPosition } from "./hex-office";
 
 export type PersonaDef = (typeof personasDoc.personas)[number] & {
   id: PersonaId;
   deskIndex?: number;
+  gender?: "male" | "female";
+  skin?: string;
+  hair?: string;
   greetings?: Partial<Record<UiLanguage, string>>;
   greeting?: string;
+  position: [number, number, number];
 };
 
-export const personas = personasDoc.personas as PersonaDef[];
+/** Live hex seats from deskIndex so radius tweaks stay in sync. */
+export const personas = (personasDoc.personas as PersonaDef[]).map((p) => {
+  const deskIndex = p.deskIndex ?? 0;
+  return {
+    ...p,
+    deskIndex,
+    position: hexSeatPosition(deskIndex),
+  };
+});
 export const orchestratorId = personasDoc.orchestratorId as PersonaId;
 
 export function getPersona(id: PersonaId): PersonaDef {

@@ -1,0 +1,63 @@
+"use client";
+
+import { personas } from "@/lib/orchestrator";
+import { useVerseStore } from "@/lib/store";
+import type { PersonaId } from "@/lib/types";
+
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
+/** Thin crew radar — avatar pills; desks remain the primary picker. */
+export function TeamMemberBar() {
+  const selected = useVerseStore((s) => s.selectedPersona);
+  const focusId = useVerseStore((s) => s.interaction.focusId);
+  const busy = useVerseStore((s) => s.busy);
+  const agentStates = useVerseStore((s) => s.agentStates);
+  const selectPersona = useVerseStore((s) => s.selectPersona);
+  const summonPersona = useVerseStore((s) => s.summonPersona);
+
+  return (
+    <nav className="team-bar radar" aria-label="Office crew">
+      <div className="team-bar-track">
+        {personas.map((p) => {
+          const id = p.id as PersonaId;
+          const on = selected === id || focusId === id;
+          const working = agentStates[id]?.working;
+          const thinking = busy && selected === id;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              className={`team-card${on ? " on" : ""}${thinking ? " thinking" : ""}`}
+              style={{ ["--p" as string]: p.color }}
+              title={`${p.name} · ${p.role}`}
+              aria-label={`${p.name}, ${p.role}`}
+              onClick={() => {
+                selectPersona(id);
+                summonPersona(id);
+              }}
+            >
+              <span className="team-avatar" aria-hidden>
+                {initials(p.name)}
+              </span>
+              <span className="team-meta">
+                <strong>{p.name}</strong>
+                <small>{p.role}</small>
+              </span>
+              <span
+                className={`team-dot${working || thinking ? " live" : " idle"}`}
+                title={thinking ? "Thinking" : working ? "Working" : "At desk"}
+              />
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}

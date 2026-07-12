@@ -19,6 +19,7 @@ import type {
   SessionTab,
   UiLanguage,
 } from "./types";
+import type { VoiceGenderPref } from "./speech";
 
 export type InteractionMode =
   | "idle"
@@ -31,6 +32,11 @@ export type InteractionState = {
   mode: InteractionMode;
   focusId: PersonaId | null;
 };
+
+/** Cooler morning → neutral day → warmer evening LEDs */
+export type OfficeMood = "morning" | "day" | "evening";
+
+const OFFICE_MOODS: OfficeMood[] = ["morning", "day", "evening"];
 
 const DEFAULT_WORKSPACE =
   (typeof process !== "undefined" && process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE) ||
@@ -86,6 +92,7 @@ type VerseState = {
   accessToken: string | null;
   apiOnline: boolean;
   language: UiLanguage;
+  voiceGender: VoiceGenderPref;
   selectedPersona: PersonaId;
   session: Session | null;
   persistedSessionId: string | null;
@@ -108,11 +115,19 @@ type VerseState = {
   subtitle: string | null;
   orbitLocked: boolean;
   chatFocusNonce: number;
+  composeDraft: string;
+  /** Full top chrome (lang, API, share, projects) — off by default for immersion */
+  officeChromeOpen: boolean;
+  /** Talk-to panel — opens on persona/desk tap or comms dock */
+  chatOpen: boolean;
+  /** Tunable office lighting mood */
+  officeMood: OfficeMood;
   setAuthConfig: (c: AuthConfig | null) => void;
   setAuthenticated: (v: boolean, username?: string | null) => void;
   setAccessToken: (token: string | null) => void;
   setApiOnline: (v: boolean) => void;
   setLanguage: (lang: UiLanguage) => void;
+  setVoiceGender: (g: VoiceGenderPref) => void;
   selectPersona: (id: PersonaId) => void;
   summonPersona: (id: PersonaId) => void;
   setSession: (s: Session | null) => void;
@@ -137,6 +152,15 @@ type VerseState = {
   setSubtitle: (text: string | null) => void;
   setOrbitLocked: (v: boolean) => void;
   bumpChatFocus: () => void;
+  setComposeDraft: (text: string) => void;
+  consumeComposeDraft: () => string;
+  setOfficeChromeOpen: (v: boolean) => void;
+  toggleOfficeChrome: () => void;
+  setChatOpen: (v: boolean) => void;
+  openChat: () => void;
+  closeChat: () => void;
+  setOfficeMood: (m: OfficeMood) => void;
+  cycleOfficeMood: () => void;
 };
 
 export const useVerseStore = create<VerseState>()(
@@ -148,6 +172,7 @@ export const useVerseStore = create<VerseState>()(
       accessToken: null,
       apiOnline: false,
       language: "ta",
+      voiceGender: "auto",
       selectedPersona: orchestratorId,
       session: null,
       persistedSessionId: null,
@@ -169,15 +194,21 @@ export const useVerseStore = create<VerseState>()(
       subtitle: null,
       orbitLocked: false,
       chatFocusNonce: 0,
+      composeDraft: "",
+      officeChromeOpen: false,
+      chatOpen: false,
+      officeMood: "day",
       setAuthConfig: (c) => set({ authConfig: c }),
       setAuthenticated: (v, username = null) => set({ authenticated: v, username }),
       setAccessToken: (accessToken) => set({ accessToken }),
       setApiOnline: (v) => set({ apiOnline: v }),
       setLanguage: (language) => set({ language }),
-      selectPersona: (id) => set({ selectedPersona: id }),
+      setVoiceGender: (voiceGender) => set({ voiceGender }),
+      selectPersona: (id) => set({ selectedPersona: id, chatOpen: true }),
       summonPersona: (id) => {
         set({
           selectedPersona: id,
+          chatOpen: true,
           interaction: { mode: "approaching", focusId: id },
           orbitLocked: true,
           subtitle: null,
@@ -344,12 +375,32 @@ export const useVerseStore = create<VerseState>()(
         set((s) => ({ greetOnce: { ...s.greetOnce, [id]: true } })),
       setSubtitle: (text) => set({ subtitle: text }),
       setOrbitLocked: (v) => set({ orbitLocked: v }),
-      bumpChatFocus: () => set((s) => ({ chatFocusNonce: s.chatFocusNonce + 1 })),
+      bumpChatFocus: () =>
+        set((s) => ({ chatFocusNonce: s.chatFocusNonce + 1, chatOpen: true })),
+      setComposeDraft: (composeDraft) => set({ composeDraft }),
+      consumeComposeDraft: () => {
+        const text = get().composeDraft;
+        set({ composeDraft: "" });
+        return text;
+      },
+      setOfficeChromeOpen: (officeChromeOpen) => set({ officeChromeOpen }),
+      toggleOfficeChrome: () =>
+        set((s) => ({ officeChromeOpen: !s.officeChromeOpen })),
+      setChatOpen: (chatOpen) => set({ chatOpen }),
+      openChat: () => set({ chatOpen: true }),
+      closeChat: () => set({ chatOpen: false }),
+      setOfficeMood: (officeMood) => set({ officeMood }),
+      cycleOfficeMood: () =>
+        set((s) => {
+          const i = OFFICE_MOODS.indexOf(s.officeMood);
+          return { officeMood: OFFICE_MOODS[(i + 1) % OFFICE_MOODS.length] };
+        }),
     }),
     {
       name: "agentverse-office-v2",
       partialize: (s) => ({
         language: s.language,
+        voiceGender: s.voiceGender,
         selectedPersona: s.selectedPersona,
         persistedSessionId: s.persistedSessionId ?? s.session?.id ?? null,
         workspacePath: s.workspacePath,
@@ -361,6 +412,7 @@ export const useVerseStore = create<VerseState>()(
         activeProjectId: s.activeProjectId,
         quests: s.quests,
         greetOnce: s.greetOnce,
+        officeMood: s.officeMood,
       }),
     },
   ),

@@ -24,3 +24,4 @@
 | 2026-07-12 19:40 | Crew Lead + Aravind | TN digital office: mandala floor, desks, sit/work→approach FSM, ta/hi/en greetings, projects+session tabs; crew renamed (Rajesh…Kabilan) | ok |
 | 2026-07-12 20:10 | Promote-EM + Ops/QA | Q1+Q2 GO agentverse **0.2.0** → PREPROD `:4310` + PROD `:5310`; staging+prod delena.buzz live | ok |
 | 2026-07-12 20:15 | Docs-Keeper | Docs + hired `agentverse-office` / `agentverse-promote` skills + Rajesh/Muthu role docs | ok |
+| 2026-07-12 20:25 | Aravind + Lavanya | Visual upgrade: humanoid figures, mandala platform, glowing desks, Sparkles, male/female voice picker | ok |

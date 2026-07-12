@@ -1,14 +1,18 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
+import { Billboard, Html } from "@react-three/drei";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { Group, Mesh } from "three";
+import * as THREE from "three";
 import { greetingFor, type PersonaDef } from "@/lib/orchestrator";
 import { speakPersona, stopSpeaking, type VoicePrefs } from "@/lib/speech";
 import { useVerseStore } from "@/lib/store";
 import type { AgentPose, PersonaId } from "@/lib/types";
-import { AgentDesk } from "./DeskCluster";
+import { isHubSeat } from "@/lib/hex-office";
+import { AgentDesk, MINI_FURNITURE } from "./DeskCluster";
+import { HubChair } from "./HexCollabOffice";
+import { HumanoidFigure } from "./HumanoidFigure";
 import { useApproachBehavior } from "./useApproachBehavior";
 
 type Props = {
@@ -16,22 +20,82 @@ type Props = {
     greetings?: Partial<Record<"ta" | "hi" | "en", string>>;
     greeting?: string;
     voice?: VoicePrefs;
+    gender?: "male" | "female";
+    skin?: string;
+    hair?: string;
   };
   reducedMotion: boolean;
   showLabels: boolean;
   lod: "full" | "simple";
 };
 
+/** Seat on the outside of the hex desk — matches AgentDesk chair at local −Z. */
+function chairHome(desk: [number, number, number]): [number, number, number] {
+  const len = Math.hypot(desk[0], desk[2]);
+  if (len < 0.35) {
+    // Hub: sit just south of the well, facing the collab orb
+    return [0, 0, 0.42];
+  }
+  const ox = desk[0] / len;
+  const oz = desk[2] / len;
+  const seatDist = 0.48 * MINI_FURNITURE + 0.28;
+  return [desk[0] + ox * seatDist, 0, desk[2] + oz * seatDist];
+}
+
+/** Yaw-only so characters never pitch into the floor. */
+function setYawToward(
+  g: Group,
+  from: THREE.Vector3,
+  toX: number,
+  toZ: number,
+  blend = 1,
+) {
+  const dx = toX - from.x;
+  const dz = toZ - from.z;
+  if (dx * dx + dz * dz < 1e-8) return;
+  const target = Math.atan2(dx, dz);
+  if (blend >= 1) {
+    g.rotation.set(0, target, 0);
+    return;
+  }
+  let diff = target - g.rotation.y;
+  while (diff > Math.PI) diff -= Math.PI * 2;
+  while (diff < -Math.PI) diff += Math.PI * 2;
+  g.rotation.y += diff * blend;
+  g.rotation.x = 0;
+  g.rotation.z = 0;
+}
+
+function DeskOrb({ color, y = 1.45 }: { color: string; y?: number }) {
+  const ref = useRef<Mesh>(null);
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    ref.current.position.y = y + Math.sin(t * 1.6 + y) * 0.06;
+    ref.current.rotation.y = t * 0.8;
+  });
+  return (
+    <mesh ref={ref} position={[0, y, 0]} castShadow>
+      <octahedronGeometry args={[0.09, 0]} />
+      <meshStandardMaterial
+        color={color}
+        emissive={color}
+        emissiveIntensity={0.45}
+        metalness={0.55}
+        roughness={0.25}
+      />
+    </mesh>
+  );
+}
+
 export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props) {
   const group = useRef<Group>(null);
-  const body = useRef<Mesh>(null);
-  const armL = useRef<Mesh>(null);
-  const armR = useRef<Mesh>(null);
   const [wavePhase, setWavePhase] = useState(0);
   const [localPose, setLocalPose] = useState<AgentPose>("sitting");
 
   const selected = useVerseStore((s) => s.selectedPersona);
   const focusId = useVerseStore((s) => s.interaction.focusId);
+  const interactionMode = useVerseStore((s) => s.interaction.mode);
   const subtitle = useVerseStore((s) => s.subtitle);
   const agentState = useVerseStore((s) => s.agentStates[persona.id as PersonaId]);
   const activeQuest = useVerseStore((s) =>
@@ -41,18 +105,35 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
   const isSelected = selected === persona.id;
   const isFocus = focusId === persona.id;
   const pose = isFocus ? localPose : agentState?.pose ?? "sitting";
-  const sitting = pose === "sitting" && !isFocus;
+  const walking = pose === "walking";
+  const sitting = pose === "sitting";
 
-  const pos = useMemo(
+  const deskPos = useMemo(
     () => persona.position as [number, number, number],
     [persona.position],
   );
+  const home = useMemo(() => chairHome(deskPos), [deskPos]);
+  const hub = isHubSeat(deskPos);
+
+  const look = useMemo(
+    () => ({
+      accent: persona.color,
+      skin: persona.skin ?? "#E8C4A8",
+      hair: persona.hair ?? "#2A1F14",
+      gender: (persona.gender ?? "male") as "male" | "female",
+      lod,
+    }),
+    [persona, lod],
+  );
 
   useLayoutEffect(() => {
-    if (group.current) {
-      group.current.position.set(...pos);
-    }
-  }, [pos]);
+    if (!group.current) return;
+    group.current.position.set(home[0], 0, home[2]);
+    // Face the desk / hub (toward center for ring seats)
+    const faceX = hub ? 0 : deskPos[0] * 0.35;
+    const faceZ = hub ? -0.15 : deskPos[2] * 0.35;
+    setYawToward(group.current, group.current.position, faceX, faceZ, 1);
+  }, [home, deskPos, hub]);
 
   const onPoseChange = useCallback((p: AgentPose) => {
     setLocalPose(p);
@@ -73,7 +154,14 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
     });
     setLocalPose("standing");
     if (!reducedMotion) {
-      speakPersona(persona.id as PersonaId, line, persona.voice, lang);
+      speakPersona(
+        persona.id as PersonaId,
+        line,
+        persona.voice,
+        lang,
+        store.voiceGender,
+        persona.gender ?? "male",
+      );
     }
     setWavePhase(1);
     window.setTimeout(() => {
@@ -83,12 +171,12 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
         s.setAgentState(persona.id as PersonaId, { status: "In conversation" });
       }
       setWavePhase(0);
-    }, 2200);
+    }, 2400);
   }, [persona, reducedMotion]);
 
   useApproachBehavior({
     personaId: persona.id as PersonaId,
-    home: pos,
+    home,
     groupRef: group,
     reducedMotion,
     onArrivedGreet,
@@ -97,61 +185,59 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
 
   useLayoutEffect(() => {
     if (!isFocus) return;
-    const mode = useVerseStore.getState().interaction.mode;
-    if (mode !== "approaching") return;
+    if (interactionMode !== "approaching") return;
     const t = window.setTimeout(() => {
       const s = useVerseStore.getState();
       if (s.interaction.focusId === persona.id && s.interaction.mode === "approaching") {
         onArrivedGreet();
       }
-    }, 3200);
+    }, 3400);
     return () => window.clearTimeout(t);
-  }, [isFocus, persona.id, onArrivedGreet]);
+  }, [isFocus, interactionMode, persona.id, onArrivedGreet]);
 
-  useFrame((state) => {
-    const t = state.clock.elapsedTime;
-    if (body.current && isSelected && !isFocus) {
-      const s = 1 + Math.sin(t * 3) * 0.03;
-      body.current.scale.setScalar(s);
-    }
-    // Typing / work loop while seated
-    if (sitting && armR.current) {
-      armR.current.rotation.x =
-        Math.sin(t * 6 + (persona.deskIndex ?? 0)) * 0.35 - 0.55;
-      armR.current.rotation.z = 0.15;
-    } else if (armR.current && wavePhase > 0) {
-      armR.current.rotation.z = Math.sin(t * 10) * 0.7 - 0.4;
-      armR.current.rotation.x = 0;
-    } else if (armR.current) {
-      armR.current.rotation.z = 0;
-      armR.current.rotation.x = 0;
-    }
-    if (sitting && armL.current) {
-      armL.current.rotation.x = Math.sin(t * 5.5 + 1) * 0.25 - 0.45;
-    } else if (armL.current) {
-      armL.current.rotation.x = 0;
-    }
+  useFrame((_, dt) => {
+    if (!group.current || isFocus) return;
+    if (!sitting) return;
+    group.current.position.y = 0;
+    const faceX = hub ? 0 : deskPos[0] * 0.35;
+    const faceZ = hub ? -0.15 : deskPos[2] * 0.35;
+    setYawToward(group.current, group.current.position, faceX, faceZ, Math.min(1, dt * 4));
   });
 
-  const bodyY = sitting ? 0.78 : 1.1;
-  const headY = sitting ? 1.55 : 2.05;
   const progress = agentState?.progress ?? (activeQuest ? 40 : 0);
+  const labelY = sitting ? 1.35 : 1.75;
+  const prominent = isSelected || isFocus;
+  const showAgentLabel = showLabels || prominent;
+  const figureScale = 0.85;
+
+  function summon(e: { stopPropagation: () => void }) {
+    e.stopPropagation();
+    stopSpeaking();
+    useVerseStore.getState().summonPersona(persona.id as PersonaId);
+  }
 
   return (
     <group>
-      <AgentDesk
-        position={[pos[0], 0, pos[2]]}
-        color={persona.color}
-        progress={sitting ? progress : 0}
-        lod={lod}
-      />
-      <group
-        ref={group}
-        onClick={(e) => {
-          e.stopPropagation();
-          stopSpeaking();
-          useVerseStore.getState().summonPersona(persona.id as PersonaId);
-        }}
+      {hub ? (
+        <HubChair color={persona.color} />
+      ) : (
+        <>
+          <AgentDesk
+            position={deskPos}
+            color={persona.color}
+            progress={sitting ? progress : 0}
+            lod={lod}
+            faceCenter
+          />
+          <group position={deskPos}>
+            <DeskOrb color={persona.color} />
+          </group>
+        </>
+      )}
+
+      <mesh
+        position={[home[0], 0.75, home[2]]}
+        onClick={summon}
         onPointerOver={() => {
           document.body.style.cursor = "pointer";
         }}
@@ -159,97 +245,84 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
           document.body.style.cursor = "auto";
         }}
       >
-        {/* Torso */}
-        <mesh ref={body} position={[0, bodyY, sitting ? -0.08 : 0]} castShadow>
-          <capsuleGeometry args={[0.32, sitting ? 0.45 : 0.7, 4, 8]} />
+        <sphereGeometry args={[0.9, 8, 8]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+
+      <group
+        ref={group}
+        onClick={summon}
+        onPointerOver={() => {
+          document.body.style.cursor = "pointer";
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = "auto";
+        }}
+      >
+        <HumanoidFigure
+          look={look}
+          sitting={sitting}
+          active={prominent}
+          wavePhase={wavePhase}
+          phase={(persona.deskIndex ?? 0) * 1.7}
+          working={agentState?.working ?? true}
+          walking={walking}
+          scale={figureScale}
+        />
+
+        <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.26, 0.36, 24]} />
           <meshStandardMaterial
             color={persona.color}
             emissive={persona.color}
-            emissiveIntensity={isSelected || isFocus ? 0.35 : 0.12}
-            roughness={0.45}
-            metalness={0.2}
-          />
-        </mesh>
-        {/* Head */}
-        <mesh position={[0, headY, sitting ? -0.05 : 0]} castShadow>
-          <sphereGeometry args={[0.28, lod === "simple" ? 8 : 12, lod === "simple" ? 8 : 12]} />
-          <meshStandardMaterial color="#F5E6D3" roughness={0.55} />
-        </mesh>
-        {/* Arms */}
-        <mesh ref={armL} position={[-0.42, sitting ? 0.95 : 1.35, sitting ? 0.15 : 0]} castShadow>
-          <capsuleGeometry args={[0.07, 0.32, 3, 6]} />
-          <meshStandardMaterial color={persona.color} roughness={0.5} />
-        </mesh>
-        <mesh ref={armR} position={[0.42, sitting ? 0.95 : 1.35, sitting ? 0.15 : 0]} castShadow>
-          <capsuleGeometry args={[0.07, 0.32, 3, 6]} />
-          <meshStandardMaterial color={persona.color} roughness={0.5} />
-        </mesh>
-        {/* Legs / seated thighs */}
-        {sitting ? (
-          <>
-            <mesh position={[-0.14, 0.48, 0.18]} rotation={[1.1, 0, 0]} castShadow>
-              <capsuleGeometry args={[0.09, 0.28, 3, 6]} />
-              <meshStandardMaterial color="#1a2433" roughness={0.6} />
-            </mesh>
-            <mesh position={[0.14, 0.48, 0.18]} rotation={[1.1, 0, 0]} castShadow>
-              <capsuleGeometry args={[0.09, 0.28, 3, 6]} />
-              <meshStandardMaterial color="#1a2433" roughness={0.6} />
-            </mesh>
-          </>
-        ) : (
-          <>
-            <mesh position={[-0.14, 0.4, 0]} castShadow>
-              <capsuleGeometry args={[0.09, 0.4, 3, 6]} />
-              <meshStandardMaterial color="#1a2433" roughness={0.6} />
-            </mesh>
-            <mesh position={[0.14, 0.4, 0]} castShadow>
-              <capsuleGeometry args={[0.09, 0.4, 3, 6]} />
-              <meshStandardMaterial color="#1a2433" roughness={0.6} />
-            </mesh>
-          </>
-        )}
-        <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.5, 16]} />
-          <meshStandardMaterial
-            color={persona.color}
+            emissiveIntensity={prominent ? 0.55 : 0.22}
             transparent
-            opacity={isSelected || isFocus ? 0.55 : 0.2}
+            opacity={prominent ? 0.55 : 0.28}
           />
         </mesh>
-        {showLabels || isFocus ? (
-          <Html
-            position={[0, sitting ? 2.15 : 2.7, 0]}
-            center
-            distanceFactor={8}
-            style={{ pointerEvents: "none", userSelect: "none" }}
-            zIndexRange={[10, 0]}
-          >
-            <div className={`persona-tag${isSelected || isFocus ? " active" : ""}`}>
-              <strong>{persona.name}</strong>
-              <span>{persona.role}</span>
-              {agentState?.working || activeQuest ? (
-                <em>{agentState?.status || "On mission"}</em>
-              ) : null}
-              {progress > 0 && sitting ? (
-                <div className="persona-progress" aria-hidden>
-                  <i style={{ width: `${Math.min(100, progress)}%`, background: persona.color }} />
-                </div>
-              ) : null}
-            </div>
-          </Html>
+
+        {showAgentLabel ? (
+          <Billboard position={[0, labelY, 0]} follow lockX={false} lockZ={false}>
+            <Html
+              center
+              distanceFactor={10}
+              style={{ pointerEvents: "none", userSelect: "none" }}
+              zIndexRange={[12, 0]}
+            >
+              <div className={`persona-tag${prominent ? " active" : ""}`}>
+                <strong>{persona.name}</strong>
+                <span>{persona.role}</span>
+                {agentState?.working || activeQuest ? (
+                  <em>{agentState?.status || "Working"}</em>
+                ) : null}
+                {progress > 0 && sitting ? (
+                  <div className="persona-progress" aria-hidden>
+                    <i
+                      style={{
+                        width: `${Math.min(100, progress)}%`,
+                        background: persona.color,
+                      }}
+                    />
+                  </div>
+                ) : null}
+              </div>
+            </Html>
+          </Billboard>
         ) : null}
+
         {isFocus && subtitle ? (
-          <Html
-            position={[0, 3.35, 0]}
-            center
-            distanceFactor={10}
-            style={{ pointerEvents: "none", userSelect: "none" }}
-            zIndexRange={[20, 0]}
-          >
-            <div className="persona-subtitle" role="status">
-              {subtitle}
-            </div>
-          </Html>
+          <Billboard position={[0, labelY + 0.35, 0]} follow>
+            <Html
+              center
+              distanceFactor={11}
+              style={{ pointerEvents: "none", userSelect: "none" }}
+              zIndexRange={[22, 0]}
+            >
+              <div className="persona-subtitle" role="status">
+                {subtitle}
+              </div>
+            </Html>
+          </Billboard>
         ) : null}
       </group>
     </group>

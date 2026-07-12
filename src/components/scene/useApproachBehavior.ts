@@ -7,11 +7,11 @@ import * as THREE from "three";
 import type { PersonaId } from "@/lib/types";
 import { useVerseStore, type InteractionMode } from "@/lib/store";
 
-const APPROACH_SPOT = new THREE.Vector3(0, 0, 5.2);
+const APPROACH_SPOT = new THREE.Vector3(0, 0, 4.8);
 const ARRIVE_EPS = 0.12;
-const WALK_SPEED = 3.2;
-const RETURN_SPEED = 2.8;
-const HOME_AFTER_MS = 12000;
+const WALK_SPEED = 3.4;
+const RETURN_SPEED = 2.9;
+const HOME_AFTER_MS = 14000;
 
 type Args = {
   personaId: PersonaId;
@@ -19,7 +19,6 @@ type Args = {
   groupRef: RefObject<Group | null>;
   reducedMotion: boolean;
   onArrivedGreet: () => void;
-  /** Fired when avatar should leave the chair (stand) or sit again */
   onPoseChange?: (pose: "sitting" | "standing" | "walking") => void;
 };
 
@@ -29,13 +28,32 @@ function moveToward(
   step: number,
 ): THREE.Vector3 {
   const delta = target.clone().sub(current);
+  delta.y = 0;
   const dist = delta.length();
-  if (dist <= step || dist < 1e-4) return target.clone();
+  if (dist <= step || dist < 1e-4) {
+    return new THREE.Vector3(target.x, 0, target.z);
+  }
   return current.clone().add(delta.multiplyScalar(step / dist));
+}
+
+/** Yaw-only facing — never pitch the body into the floor. */
+function faceYaw(g: Group, lookX: number, lookZ: number, t: number) {
+  const dx = lookX - g.position.x;
+  const dz = lookZ - g.position.z;
+  if (dx * dx + dz * dz < 1e-6) return;
+  const targetYaw = Math.atan2(dx, dz);
+  const cur = g.rotation.y;
+  let diff = targetYaw - cur;
+  while (diff > Math.PI) diff -= Math.PI * 2;
+  while (diff < -Math.PI) diff += Math.PI * 2;
+  g.rotation.y = cur + diff * Math.min(1, t * 5);
+  g.rotation.x = 0;
+  g.rotation.z = THREE.MathUtils.lerp(g.rotation.z, 0, t * 6);
 }
 
 /**
  * Sit → stand → walk to user → greet/talk → return → sit at desk.
+ * Keeps Y locked to the floor (no swimming).
  */
 export function useApproachBehavior({
   personaId,
@@ -56,7 +74,7 @@ export function useApproachBehavior({
   const isFocus = focusId === personaId;
 
   useEffect(() => {
-    homeVec.current.set(...home);
+    homeVec.current.set(home[0], 0, home[2]);
   }, [home]);
 
   useEffect(() => {
@@ -101,7 +119,7 @@ export function useApproachBehavior({
     };
   }, [mode, personaId, onPoseChange]);
 
-  useFrame((state, dt) => {
+  useFrame((_, dt) => {
     const g = groupRef.current;
     if (!g) return;
     const clampedDt = Math.min(dt, 0.05);
@@ -110,11 +128,13 @@ export function useApproachBehavior({
     const active = store.interaction.focusId === personaId;
     const m = active ? store.interaction.mode : "idle";
 
-    // Brief stand-up delay before walking
-    if (m === "approaching" && standPhase.current < 0.35 && !reducedMotion) {
+    if (m === "approaching" && standPhase.current < 0.3 && !reducedMotion) {
       standPhase.current += clampedDt;
-      g.position.lerp(homeVec.current, clampedDt * 4);
-      g.position.y = home[1] + standPhase.current * 0.15;
+      g.position.x = THREE.MathUtils.lerp(g.position.x, homeVec.current.x, clampedDt * 4);
+      g.position.z = THREE.MathUtils.lerp(g.position.z, homeVec.current.z, clampedDt * 4);
+      g.position.y = 0;
+      g.rotation.x = 0;
+      g.rotation.z = 0;
       return;
     }
 
@@ -124,8 +144,8 @@ export function useApproachBehavior({
         : homeVec.current;
 
     if (reducedMotion && m === "approaching") {
-      g.position.copy(APPROACH_SPOT);
-      g.lookAt(0, 1.2, 9);
+      g.position.set(APPROACH_SPOT.x, 0, APPROACH_SPOT.z);
+      faceYaw(g, 0, 10, 10);
       if (!greetedRef.current) {
         greetedRef.current = true;
         onArrivedGreet();
@@ -134,8 +154,10 @@ export function useApproachBehavior({
     }
 
     if (m === "idle" && !active) {
-      g.position.lerp(homeVec.current, Math.min(1, clampedDt * 1.5));
-      g.position.y = home[1];
+      g.position.x = THREE.MathUtils.lerp(g.position.x, homeVec.current.x, Math.min(1, clampedDt * 1.5));
+      g.position.z = THREE.MathUtils.lerp(g.position.z, homeVec.current.z, Math.min(1, clampedDt * 1.5));
+      g.position.y = 0;
+      g.rotation.x = 0;
       g.rotation.z = THREE.MathUtils.lerp(g.rotation.z, 0, clampedDt * 6);
       return;
     }
@@ -146,27 +168,16 @@ export function useApproachBehavior({
 
     const speed = m === "returning" ? RETURN_SPEED : WALK_SPEED;
     const next = moveToward(g.position, target, speed * clampedDt);
-
-    if (m === "approaching" || m === "returning") {
-      const dist = g.position.distanceTo(target);
-      if (dist > ARRIVE_EPS) {
-        next.y = home[1] + Math.sin(state.clock.elapsedTime * 8) * 0.06;
-        g.rotation.z = Math.sin(state.clock.elapsedTime * 9) * 0.06;
-      }
-    } else {
-      next.y = home[1];
-      g.rotation.z = THREE.MathUtils.lerp(g.rotation.z, 0, clampedDt * 6);
-    }
-
+    next.y = 0;
     g.position.copy(next);
+    g.rotation.x = 0;
+    g.rotation.z = 0;
 
-    const look =
-      m === "approaching" || m === "greeting" || m === "talking"
-        ? new THREE.Vector3(0, 1.4, 10)
-        : homeVec.current.clone().add(new THREE.Vector3(0, 1.4, 0.8));
-    const mat = new THREE.Matrix4().lookAt(g.position, look, new THREE.Vector3(0, 1, 0));
-    const quat = new THREE.Quaternion().setFromRotationMatrix(mat);
-    g.quaternion.slerp(quat, Math.min(1, clampedDt * 5));
+    if (m === "approaching" || m === "greeting" || m === "talking") {
+      faceYaw(g, 0, 10, clampedDt);
+    } else if (m === "returning") {
+      faceYaw(g, homeVec.current.x, homeVec.current.z, clampedDt);
+    }
 
     if (m === "approaching" && g.position.distanceTo(APPROACH_SPOT) < ARRIVE_EPS) {
       if (!greetedRef.current) {
@@ -177,6 +188,7 @@ export function useApproachBehavior({
     }
 
     if (m === "returning" && g.position.distanceTo(homeVec.current) < ARRIVE_EPS) {
+      g.position.set(homeVec.current.x, 0, homeVec.current.z);
       store.setInteraction({ mode: "idle", focusId: null });
       store.setOrbitLocked(false);
       store.setSubtitle(null);
