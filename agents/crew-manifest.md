@@ -18,7 +18,7 @@
 | Database Architect | Pending | After architecture |
 | Design System Keeper | Pending | Gaming / 3D UI + mobile-first |
 | Validation Gatekeeper | Pending | Cross-review before coding |
-| QA-Tester | Standby | Activate post-approval |
+| QA-Tester (Kabir — Device Lab / Chrome DevTools) | Active | Realme P2 Pro 360×780 playbook; see `agents/roles/kabir-device-lab-qa.md` |
 | Security-Auditor | Standby | CSS auth mandatory |
 | Docs-Keeper | Active | README / IMPLEMENTATION-GUIDE sync |
 | Promote-EM / Promote-Ops | Standby | After DEV evidence |

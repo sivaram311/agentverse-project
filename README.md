@@ -11,6 +11,7 @@ Next.js + React Three Fiber hub that **migrates Agent Portal UX** onto a gamifie
 | Priya | Creative |
 | Arjun | Coder |
 | Meera | Companion |
+| Kabir | Device Lab QA (Chrome DevTools) |
 
 Prompts & routing: `src/prompts/personas.json`  
 Machine persona standards: `E:\machine-docs\personas`  
@@ -36,7 +37,11 @@ npm run dev
 
 Bundled backends (junctions): `services/agent-portal`, `services/centralized-security-system`.
 
-Open `http://127.0.0.1:3310` (phone/tablet on LAN: `http://<host>:3310`).
+Open `http://127.0.0.1:3310` (phone/tablet / public IP: `http://<host>:3310`).
+
+PREPROD: https://agentverse-staging.delena.buzz (`F:\apps\agentverse` :4310).
+
+CORS is open (`Access-Control-Allow-Origin: *`) on the UI and `/api/*` proxies for LAN/public-IP access. Portal/CSS use `APP_CORS_ORIGINS=*` / `CSS_CORS_ORIGINS=*`.
 
 Realtime uses same-origin message polling (no SockJS → no CORS / unload console noise).
 

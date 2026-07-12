@@ -49,6 +49,7 @@ if (-not $UiOnly) {
         Select-Object -First 1
     }
     if ($cssJar) {
+      $env:CSS_CORS_ORIGINS = "*"
       Start-JavaJar $cssJar.FullName @() (Join-Path $LogDir "css.log") "CSS :9000"
       Start-Sleep -Seconds 4
     } else {
@@ -74,8 +75,9 @@ if (-not $UiOnly) {
         Select-Object -First 1
     }
     if ($portalJar) {
-      # Ensure AgentVerse origin is accepted if any direct calls remain
-      $env:APP_CORS_ORIGINS = "http://127.0.0.1:3310,http://localhost:3310,*"
+      # CORS disabled (allow any origin) for public-IP / LAN access
+      $env:APP_CORS_ORIGINS = "*"
+      $env:CSS_CORS_ORIGINS = "*"
       Start-JavaJar $portalJar.FullName @() (Join-Path $LogDir "agent-portal.log") "agent-portal :8080"
       Start-Sleep -Seconds 6
     } else {
@@ -86,9 +88,26 @@ if (-not $UiOnly) {
   }
 }
 
+# Ensure CSS also allows any origin when we start it
+if (-not $UiOnly -and -not $SkipCss) {
+  $env:CSS_CORS_ORIGINS = "*"
+}
+
 Set-Location $Root
 if (-not (Test-Path (Join-Path $Root "node_modules"))) {
   npm install
 }
-Write-Host "Starting AgentVerse UI on :3310"
+
+$pub = $null
+try {
+  $pub = (Get-NetIPAddress -AddressFamily IPv4 |
+    Where-Object { $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '169.254.*' -and $_.InterfaceAlias -notmatch 'vEthernet|Loopback|WSL' } |
+    Select-Object -First 1 -ExpandProperty IPAddress)
+} catch { }
+
+Write-Host "Starting AgentVerse UI on 0.0.0.0:3310 (CORS open)"
+if ($pub) {
+  Write-Host "Public / LAN URL: http://${pub}:3310/"
+}
+Write-Host "Local URL:         http://127.0.0.1:3310/"
 npm run dev

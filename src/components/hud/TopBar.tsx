@@ -1,17 +1,23 @@
 "use client";
 
 import { clearTokens } from "@/lib/auth";
+import { copySessionShareUrl } from "@/lib/session-share";
 import { personas } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
+import type { PersonaId } from "@/lib/types";
+import { useState } from "react";
 
 export function TopBar() {
   const apiOnline = useVerseStore((s) => s.apiOnline);
   const authenticated = useVerseStore((s) => s.authenticated);
   const username = useVerseStore((s) => s.username);
   const selected = useVerseStore((s) => s.selectedPersona);
+  const summonPersona = useVerseStore((s) => s.summonPersona);
   const selectPersona = useVerseStore((s) => s.selectPersona);
   const authConfig = useVerseStore((s) => s.authConfig);
   const setAuthenticated = useVerseStore((s) => s.setAuthenticated);
+  const session = useVerseStore((s) => s.session);
+  const [copied, setCopied] = useState(false);
 
   return (
     <header className="topbar">
@@ -29,7 +35,10 @@ export function TopBar() {
             type="button"
             className={selected === p.id ? "on" : undefined}
             style={{ ["--p" as string]: p.color }}
-            onClick={() => selectPersona(p.id)}
+            onClick={() => {
+              selectPersona(p.id as PersonaId);
+              summonPersona(p.id as PersonaId);
+            }}
           >
             {p.name}
           </button>
@@ -46,6 +55,19 @@ export function TopBar() {
         ) : (
           <span className="pill ok">CSS off</span>
         )}
+        {authenticated && session ? (
+          <button
+            type="button"
+            className="ghost keep-mobile"
+            onClick={async () => {
+              const ok = await copySessionShareUrl(session.id);
+              setCopied(ok);
+              window.setTimeout(() => setCopied(false), 2000);
+            }}
+          >
+            {copied ? "Copied" : "Share"}
+          </button>
+        ) : null}
         {authenticated ? (
           <button
             type="button"
@@ -53,6 +75,8 @@ export function TopBar() {
             onClick={() => {
               clearTokens();
               setAuthenticated(false, null);
+              useVerseStore.getState().setSession(null);
+              useVerseStore.getState().setMessages([]);
             }}
           >
             Sign out

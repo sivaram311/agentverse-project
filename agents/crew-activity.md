@@ -13,3 +13,11 @@
 | 2026-07-12 17:35 | Aarav | Deep-dive: Spring 403=`Forbidden` when no/invalid Bearer; ownership is 404; dual-token poison | ok |
 | 2026-07-12 17:38 | Arjun | Verse-only tokens + JWT iss/aud gate; no portal fallback; auth-only sign-out; require Bearer on session APIs | ok |
 | 2026-07-12 17:40 | QA | Smoke: login→create→prompt→`CREW_FIX_VERIFY_OK`; noauth→403; tsc clean | PASS |
+| 2026-07-12 18:50 | EM + QA/Sec/Review/Ops | Q1 promote agentverse-0.1.0 → PREPROD `:4310` | GO + deployed |
+| 2026-07-12 17:54 | Crew Lead | Hired **Kabir** (Device Lab QA / Chrome DevTools Scout) into hub + routing | ok |
+| 2026-07-12 18:10 | Arjun + Kabir | Living hub: walk/greet FSM, SpeechSynthesis, session share, workspace orbs; Realme 360 smoke PASS | ok |
+| 2026-07-12 18:35 | Promote-EM | Q1 agentverse 0.1.0 → PREPROD stalled: QA FAIL (HTTP 500/429 under poll storm); security+review PASS; not deployed | blocked |
+| 2026-07-12 18:42 | Arjun | Realtime poll backoff on 429/5xx; re-smoke login+create+prompt 200 after cooldown | ok |
+| 2026-07-12 18:55 | Aarav + Security | Root-cause: Next `.next` chunk corruption → smoke 500s (not CSS CORS). CSS CORS+OPTIONS fixed; CSS :9000/:4900 restarted; UI smoke PASS | ok |
+| 2026-07-12 18:57 | Ops | Cloudflare DNS upsert `agentverse-staging.delena.buzz` blocked: API token Invalid (code 1000); nginx Host ready; DNS still NXDOMAIN | blocked |
+| 2026-07-12 19:09 | Ops | Saved CF Account token MyProductionApps; created A agentverse-staging.delena.buzz → 103.118.183.185 proxied; public /health 200 | ok |

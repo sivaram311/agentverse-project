@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { corsPreflight, withOpenCors } from "@/lib/cors";
 
 const CSS = process.env.CSS_AUTH_URL || "http://127.0.0.1:9000";
 
@@ -31,13 +32,19 @@ async function proxy(req: NextRequest, pathParts: string[]) {
   const upstreamType = upstream.headers.get("content-type");
   if (upstreamType) outHeaders.set("content-type", upstreamType);
 
-  return new NextResponse(upstream.body, {
-    status: upstream.status,
-    headers: outHeaders,
-  });
+  return withOpenCors(
+    new NextResponse(upstream.body, {
+      status: upstream.status,
+      headers: outHeaders,
+    }),
+  );
 }
 
 type Ctx = { params: Promise<{ path: string[] }> };
+
+export async function OPTIONS(req: NextRequest) {
+  return corsPreflight(req);
+}
 
 export async function GET(req: NextRequest, ctx: Ctx) {
   const { path } = await ctx.params;

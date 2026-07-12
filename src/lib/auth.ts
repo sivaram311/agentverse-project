@@ -28,15 +28,20 @@ export function decodeJwtPayload(token: string): JwtClaims | null {
   }
 }
 
-/** Expected issuer for DEV portal = CSS authUrl without trailing slash. */
+/**
+ * Expected JWT issuer for local client-side gating.
+ * Prefer portal authUrl; else NEXT_PUBLIC_CSS_ISSUER (preprod/prod).
+ * Empty means "do not client-check iss" — portal JWKS still enforces.
+ */
 export function expectedIssuer(config: AuthConfig | null | undefined): string {
-  const raw = (config?.authUrl || "http://localhost:9000").trim().replace(/\/$/, "");
-  return raw;
+  const fromConfig = (config?.authUrl || "").trim().replace(/\/$/, "");
+  if (fromConfig) return fromConfig;
+  return (process.env.NEXT_PUBLIC_CSS_ISSUER || "").trim().replace(/\/$/, "");
 }
 
 /**
  * Portal CssJwtValidator requires matching issuer + audience/client_id.
- * Reject tokens from prod/preprod CSS that would yield anonymous→403.
+ * Reject tokens from foreign CSS that would yield anonymous→403.
  */
 export function isTokenAcceptableForPortal(
   token: string | null | undefined,
@@ -47,7 +52,7 @@ export function isTokenAcceptableForPortal(
   if (!claims) return false;
   if (claims.exp && Date.now() >= claims.exp * 1000) return false;
   const iss = expectedIssuer(config);
-  if (claims.iss && claims.iss.replace(/\/$/, "") !== iss) return false;
+  if (iss && claims.iss && claims.iss.replace(/\/$/, "") !== iss) return false;
   const clientId = config?.clientId || "agent-portal";
   const aud = claims.aud;
   const audOk = Array.isArray(aud)

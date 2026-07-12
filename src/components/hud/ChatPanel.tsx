@@ -5,11 +5,10 @@ import { ApiError, portalApi } from "@/lib/api";
 import { clearTokens, getAccessToken, getStoredUser } from "@/lib/auth";
 import { getPersona, makeQuest, routeQuest } from "@/lib/orchestrator";
 import { connectSessionEvents } from "@/lib/realtime";
+import { readSessionIdFromUrl } from "@/lib/session-share";
 import { useVerseStore } from "@/lib/store";
 import type { Session } from "@/lib/types";
-
-const DEFAULT_WORKSPACE =
-  process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE || "demo";
+import { WorkspacePicker } from "./WorkspacePicker";
 
 const BUSY_STATUSES = new Set([
   "STREAMING",
@@ -51,8 +50,8 @@ function isAuthRejection(error: unknown): error is ApiError {
 async function ensureIdleSession(
   session: Session,
   authConfig: Parameters<typeof portalApi.cancelRun>[1],
+  workspacePath: string,
 ): Promise<Session> {
-  // Always re-read server status — Zustand can be stale (e.g. STREAMING while UI says IDLE).
   let latest = session;
   try {
     latest = await portalApi.getSession(session.id, authConfig);
@@ -64,7 +63,7 @@ async function ensureIdleSession(
   if (BUSY_STATUSES.has(latest.status)) {
     return portalApi.createSession(
       {
-        workspacePath: DEFAULT_WORKSPACE,
+        workspacePath,
         title: "AgentVerse Hub",
         provider: "cursor",
       },
@@ -82,13 +81,22 @@ export function ChatPanel() {
   const messages = useVerseStore((s) => s.messages);
   const busy = useVerseStore((s) => s.busy);
   const streamingHint = useVerseStore((s) => s.streamingHint);
+  const workspacePath = useVerseStore((s) => s.workspacePath);
+  const chatFocusNonce = useVerseStore((s) => s.chatFocusNonce);
   const [text, setText] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const persona = useMemo(() => getPersona(selectedPersona), [selectedPersona]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingHint]);
+
+  useEffect(() => {
+    if (chatFocusNonce > 0) {
+      inputRef.current?.focus();
+    }
+  }, [chatFocusNonce]);
 
   useEffect(() => {
     if (!session || !getAccessToken()) return;
@@ -117,6 +125,25 @@ export function ChatPanel() {
       try {
         const store = useVerseStore.getState();
         if (store.session) return;
+
+        const urlSessionId = readSessionIdFromUrl();
+        const preferredId = urlSessionId || store.persistedSessionId;
+
+        if (preferredId) {
+          try {
+            const existing = await portalApi.getSession(preferredId, authConfig);
+            if (cancelled) return;
+            if (existing.status !== "ARCHIVED") {
+              store.setSession(existing);
+              const msgs = await portalApi.getMessages(existing.id, authConfig);
+              if (!cancelled) store.setMessages(msgs);
+              return;
+            }
+          } catch {
+            /* fall through to list / create */
+          }
+        }
+
         const sessions = await portalApi.listSessions(authConfig);
         if (cancelled) return;
         const existing = sessions.find(
@@ -125,11 +152,12 @@ export function ChatPanel() {
             s.status !== "ARCHIVED" &&
             !BUSY_STATUSES.has(s.status),
         );
+        const path = store.workspacePath;
         const next =
           existing ??
           (await portalApi.createSession(
             {
-              workspacePath: DEFAULT_WORKSPACE,
+              workspacePath: path,
               title: "AgentVerse Hub",
               provider: "cursor",
             },
@@ -190,19 +218,18 @@ export function ChatPanel() {
     store.setStreamingHint(`${getPersona(routed.assignee).name} is on it…`);
 
     try {
-      let active = await ensureIdleSession(session, authConfig);
+      let active = await ensureIdleSession(session, authConfig, store.workspacePath);
       store.setSession(active);
       try {
         await portalApi.sendPrompt(active.id, routed.composedPrompt, authConfig);
       } catch (err) {
-        // One retry: cancel stuck run / mint a fresh hub session.
         if (
           err instanceof ApiError &&
           (err.message.includes("active run") || err.status === 400)
         ) {
           active = await portalApi.createSession(
             {
-              workspacePath: DEFAULT_WORKSPACE,
+              workspacePath: store.workspacePath,
               title: "AgentVerse Hub",
               provider: "cursor",
             },
@@ -257,12 +284,15 @@ export function ChatPanel() {
     <aside className="chat-panel">
       <header>
         <h2>Talk to {persona.name}</h2>
-        <p className="muted">{persona.title} · {persona.role}</p>
+        <p className="muted">
+          {persona.title} · {persona.role}
+        </p>
+        <WorkspacePicker />
       </header>
       <div className="chat-log" role="log" aria-live="polite">
         {messages.length === 0 ? (
           <p className="muted">
-            Ask Rajveer to route a quest, or tap a persona and speak directly.
+            Tap a persona to summon them, or ask Rajveer to route a quest.
           </p>
         ) : (
           messages.map((m) => (
@@ -277,6 +307,7 @@ export function ChatPanel() {
       </div>
       <form onSubmit={onSubmit} className="chat-compose">
         <input
+          ref={inputRef}
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={
@@ -291,6 +322,11 @@ export function ChatPanel() {
           {busy ? "…" : "Send"}
         </button>
       </form>
+      {session ? (
+        <p className="session-meta muted">
+          Session {session.id.slice(0, 8)}… · {workspacePath}
+        </p>
+      ) : null}
     </aside>
   );
 }

@@ -378,6 +378,148 @@ body {
   font-style: normal;
 }
 
+.persona-subtitle {
+  max-width: min(70vw, 14rem);
+  padding: 0.4rem 0.55rem;
+  border-radius: 0.55rem;
+  background: rgba(7, 11, 16, 0.88);
+  border: 1px solid rgba(232, 168, 56, 0.45);
+  color: #f2f5f7;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+}
+
+.verse-subtitle {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%);
+  z-index: 4;
+  max-width: min(88vw, 20rem);
+  pointer-events: none;
+}
+
+.workspace-orb-label {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.45rem;
+  background: rgba(7, 11, 16, 0.82);
+  border: 1px solid var(--av-line);
+  text-align: center;
+  font-size: 0.65rem;
+  color: #fff;
+  max-width: 8rem;
+  pointer-events: none;
+}
+
+.workspace-orb-label span {
+  color: var(--av-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.55rem;
+}
+
+.workspace-picker {
+  position: relative;
+  margin-top: 0.45rem;
+}
+
+.workspace-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: 100%;
+  background: #0c1219;
+  border: 1px solid var(--av-line);
+  border-radius: 0.5rem;
+  color: inherit;
+  padding: 0.4rem 0.55rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-chip strong {
+  font-size: 0.78rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.workspace-pop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 8;
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.65rem;
+  background: var(--av-plate-2);
+  border: 1px solid var(--av-line);
+  border-radius: 0.65rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.workspace-pop label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--av-muted);
+}
+
+.workspace-pop input {
+  background: #0c1219;
+  border: 1px solid var(--av-line);
+  border-radius: 0.45rem;
+  color: var(--av-ink);
+  padding: 0.45rem 0.55rem;
+  font-size: 0.8rem;
+}
+
+.workspace-recent {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+  max-height: 6rem;
+  overflow: auto;
+}
+
+.workspace-recent button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: var(--av-muted);
+  font-size: 0.7rem;
+  padding: 0.25rem 0;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.session-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.65rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .login-overlay {
   position: fixed;
   inset: 0;
@@ -467,7 +609,7 @@ body {
     max-height: min(38dvh, 320px);
   }
 
-  .status-cluster .ghost {
+  .status-cluster .ghost:not(.keep-mobile) {
     display: none;
   }
 

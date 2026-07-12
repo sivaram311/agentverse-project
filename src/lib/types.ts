@@ -60,7 +60,13 @@ export type Health = {
   capabilities?: Record<string, boolean>;
 };
 
-export type PersonaId = "rajveer" | "aarav" | "priya" | "arjun" | "meera";
+export type PersonaId =
+  | "rajveer"
+  | "aarav"
+  | "priya"
+  | "arjun"
+  | "meera"
+  | "kabir";
 
 export type Quest = {
   id: string;

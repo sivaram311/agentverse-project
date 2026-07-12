@@ -1,18 +1,25 @@
 # AgentVerse — Implementation Guide
 
-**Status:** GO — implementing (2026-07-12)  
+**Status:** GO — implementing (2026-07-12); **Q1 PREPROD live** (`F:\apps\agentverse` :4310)  
 **Stack:** Next.js 15 + R3F / Three.js  
-**API:** Existing agent-portal `:8080`  
-**UI port:** 3310  
+**API:** agent-portal DEV `:8080` / PREPROD `:4080`  
+**UI ports:** DEV 3310 · PREPROD 4310  
 **Personas:** Rajveer, Aarav, Priya, Arjun, Meera (`src/prompts/personas.json`)
 
 ## Run
 
 ```powershell
+# DEV
 cd E:\MyWorkspace\agentverse-project
 npm install
 npm run dev
+
+# PREPROD
+cd F:\apps\agentverse
+.\start.ps1 -EnvName preprod
 ```
+
+See [OPS.md](./OPS.md) for env matrix and promote notes.
 
 ## Architecture
 

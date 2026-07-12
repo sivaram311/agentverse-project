@@ -1,0 +1,21 @@
+---
+description: Q1/Q2 promote must include Cloudflare DNS + nginx Host for delena.buzz
+alwaysApply: true
+---
+
+# Promote DNS (Cloudflare) — required
+
+When promoting AgentVerse (or any app) DEV → PREPROD / PROD:
+
+1. **Reserve port** in `E:\MyAgent\workflow\ports` (PREPROD 4xxx, PROD 5xxx).
+2. **Deploy bits** to `F:\apps\<app>` or `G:\apps\<app>`.
+3. **Nginx** Host block for `<app>-staging.delena.buzz` / `<app>.delena.buzz`.
+4. **Cloudflare DNS is mandatory** — do not leave "DNS pending":
+   - Helper: `E:\MyWorkspace\agent-portal\scripts\cloudflare-dns.ps1`
+   - Creds: `E:\MyWorkspace\agent-portal\.env` + `E:\MyAgent\workflow\secrets\cloudflare.token` (never commit)
+   - PREPROD example: `-Upsert -Name agentverse-staging -Type A -Content 103.118.183.185 -Proxied`
+   - Prefer subdomain URLs over public IP in docs and evidence.
+5. Verify `https://<host>/health` publicly after upsert.
+6. Log ops row in `agents/crew-activity.md` and `E:\MyAgent\workflow\activity\ACTIVITY-LOG.md`.
+
+If Cloudflare returns **Invalid API Token**, stop and refresh the Account API token before closing Q1/Q2.

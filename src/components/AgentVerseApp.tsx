@@ -19,6 +19,15 @@ export function AgentVerseApp() {
   const authConfig = useVerseStore((s) => s.authConfig);
   const authenticated = useVerseStore((s) => s.authenticated);
   const error = useVerseStore((s) => s.error);
+  const subtitle = useVerseStore((s) => s.subtitle);
+  const focusId = useVerseStore((s) => s.interaction.focusId);
+  const interactionMode = useVerseStore((s) => s.interaction.mode);
+
+  useEffect(() => {
+    document.body.dataset.avFocus = focusId ?? "";
+    document.body.dataset.avMode = interactionMode;
+    document.body.dataset.avSubtitle = subtitle ? "1" : "0";
+  }, [focusId, interactionMode, subtitle]);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -68,6 +77,33 @@ export function AgentVerseApp() {
     };
   }, []);
 
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== "agentverse-verse" || !e.newValue) return;
+      try {
+        const parsed = JSON.parse(e.newValue) as {
+          state?: {
+            selectedPersona?: string;
+            workspacePath?: string;
+          };
+        };
+        const remote = parsed.state;
+        if (!remote) return;
+        const store = useVerseStore.getState();
+        if (remote.selectedPersona && remote.selectedPersona !== store.selectedPersona) {
+          store.selectPersona(remote.selectedPersona as never);
+        }
+        if (remote.workspacePath && remote.workspacePath !== store.workspacePath) {
+          store.setWorkspacePath(remote.workspacePath);
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   const showLogin = !!authConfig?.cssEnabled && !authenticated;
 
   return (
@@ -82,8 +118,13 @@ export function AgentVerseApp() {
         <div className="hero-copy" aria-hidden={showLogin}>
           <p className="brand-kicker">AgentVerse</p>
           <h1>Mission lobby</h1>
-          <p>Rajveer routes quests across your Indian crew.</p>
+          <p>Tap a persona to summon · Rajveer routes the crew.</p>
         </div>
+        {subtitle && focusId ? (
+          <div className="verse-subtitle persona-subtitle" role="status">
+            {subtitle}
+          </div>
+        ) : null}
       </main>
       {error && !showLogin ? (
         <div className="toast error" role="alert">

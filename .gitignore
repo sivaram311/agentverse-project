@@ -8,7 +8,9 @@ dist
 npm-debug.log*
 tsconfig.tsbuildinfo
 e2e-artifacts
-.cursor
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
 
 # Local backend junctions (separate repos — do not vendor)
 services/centralized-security-system/
