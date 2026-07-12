@@ -2,7 +2,23 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { AuthConfig, Message, PersonaId, Quest, Session } from "./types";
+import {
+  getPersona,
+  nextClusterOffset,
+  orchestratorId,
+  projectColor,
+} from "./orchestrator";
+import type {
+  AgentRuntimeState,
+  AuthConfig,
+  Message,
+  OfficeProject,
+  PersonaId,
+  Quest,
+  Session,
+  SessionTab,
+  UiLanguage,
+} from "./types";
 
 export type InteractionMode =
   | "idle"
@@ -16,17 +32,72 @@ export type InteractionState = {
   focusId: PersonaId | null;
 };
 
+const DEFAULT_WORKSPACE =
+  (typeof process !== "undefined" && process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE) ||
+  "demo";
+
+const HUB_PROJECT: OfficeProject = {
+  id: "hub",
+  name: "Office Hub",
+  idea: "Main AgentVerse digital office",
+  color: "#E8A838",
+  clusterOffset: [0, 0, 0],
+  managerId: "rajesh",
+  crewIds: [
+    "rajesh",
+    "karthik",
+    "lavanya",
+    "aravind",
+    "meenakshi",
+    "muthu",
+    "kabilan",
+  ],
+  createdAt: 0,
+};
+
+function defaultAgentStates(): Record<PersonaId, AgentRuntimeState> {
+  const ids: PersonaId[] = [
+    "rajesh",
+    "karthik",
+    "lavanya",
+    "aravind",
+    "meenakshi",
+    "muthu",
+    "kabilan",
+  ];
+  return Object.fromEntries(
+    ids.map((id) => [
+      id,
+      {
+        pose: "sitting" as const,
+        status: "At desk",
+        progress: 0,
+        projectId: "hub",
+        working: true,
+      },
+    ]),
+  ) as Record<PersonaId, AgentRuntimeState>;
+}
+
 type VerseState = {
   authConfig: AuthConfig | null;
   authenticated: boolean;
   username: string | null;
   accessToken: string | null;
   apiOnline: boolean;
+  language: UiLanguage;
   selectedPersona: PersonaId;
   session: Session | null;
   persistedSessionId: string | null;
   workspacePath: string;
   recentWorkspaces: string[];
+  /** workspacePath → portal session id */
+  sessionsByPath: Record<string, string>;
+  sessionTabs: SessionTab[];
+  activeTabSessionId: string | null;
+  projects: OfficeProject[];
+  activeProjectId: string;
+  agentStates: Record<PersonaId, AgentRuntimeState>;
   messages: Message[];
   quests: Quest[];
   busy: boolean;
@@ -41,11 +112,18 @@ type VerseState = {
   setAuthenticated: (v: boolean, username?: string | null) => void;
   setAccessToken: (token: string | null) => void;
   setApiOnline: (v: boolean) => void;
+  setLanguage: (lang: UiLanguage) => void;
   selectPersona: (id: PersonaId) => void;
   summonPersona: (id: PersonaId) => void;
   setSession: (s: Session | null) => void;
   setWorkspacePath: (path: string) => void;
   rememberWorkspace: (path: string) => void;
+  registerSessionForPath: (path: string, sessionId: string, label?: string) => void;
+  switchSessionTab: (sessionId: string) => void;
+  closeSessionTab: (sessionId: string) => void;
+  setActiveProject: (id: string) => void;
+  deployProject: (name: string, idea: string) => OfficeProject;
+  setAgentState: (id: PersonaId, patch: Partial<AgentRuntimeState>) => void;
   setMessages: (m: Message[]) => void;
   appendMessage: (m: Message) => void;
   upsertMessage: (m: Message, appendContent?: boolean) => void;
@@ -61,10 +139,6 @@ type VerseState = {
   bumpChatFocus: () => void;
 };
 
-const DEFAULT_WORKSPACE =
-  (typeof process !== "undefined" && process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE) ||
-  "demo";
-
 export const useVerseStore = create<VerseState>()(
   persist(
     (set, get) => ({
@@ -73,11 +147,18 @@ export const useVerseStore = create<VerseState>()(
       username: null,
       accessToken: null,
       apiOnline: false,
-      selectedPersona: "rajveer",
+      language: "ta",
+      selectedPersona: orchestratorId,
       session: null,
       persistedSessionId: null,
       workspacePath: DEFAULT_WORKSPACE,
       recentWorkspaces: [DEFAULT_WORKSPACE],
+      sessionsByPath: {},
+      sessionTabs: [],
+      activeTabSessionId: null,
+      projects: [HUB_PROJECT],
+      activeProjectId: "hub",
+      agentStates: defaultAgentStates(),
       messages: [],
       quests: [],
       busy: false,
@@ -92,22 +173,19 @@ export const useVerseStore = create<VerseState>()(
       setAuthenticated: (v, username = null) => set({ authenticated: v, username }),
       setAccessToken: (accessToken) => set({ accessToken }),
       setApiOnline: (v) => set({ apiOnline: v }),
+      setLanguage: (language) => set({ language }),
       selectPersona: (id) => set({ selectedPersona: id }),
       summonPersona: (id) => {
-        const prev = get().interaction.focusId;
-        if (prev && prev !== id) {
-          set({
-            selectedPersona: id,
-            interaction: { mode: "approaching", focusId: id },
-            orbitLocked: true,
-            subtitle: null,
-          });
-          return;
-        }
         set({
           selectedPersona: id,
           interaction: { mode: "approaching", focusId: id },
           orbitLocked: true,
+          subtitle: null,
+        });
+        get().setAgentState(id, {
+          pose: "standing",
+          working: false,
+          status: "Approaching",
         });
       },
       setSession: (s) =>
@@ -115,6 +193,7 @@ export const useVerseStore = create<VerseState>()(
           session: s,
           persistedSessionId: s?.id ?? null,
           workspacePath: s?.workspacePath || get().workspacePath,
+          activeTabSessionId: s?.id ?? get().activeTabSessionId,
         }),
       setWorkspacePath: (path) => set({ workspacePath: path }),
       rememberWorkspace: (path) => {
@@ -126,6 +205,77 @@ export const useVerseStore = create<VerseState>()(
         ].slice(0, 8);
         set({ workspacePath: trimmed, recentWorkspaces: recent });
       },
+      registerSessionForPath: (path, sessionId, label) => {
+        const short =
+          label ||
+          path.replace(/\\/g, "/").split("/").pop() ||
+          path.slice(0, 16);
+        const tabs = get().sessionTabs.filter((t) => t.sessionId !== sessionId);
+        const nextTab: SessionTab = {
+          sessionId,
+          workspacePath: path,
+          label: short,
+        };
+        set({
+          sessionsByPath: { ...get().sessionsByPath, [path]: sessionId },
+          sessionTabs: [nextTab, ...tabs].slice(0, 6),
+          activeTabSessionId: sessionId,
+        });
+      },
+      switchSessionTab: (sessionId) => {
+        const tab = get().sessionTabs.find((t) => t.sessionId === sessionId);
+        if (!tab) return;
+        set({
+          activeTabSessionId: sessionId,
+          workspacePath: tab.workspacePath,
+        });
+      },
+      closeSessionTab: (sessionId) => {
+        const tabs = get().sessionTabs.filter((t) => t.sessionId !== sessionId);
+        const active =
+          get().activeTabSessionId === sessionId
+            ? (tabs[0]?.sessionId ?? null)
+            : get().activeTabSessionId;
+        set({ sessionTabs: tabs, activeTabSessionId: active });
+      },
+      setActiveProject: (id) => set({ activeProjectId: id }),
+      deployProject: (name, idea) => {
+        const existing = get().projects.filter((p) => p.id !== "hub");
+        const id = `proj-${Date.now().toString(36)}`;
+        const project: OfficeProject = {
+          id,
+          name: name.slice(0, 48) || "New Project",
+          idea: idea.slice(0, 200),
+          color: projectColor(existing.length),
+          clusterOffset: nextClusterOffset(existing.length),
+          managerId: "muthu",
+          crewIds: ["muthu", "aravind", "karthik", "kabilan"],
+          createdAt: Date.now(),
+        };
+        set({
+          projects: [...get().projects, project],
+          activeProjectId: id,
+        });
+        // Light up crew as working on the new project
+        for (const pid of project.crewIds) {
+          get().setAgentState(pid, {
+            projectId: id,
+            working: true,
+            status: `On ${project.name}`,
+            progress: 12,
+            pose: "sitting",
+          });
+        }
+        getPersona("muthu"); // warm import side-effects / validate
+        return project;
+      },
+      setAgentState: (id, patch) =>
+        set((s) => ({
+          agentStates: {
+            ...s.agentStates,
+            [id]: { ...s.agentStates[id], ...patch },
+          },
+        })),
       setMessages: (m) => set({ messages: m }),
       appendMessage: (m) => set((s) => ({ messages: [...s.messages, m] })),
       upsertMessage: (m, appendContent = false) =>
@@ -142,11 +292,49 @@ export const useVerseStore = create<VerseState>()(
           };
           return { messages };
         }),
-      addQuest: (q) => set((s) => ({ quests: [q, ...s.quests].slice(0, 12) })),
+      addQuest: (q) => {
+        set((s) => ({ quests: [q, ...s.quests].slice(0, 12) }));
+        get().setAgentState(q.assignee, {
+          working: true,
+          status: q.title,
+          progress: q.progress ?? 10,
+          projectId: q.projectId ?? get().activeProjectId,
+        });
+      },
       updateQuest: (id, patch) =>
-        set((s) => ({
-          quests: s.quests.map((q) => (q.id === id ? { ...q, ...patch } : q)),
-        })),
+        set((s) => {
+          const quests = s.quests.map((q) => (q.id === id ? { ...q, ...patch } : q));
+          const q = quests.find((x) => x.id === id);
+          if (q && typeof patch.progress === "number") {
+            const agentStates = {
+              ...s.agentStates,
+              [q.assignee]: {
+                ...s.agentStates[q.assignee],
+                progress: patch.progress,
+                working: patch.status !== "done",
+                status:
+                  patch.status === "done" ? "At desk" : s.agentStates[q.assignee].status,
+              },
+            };
+            return { quests, agentStates };
+          }
+          if (q && patch.status === "done") {
+            return {
+              quests,
+              agentStates: {
+                ...s.agentStates,
+                [q.assignee]: {
+                  ...s.agentStates[q.assignee],
+                  progress: 100,
+                  working: false,
+                  status: "At desk",
+                  pose: "sitting",
+                },
+              },
+            };
+          }
+          return { quests };
+        }),
       setBusy: (v) => set({ busy: v }),
       setError: (e) => set({ error: e }),
       setStreamingHint: (h) => set({ streamingHint: h }),
@@ -159,12 +347,18 @@ export const useVerseStore = create<VerseState>()(
       bumpChatFocus: () => set((s) => ({ chatFocusNonce: s.chatFocusNonce + 1 })),
     }),
     {
-      name: "agentverse-verse",
+      name: "agentverse-office-v2",
       partialize: (s) => ({
+        language: s.language,
         selectedPersona: s.selectedPersona,
         persistedSessionId: s.persistedSessionId ?? s.session?.id ?? null,
         workspacePath: s.workspacePath,
         recentWorkspaces: s.recentWorkspaces,
+        sessionsByPath: s.sessionsByPath,
+        sessionTabs: s.sessionTabs,
+        activeTabSessionId: s.activeTabSessionId,
+        projects: s.projects,
+        activeProjectId: s.activeProjectId,
         quests: s.quests,
         greetOnce: s.greetOnce,
       }),

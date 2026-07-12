@@ -1,21 +1,29 @@
-# AgentVerse - 3D Multi-Device Agent Portal (Gaming Style)
+# AgentVerse - 3D Multi-Agent Office Workplace
 
-Next.js + React Three Fiber hub that **migrates Agent Portal UX** onto a gamified 3D lobby, reusing the existing API at `:8080`.
+Next.js + React Three Fiber **Tamil Nadu digital office** — agents sit at desks, walk over when summoned, and talk via the Agent Portal API at `:8080`.
 
-## Personas
+## Office crew
 
 | Name | Role |
 |------|------|
-| Rajveer | Orchestrator |
-| Aarav | Research |
-| Priya | Creative |
-| Arjun | Coder |
-| Meera | Companion |
-| Kabir | Device Lab QA (Chrome DevTools) |
+| Rajesh | Orchestrator (Office Lead) |
+| Karthik | Research |
+| Lavanya | Creative |
+| Aravind | Coder |
+| Meenakshi | Companion |
+| Muthu | Project Manager |
+| Kabilan | Device Lab QA (Chrome DevTools) |
 
+Greetings default to **Tamil** (`ta-IN`); switch Hindi / English in the top bar.  
 Prompts & routing: `src/prompts/personas.json`  
-Machine persona standards: `E:\machine-docs\personas`  
 Crew / pre-work: `agents/`
+
+## Features
+
+- Mandala office floor, holographic desks, work-loop animations
+- Click agent → stand → walk → greet → chat → return to desk
+- Multi-project desk clusters (ask Rajesh: `new project: …`)
+- Per-directory portal sessions (workspace picker + session tabs)
 
 ## Prerequisites
 
@@ -39,21 +47,24 @@ Bundled backends (junctions): `services/agent-portal`, `services/centralized-sec
 
 Open `http://127.0.0.1:3310` (phone/tablet / public IP: `http://<host>:3310`).
 
-PREPROD: https://agentverse-staging.delena.buzz (`F:\apps\agentverse` :4310).
+PREPROD: https://agentverse-staging.delena.buzz (`F:\apps\agentverse` :4310).  
+PROD: https://agentverse.delena.buzz (`G:\apps\agentverse` :5310).
 
 CORS is open (`Access-Control-Allow-Origin: *`) on the UI and `/api/*` proxies for LAN/public-IP access. Portal/CSS use `APP_CORS_ORIGINS=*` / `CSS_CORS_ORIGINS=*`.
 
 Realtime uses same-origin message polling (no SockJS → no CORS / unload console noise).
 
-## Production build
+## Production build / release
 
 ```powershell
 npm run build
-npm run start
+# Pack to H:\releases\agentverse-<ver>\ then start via start.ps1 -EnvName preprod|prod
+# Promote playbook: .cursor/skills/agentverse-promote + docs/OPS.md
 ```
 
 ## Docs
 
 - `docs/IMPLEMENTATION-GUIDE.md`
 - `docs/OPS.md`
+- `agents/roles/office-crew.md`
 - Migration source: `https://github.com/sivaram311/agent-portal.git` → `E:\MyWorkspace\agent-portal`

@@ -60,13 +60,45 @@ export type Health = {
   capabilities?: Record<string, boolean>;
 };
 
+/** Tamil Nadu office crew */
 export type PersonaId =
-  | "rajveer"
-  | "aarav"
-  | "priya"
-  | "arjun"
-  | "meera"
-  | "kabir";
+  | "rajesh"
+  | "karthik"
+  | "lavanya"
+  | "aravind"
+  | "meenakshi"
+  | "muthu"
+  | "kabilan";
+
+export type UiLanguage = "ta" | "hi" | "en";
+
+export type AgentPose = "sitting" | "standing" | "walking";
+
+export type AgentRuntimeState = {
+  pose: AgentPose;
+  status: string;
+  progress: number;
+  projectId: string | null;
+  working: boolean;
+};
+
+export type OfficeProject = {
+  id: string;
+  name: string;
+  idea: string;
+  color: string;
+  /** World-space offset for this project's desk cluster */
+  clusterOffset: [number, number, number];
+  managerId: PersonaId;
+  crewIds: PersonaId[];
+  createdAt: number;
+};
+
+export type SessionTab = {
+  sessionId: string;
+  workspacePath: string;
+  label: string;
+};
 
 export type Quest = {
   id: string;
@@ -75,6 +107,8 @@ export type Quest = {
   assignee: PersonaId;
   status: "open" | "active" | "done";
   createdAt: number;
+  progress?: number;
+  projectId?: string | null;
 };
 
 export type AgentEvent = {

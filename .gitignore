@@ -11,6 +11,8 @@ e2e-artifacts
 .cursor/*
 !.cursor/rules/
 !.cursor/rules/**
+!.cursor/skills/
+!.cursor/skills/**
 
 # Local backend junctions (separate repos — do not vendor)
 services/centralized-security-system/

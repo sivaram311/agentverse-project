@@ -6,12 +6,13 @@ import { useVerseStore } from "@/lib/store";
 export function QuestPanel() {
   const quests = useVerseStore((s) => s.quests);
   const selectPersona = useVerseStore((s) => s.selectPersona);
+  const projects = useVerseStore((s) => s.projects);
 
   return (
     <aside className="quest-panel">
       <header>
         <h2>Quests</h2>
-        <p className="muted">Missions routed by Rajveer</p>
+        <p className="muted">Missions routed by Rajesh</p>
       </header>
       <ul>
         {quests.length === 0 ? (
@@ -19,6 +20,7 @@ export function QuestPanel() {
         ) : (
           quests.map((q) => {
             const agent = getPersona(q.assignee);
+            const project = projects.find((p) => p.id === q.projectId);
             return (
               <li key={q.id}>
                 <button
@@ -29,7 +31,11 @@ export function QuestPanel() {
                 >
                   <strong>{q.title}</strong>
                   <span>{q.description}</span>
-                  <em>{q.status}</em>
+                  {project ? <span className="quest-project">{project.name}</span> : null}
+                  <em>
+                    {q.status}
+                    {typeof q.progress === "number" ? ` · ${q.progress}%` : ""}
+                  </em>
                 </button>
               </li>
             );

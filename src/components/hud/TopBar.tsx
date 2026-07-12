@@ -6,6 +6,8 @@ import { personas } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
 import type { PersonaId } from "@/lib/types";
 import { useState } from "react";
+import { LanguagePicker } from "./LanguagePicker";
+import { ProjectSwitcher } from "./ProjectSwitcher";
 
 export function TopBar() {
   const apiOnline = useVerseStore((s) => s.apiOnline);
@@ -25,10 +27,10 @@ export function TopBar() {
         <span className="brand-mark">AV</span>
         <div>
           <strong>AgentVerse</strong>
-          <small>3D agent hub · portal API</small>
+          <small>TN digital office · portal API</small>
         </div>
       </div>
-      <nav className="persona-rail" aria-label="Personas">
+      <nav className="persona-rail" aria-label="Office crew">
         {personas.map((p) => (
           <button
             key={p.id}
@@ -45,6 +47,7 @@ export function TopBar() {
         ))}
       </nav>
       <div className="status-cluster">
+        <LanguagePicker />
         <span className={`pill ${apiOnline ? "ok" : "bad"}`}>
           API {apiOnline ? "online" : "offline"}
         </span>
@@ -82,6 +85,9 @@ export function TopBar() {
             Sign out
           </button>
         ) : null}
+      </div>
+      <div className="topbar-projects">
+        <ProjectSwitcher />
       </div>
     </header>
   );

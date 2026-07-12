@@ -21,3 +21,6 @@
 | 2026-07-12 18:55 | Aarav + Security | Root-cause: Next `.next` chunk corruption → smoke 500s (not CSS CORS). CSS CORS+OPTIONS fixed; CSS :9000/:4900 restarted; UI smoke PASS | ok |
 | 2026-07-12 18:57 | Ops | Cloudflare DNS upsert `agentverse-staging.delena.buzz` blocked: API token Invalid (code 1000); nginx Host ready; DNS still NXDOMAIN | blocked |
 | 2026-07-12 19:09 | Ops | Saved CF Account token MyProductionApps; created A agentverse-staging.delena.buzz → 103.118.183.185 proxied; public /health 200 | ok |
+| 2026-07-12 19:40 | Crew Lead + Aravind | TN digital office: mandala floor, desks, sit/work→approach FSM, ta/hi/en greetings, projects+session tabs; crew renamed (Rajesh…Kabilan) | ok |
+| 2026-07-12 20:10 | Promote-EM + Ops/QA | Q1+Q2 GO agentverse **0.2.0** → PREPROD `:4310` + PROD `:5310`; staging+prod delena.buzz live | ok |
+| 2026-07-12 20:15 | Docs-Keeper | Docs + hired `agentverse-office` / `agentverse-promote` skills + Rajesh/Muthu role docs | ok |

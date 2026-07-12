@@ -72,10 +72,17 @@ agents/
 - Cross-review all pre-work docs; maintain checklist.
 
 ### Promote-EM / Promote-Ops
-- Evidence gathering and promotion execution (Q1/Q2).
+- Evidence gathering and promotion execution (Q1/Q2). Skills: `E:\MyAgent\.cursor\skills\promote-*`.
 
 ### QA-Tester, Security-Auditor, Docs-Keeper, Mobile-Ops, VPS Guardian
 - As previously defined; participate in validation where relevant.
+
+## AgentVerse office crew (in-app)
+
+Tamil Nadu digital office personas live in `src/prompts/personas.json` and `agents/roles/office-crew.md`:
+Rajesh, Karthik, Lavanya, Aravind, Meenakshi, Muthu, Kabilan.
+
+Project skills: `agentverse-office`, `agentverse-promote`.
 
 ## Next Steps for Crews
 - Copy templates into new projects.

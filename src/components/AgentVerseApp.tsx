@@ -117,8 +117,8 @@ export function AgentVerseApp() {
         </div>
         <div className="hero-copy" aria-hidden={showLogin}>
           <p className="brand-kicker">AgentVerse</p>
-          <h1>Mission lobby</h1>
-          <p>Tap a persona to summon · Rajveer routes the crew.</p>
+          <h1>Digital office</h1>
+          <p>Tap a desk · Rajesh routes the crew · Tamil by default.</p>
         </div>
         {subtitle && focusId ? (
           <div className="verse-subtitle persona-subtitle" role="status">

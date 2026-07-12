@@ -7,11 +7,11 @@ import * as THREE from "three";
 import type { PersonaId } from "@/lib/types";
 import { useVerseStore, type InteractionMode } from "@/lib/store";
 
-const APPROACH_SPOT = new THREE.Vector3(0, 0, 4.5);
+const APPROACH_SPOT = new THREE.Vector3(0, 0, 5.2);
 const ARRIVE_EPS = 0.12;
 const WALK_SPEED = 3.2;
 const RETURN_SPEED = 2.8;
-const HOME_AFTER_MS = 10000;
+const HOME_AFTER_MS = 12000;
 
 type Args = {
   personaId: PersonaId;
@@ -19,6 +19,8 @@ type Args = {
   groupRef: RefObject<Group | null>;
   reducedMotion: boolean;
   onArrivedGreet: () => void;
+  /** Fired when avatar should leave the chair (stand) or sit again */
+  onPoseChange?: (pose: "sitting" | "standing" | "walking") => void;
 };
 
 function moveToward(
@@ -33,7 +35,7 @@ function moveToward(
 }
 
 /**
- * Lerp avatar between home pad and camera-front approach spot based on interaction FSM.
+ * Sit → stand → walk to user → greet/talk → return → sit at desk.
  */
 export function useApproachBehavior({
   personaId,
@@ -41,10 +43,12 @@ export function useApproachBehavior({
   groupRef,
   reducedMotion,
   onArrivedGreet,
+  onPoseChange,
 }: Args) {
   const homeVec = useRef(new THREE.Vector3(...home));
   const greetedRef = useRef(false);
   const returnTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const standPhase = useRef(0);
   const mode = useVerseStore((s) =>
     s.interaction.focusId === personaId ? s.interaction.mode : ("idle" as InteractionMode),
   );
@@ -58,6 +62,7 @@ export function useApproachBehavior({
   useEffect(() => {
     if (!isFocus) {
       greetedRef.current = false;
+      standPhase.current = 0;
       if (returnTimer.current) {
         clearTimeout(returnTimer.current);
         returnTimer.current = null;
@@ -66,12 +71,26 @@ export function useApproachBehavior({
   }, [isFocus]);
 
   useEffect(() => {
+    if (mode === "approaching") {
+      standPhase.current = 0;
+      onPoseChange?.("standing");
+      useVerseStore.getState().setAgentState(personaId, {
+        pose: "standing",
+        working: false,
+        status: "Standing up",
+      });
+    }
+  }, [mode, personaId, onPoseChange]);
+
+  useEffect(() => {
     if (mode !== "greeting" && mode !== "talking") return;
     if (returnTimer.current) clearTimeout(returnTimer.current);
     returnTimer.current = setTimeout(() => {
       const s = useVerseStore.getState();
       if (s.interaction.focusId === personaId) {
         s.setInteraction({ mode: "returning" });
+        onPoseChange?.("walking");
+        s.setAgentState(personaId, { pose: "walking", status: "Returning to desk" });
       }
     }, HOME_AFTER_MS);
     return () => {
@@ -80,7 +99,7 @@ export function useApproachBehavior({
         returnTimer.current = null;
       }
     };
-  }, [mode, personaId]);
+  }, [mode, personaId, onPoseChange]);
 
   useFrame((state, dt) => {
     const g = groupRef.current;
@@ -90,6 +109,14 @@ export function useApproachBehavior({
     const store = useVerseStore.getState();
     const active = store.interaction.focusId === personaId;
     const m = active ? store.interaction.mode : "idle";
+
+    // Brief stand-up delay before walking
+    if (m === "approaching" && standPhase.current < 0.35 && !reducedMotion) {
+      standPhase.current += clampedDt;
+      g.position.lerp(homeVec.current, clampedDt * 4);
+      g.position.y = home[1] + standPhase.current * 0.15;
+      return;
+    }
 
     const target =
       m === "approaching" || m === "greeting" || m === "talking"
@@ -108,7 +135,13 @@ export function useApproachBehavior({
 
     if (m === "idle" && !active) {
       g.position.lerp(homeVec.current, Math.min(1, clampedDt * 1.5));
+      g.position.y = home[1];
+      g.rotation.z = THREE.MathUtils.lerp(g.rotation.z, 0, clampedDt * 6);
       return;
+    }
+
+    if (m === "approaching" || m === "returning") {
+      onPoseChange?.("walking");
     }
 
     const speed = m === "returning" ? RETURN_SPEED : WALK_SPEED;
@@ -129,8 +162,8 @@ export function useApproachBehavior({
 
     const look =
       m === "approaching" || m === "greeting" || m === "talking"
-        ? new THREE.Vector3(0, 1.4, 9)
-        : homeVec.current.clone().add(new THREE.Vector3(0, 1.4, 1));
+        ? new THREE.Vector3(0, 1.4, 10)
+        : homeVec.current.clone().add(new THREE.Vector3(0, 1.4, 0.8));
     const mat = new THREE.Matrix4().lookAt(g.position, look, new THREE.Vector3(0, 1, 0));
     const quat = new THREE.Quaternion().setFromRotationMatrix(mat);
     g.quaternion.slerp(quat, Math.min(1, clampedDt * 5));
@@ -138,6 +171,7 @@ export function useApproachBehavior({
     if (m === "approaching" && g.position.distanceTo(APPROACH_SPOT) < ARRIVE_EPS) {
       if (!greetedRef.current) {
         greetedRef.current = true;
+        onPoseChange?.("standing");
         onArrivedGreet();
       }
     }
@@ -146,7 +180,14 @@ export function useApproachBehavior({
       store.setInteraction({ mode: "idle", focusId: null });
       store.setOrbitLocked(false);
       store.setSubtitle(null);
+      store.setAgentState(personaId, {
+        pose: "sitting",
+        working: true,
+        status: "At desk",
+      });
+      onPoseChange?.("sitting");
       greetedRef.current = false;
+      standPhase.current = 0;
     }
   });
 }
