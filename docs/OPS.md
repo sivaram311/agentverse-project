@@ -8,16 +8,14 @@
 
 ## PREPROD
 
-- Release: `H:\releases\agentverse-0.2.12\` (H: nearly full — prefer direct E→F sync for hotfixes)
+- Release: `H:\releases\agentverse-0.3.0\` (H: nearly full — prefer direct E→F sync for hotfixes)
 - Start: `F:\apps\agentverse\start.ps1 -EnvName preprod`
-- Evidence: `H:\releases\agentverse-0.2.12\evidence\q1\`
+- Evidence: `H:\releases\agentverse-0.3.0\evidence\q1\`
 - Auth: CSS clientId `agent-portal` (shared)
 - DNS: Cloudflare A `agentverse-staging.delena.buzz` → `103.118.183.185` (proxied)
-- **Bypass CF (phone test):** `http://103.118.183.185:4310/` — same PREPROD process; CORS open (`*`); HTML `Cache-Control: no-store`
-- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.12) — **Q1_PREPROD_OK_032**
-- **0.2.12:** open CORS + no-store HTML (anti CF sticky); middleware OPTIONS; IP smoke parity with CF
-- **0.2.11:** mobile input fix only (PROD-like visuals kept) — joystick `lostpointercapture`; move/camera `getState()` in `useFrame`
-- **0.2.10:** always-full Expanded HQ like PROD — no team cull / proxy / distance streaming; load progress bar
+- **Bypass CF:** `http://103.118.183.185:4310/`
+- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.3.0) — **Q1_PREPROD_OK_030**
+- **0.3.0:** PROD-sized Siruseri + HexCollab office restored; **2 team pods** (Alpha/Beta); **1 meeting room** with 15 occupied chairs + TV; keep FP walk, Mathura, tap-only chat, distance labels, CORS/no-store
 - **Login:** staging/prod CSS admin password (`G:\apps\css\.env` → `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` will return **401** on staging.
 - **Camera:** after login → first-person walk+look; toggle **FP / Orbit** (or Walk / Overview) for HQ orbit.
 
@@ -33,36 +31,3 @@
 ## Health
 
 `GET /health` — process up. Authenticated smoke uses `/api/css` + `/api/portal` proxies.
-
-## Sessions (Session Desk)
-
-In-app **Sessions** (command strip / top chrome) lists portal sessions:
-- **Active / Archived** filters
-- **New** — create session on a workspace path
-- **Open** — load into tabs + chat
-- **Archive / Restore** — `POST /api/portal/sessions/{id}/archive|unarchive`
-
-Config:
-- `NEXT_PUBLIC_DEFAULT_WORKSPACE` — default path/name (e.g. `demo`)
-- `NEXT_PUBLIC_WORKSPACE_ALLOWLIST` — optional comma-separated paths for quick-picks; empty = unrestricted (portal root still applies)
-
-## DEV env discipline (do not mix)
-
-| Piece | DEV (E:) | PREPROD/PROD |
-|-------|----------|--------------|
-| CSS | `:9000`, issuer `http://localhost:9000` | `:5900` / `https://css.delena.buzz` |
-| Portal | `:8080` | `:4080` / `:5080` |
-| AgentVerse `.env.local` | `CSS_AUTH_URL=http://127.0.0.1:9000`, `NEXT_PUBLIC_CSS_ISSUER=http://localhost:9000` | set by `start.ps1` |
-| Portal start | `CSS_AUTH_URL` / `CSS_ISSUER` / `CSS_JWKS_URI` all localhost:9000; `CURSOR_AGENT_CMD` absolute; `AGENT_WORKSPACE_ROOT` under E: | F:/G: scripts |
-
-Never load a mixed `.env` that sets `CSS_AUTH_URL=https://delena.buzz` (or css.delena.buzz) into DEV portal — AgentVerse will reject tokens as incompatible JWT (`iss` vs `authUrl`).
-
-## Cloudflare (Ops)
-
-```powershell
-cd E:\MyWorkspace\agent-portal
-.\scripts\cloudflare-dns.ps1 -Upsert -Name agentverse-staging -Type A -Content 103.118.183.185 -Proxied
-.\scripts\cloudflare-dns.ps1 -Upsert -Name agentverse -Type A -Content 103.118.183.185 -Proxied
-```
-
-Token: Account API token in `.env` / `E:\MyAgent\workflow\secrets\cloudflare.token` (gitignored). See `.cursor/rules/promote-dns-cloudflare.mdc`.

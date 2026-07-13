@@ -12,8 +12,7 @@ import {
   resolveViewMode,
   type ViewMode,
 } from "@/lib/camera-framing";
-import { ANCHORS, TEAM_ZONES } from "@/lib/office-layout";
-import { resolvePerfProfile, type PerfProfile } from "@/lib/perf-profile";
+import { CONFERENCE, TEAM_ZONES } from "@/lib/office-layout";
 import { personas } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
 import { AmbientWalkers } from "./AmbientWalkers";
@@ -21,101 +20,75 @@ import { CentralConference } from "./CentralConference";
 import { DataOrbs } from "./DataOrbs";
 import { ProjectCluster } from "./DeskCluster";
 import { FramingControls } from "./FramingControls";
-import { GlassCube } from "./GlassCube";
+import { HexCollabOffice } from "./HexCollabOffice";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { SceneBootOverlay } from "./SceneBootOverlay";
-import { SideConferenceBlock } from "./SideConferenceBlock";
 import { SiruseriOffice } from "./SiruseriOffice";
 import { TeamCluster } from "./TeamCluster";
-
-/** Always-full pods — no distance cull / proxy (PROD realism). */
-function TeamClustersLayer({ showLabels }: { showLabels: boolean }) {
-  return (
-    <>
-      {TEAM_ZONES.map((zone) => (
-        <TeamCluster
-          key={zone.id}
-          zone={zone}
-          lod="full"
-          proxy={false}
-          showLabels={showLabels}
-        />
-      ))}
-    </>
-  );
-}
 
 function SceneInner({
   reducedMotion,
   showLabels,
+  lod,
+  narrow,
   viewMode,
-  profile,
 }: {
   reducedMotion: boolean;
   showLabels: boolean;
+  lod: "full" | "simple";
+  narrow: boolean;
   viewMode: ViewMode;
-  profile: PerfProfile;
 }) {
   const projects = useVerseStore((s) => s.projects);
-  const lod = profile.lod;
-  const narrow = profile.tier === "low";
+  const portrait = isPortraitView(viewMode);
 
   return (
     <>
       <color attach="background" args={["#0a1218"]} />
       <fog
         attach="fog"
-        args={["#0a1218", profile.fogNear, profile.fogFar]}
+        args={portrait ? ["#0a1218", 16, 36] : ["#0a1218", 18, 40]}
       />
-      <OfficeLighting
-        reducedMotion={reducedMotion}
-        narrow={narrow}
-        boost={profile.lightBoost}
-      />
+      <OfficeLighting reducedMotion={reducedMotion} narrow={narrow} />
       <OfficeBackdrop lod={lod} />
-      {profile.environment ? <Environment preset="city" /> : null}
-      <SiruseriOffice lod={lod} reducedMotion={reducedMotion} showMandala={false} />
+      <Environment preset="city" />
+      <SiruseriOffice lod={lod} reducedMotion={reducedMotion} />
+      <HexCollabOffice lod={lod} />
+      {/* 15-seat meeting room at back of PROD floor */}
       <CentralConference
         lod={lod}
+        position={CONFERENCE.origin}
         showLabels={showLabels}
         reducedMotion={reducedMotion}
+        occupied
       />
-      {profile.showGlassCube ? (
-        <GlassCube
-          position={ANCHORS.glassCube.position}
-          size={ANCHORS.glassCube.size}
+      {/* Two team pods fitted beside hex ring */}
+      {TEAM_ZONES.map((zone) => (
+        <TeamCluster
+          key={zone.id}
+          zone={zone}
           lod={lod}
-          reducedMotion={reducedMotion}
+          proxy={false}
+          showLabels={showLabels}
+          furnitureScale={0.78}
         />
-      ) : null}
-      {profile.showSideConference ? (
-        <SideConferenceBlock
-          position={ANCHORS.sideConference.position}
-          yaw={ANCHORS.sideConference.yaw}
-          lod={lod}
-        />
-      ) : null}
-      <TeamClustersLayer showLabels={showLabels} />
-      {profile.dataOrbs ? (
-        <group position={[0, 3.6, 0]}>
-          <DataOrbs showLabels={showLabels && viewMode !== "portrait-compact"} />
-        </group>
-      ) : null}
-      {profile.showSatelliteProjects
-        ? projects
-            .filter((p) => p.id !== "hub")
-            .map((p) => (
-              <ProjectCluster
-                key={p.id}
-                project={p}
-                showLabels={showLabels}
-                lod={lod}
-                satellite
-              />
-            ))
-        : null}
+      ))}
+      <group position={[0, 3.6, 0]}>
+        <DataOrbs showLabels={showLabels && viewMode !== "portrait-compact"} />
+      </group>
+      {projects
+        .filter((p) => p.id !== "hub")
+        .map((p) => (
+          <ProjectCluster
+            key={p.id}
+            project={p}
+            showLabels={showLabels}
+            lod={lod}
+            satellite
+          />
+        ))}
       {personas.map((p) => (
         <PersonaAvatar
           key={p.id}
@@ -126,19 +99,16 @@ function SceneInner({
         />
       ))}
       <PlayerAvatar reducedMotion={reducedMotion} />
-      {profile.ambientWalkers ? (
-        <AmbientWalkers lod="full" reducedMotion={reducedMotion} />
+      {lod === "full" ? (
+        <AmbientWalkers lod={lod} reducedMotion={reducedMotion} />
       ) : null}
-      {profile.contactShadows ? (
-        <ContactShadows
-          opacity={0.45}
-          scale={36}
-          blur={2}
-          far={12}
-          color="#000000"
-          frames={1}
-        />
-      ) : null}
+      <ContactShadows
+        opacity={0.5}
+        scale={26}
+        blur={2.4}
+        far={12}
+        color="#000000"
+      />
       <FramingControls viewMode={viewMode} />
     </>
   );
@@ -146,10 +116,8 @@ function SceneInner({
 
 export function HubScene() {
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [narrow, setNarrow] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("portrait");
-  const [profile, setProfile] = useState<PerfProfile>(() =>
-    resolvePerfProfile(390, 844, "portrait"),
-  );
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -165,10 +133,9 @@ export function HubScene() {
       const h = window.innerHeight;
       const mode = resolveViewMode(w, h);
       setViewMode(mode);
-      setProfile(resolvePerfProfile(w, h, mode));
+      setNarrow(w < 720 || mode.includes("compact"));
       document.body.dataset.avView = mode;
       document.body.dataset.avLandscape = isPortraitView(mode) ? "0" : "1";
-      document.body.dataset.avPerf = resolvePerfProfile(w, h, mode).tier;
     };
     sync();
     window.addEventListener("resize", sync);
@@ -180,23 +147,24 @@ export function HubScene() {
   }, []);
 
   const cam = presetForView(viewMode);
+  const lod: "full" | "simple" = narrow ? "simple" : "full";
 
   return (
-    <div className="hub-canvas" data-perf={profile.tier}>
+    <div className="hub-canvas" data-office="prod-0.3">
       <SceneBootOverlay />
       <Canvas
-        shadows={profile.shadows}
-        dpr={profile.dpr}
+        shadows
+        dpr={narrow ? [1, 1.25] : [1, 1.5]}
         camera={{
           position: cam.position,
           fov: cam.fov,
           near: 0.15,
-          far: profile.cameraFar,
+          far: 80,
         }}
         gl={{
-          antialias: profile.antialias,
+          antialias: !narrow,
           powerPreference: "high-performance",
-          toneMappingExposure: profile.lightBoost ? 1.4 : 1.28,
+          toneMappingExposure: 1.28,
           stencil: false,
           depth: true,
         }}
@@ -206,8 +174,9 @@ export function HubScene() {
           <SceneInner
             reducedMotion={reducedMotion}
             showLabels
+            lod={lod}
+            narrow={narrow}
             viewMode={viewMode}
-            profile={profile}
           />
         </Suspense>
       </Canvas>

@@ -6,6 +6,7 @@ import { useMemo, useRef } from "react";
 import type { Group } from "three";
 import * as THREE from "three";
 import { CONFERENCE, GLASS, type OfficeLod } from "@/lib/office-layout";
+import { HumanoidFigure } from "./HumanoidFigure";
 import { MandalaPulse } from "./SiruseriOffice";
 
 const CHAIR_CLEAR = CONFERENCE.chairClear;
@@ -17,6 +18,8 @@ type Props = {
   yaw?: number;
   showLabels?: boolean;
   reducedMotion?: boolean;
+  /** Seat a humanoid in every chair (15 occupied). */
+  occupied?: boolean;
 };
 
 /** Ergonomic chair copied from AgentDesk (DeskCluster) — not HubChair. */
@@ -93,9 +96,16 @@ const STICKY_LAYOUT = [
   [0.75, -0.3],
 ] as const;
 
+const ATTENDEE_PALETTE = [
+  { accent: "#FF6200", skin: "#C68642", hair: "#2A1F14", gender: "male" as const },
+  { accent: "#3DDC97", skin: "#E0AC69", hair: "#1a1210", gender: "female" as const },
+  { accent: "#4DA3FF", skin: "#8D5524", hair: "#0f0a08", gender: "male" as const },
+  { accent: "#E8A838", skin: "#D4A574", hair: "#3a2818", gender: "female" as const },
+  { accent: "#C4A35A", skin: "#C68642", hair: "#1c1410", gender: "male" as const },
+];
+
 /**
- * Central conference hall — long table, 15 chairs, TV wall, ideas board,
- * HexCollab pendants, and scaled MandalaPulse under the table.
+ * Meeting room — long table, 15 chairs (optionally occupied), TV wall, ideas board.
  */
 export function CentralConference({
   lod = "full",
@@ -103,6 +113,7 @@ export function CentralConference({
   yaw = 0,
   showLabels = false,
   reducedMotion = false,
+  occupied = true,
 }: Props) {
   const pendant = useRef<Group>(null);
   const [tableW, tableH, tableD] = CONFERENCE.table.size;
@@ -177,7 +188,27 @@ export function CentralConference({
       ))}
 
       {chairs.map((c, i) => (
-        <ConferenceChair key={`chair-${i}`} position={c.position} yaw={c.yaw} />
+        <group key={`seat-${i}`} position={c.position} rotation={[0, c.yaw, 0]}>
+          <ConferenceChair position={[0, 0, 0]} yaw={0} />
+          {occupied ? (
+            <group position={[0, 0, 0.02]}>
+              <HumanoidFigure
+                look={{
+                  ...ATTENDEE_PALETTE[i % ATTENDEE_PALETTE.length]!,
+                  lod,
+                }}
+                sitting
+                active={i % 4 === 0}
+                wavePhase={0}
+                phase={i * 0.37}
+                working={i % 3 !== 0}
+                walking={false}
+                scale={0.82}
+                showRing={false}
+              />
+            </group>
+          ) : null}
+        </group>
       ))}
 
       {/* HexCollab-style pendants along table X */}
@@ -211,11 +242,11 @@ export function CentralConference({
       {/* TV wall */}
       <group position={CONFERENCE.tvWall}>
         <mesh castShadow>
-          <boxGeometry args={[4.8, 2.4, 0.12]} />
+          <boxGeometry args={[3.6, 2.1, 0.12]} />
           <meshStandardMaterial color="#0c1016" metalness={0.45} roughness={0.35} />
         </mesh>
         <mesh position={[0, 0, 0.07]}>
-          <boxGeometry args={[4.5, 2.15, 0.04]} />
+          <boxGeometry args={[3.35, 1.9, 0.04]} />
           <meshStandardMaterial
             color="#4DA3FF"
             emissive="#4DA3FF"
