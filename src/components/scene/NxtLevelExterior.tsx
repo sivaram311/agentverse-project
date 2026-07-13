@@ -191,122 +191,331 @@ function EvCharger({ position }: { position: [number, number, number] }) {
   );
 }
 
+function PaverForecourt({
+  plazaZ,
+  halfW,
+  lod,
+}: {
+  plazaZ: number;
+  halfW: number;
+  lod: OfficeLod;
+}) {
+  const bond = lod === "simple" ? 1.4 : 0.85;
+  const xs: number[] = [];
+  const zs: number[] = [];
+  for (let x = -halfW * 1.05; x <= halfW * 1.05; x += bond) xs.push(x);
+  for (let z = plazaZ - 4; z <= plazaZ + 4; z += bond * 0.55) zs.push(z);
+
+  return (
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0.02]} position={[0, 0.012, plazaZ]} receiveShadow>
+        <planeGeometry args={[halfW * 2.25, 9.2]} />
+        <meshStandardMaterial color="#B8B0A4" roughness={0.78} metalness={0.04} />
+      </mesh>
+      {lod === "full"
+        ? zs.map((z, zi) =>
+            xs.map((x, xi) => (
+              <mesh
+                key={`${xi}-${zi}`}
+                rotation={[-Math.PI / 2, 0, 0]}
+                position={[x + (zi % 2) * (bond * 0.28), 0.018, z]}
+              >
+                <planeGeometry args={[bond * 0.92, bond * 0.48]} />
+                <meshStandardMaterial
+                  color={xi % 3 === 0 ? "#A8A39A" : "#C0B8AC"}
+                  roughness={0.84}
+                  metalness={0.03}
+                />
+              </mesh>
+            )),
+          )
+        : null}
+      {/* Drainage grate + manhole */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-4.2, 0.025, plazaZ + 2.2]}>
+        <planeGeometry args={[0.55, 0.35]} />
+        <meshStandardMaterial color="#3a3e44" metalness={0.45} roughness={0.4} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[3.8, 0.025, plazaZ - 1.5]}>
+        <circleGeometry args={[0.28, 16]} />
+        <meshStandardMaterial color="#4a4e54" metalness={0.4} roughness={0.45} />
+      </mesh>
+      {/* Subtle leaf scatter */}
+      {lod === "full"
+        ? [0, 1, 2, 3, 4].map((i) => (
+            <mesh
+              key={i}
+              rotation={[-Math.PI / 2, 0, i * 0.7]}
+              position={[-6 + i * 2.8, 0.03, plazaZ + 1.2 - (i % 2) * 0.8]}
+            >
+              <planeGeometry args={[0.12, 0.08]} />
+              <meshStandardMaterial color="#3A6A3A" roughness={0.9} transparent opacity={0.7} />
+            </mesh>
+          ))
+        : null}
+    </group>
+  );
+}
+
+function YoungTree({
+  position,
+  palm,
+  staked,
+}: {
+  position: [number, number, number];
+  palm?: boolean;
+  staked?: boolean;
+}) {
+  return (
+    <group position={position}>
+      {palm ? (
+        <>
+          <mesh position={[0, 1.1, 0]} castShadow>
+            <cylinderGeometry args={[0.08, 0.12, 2.2, 8]} />
+            <meshStandardMaterial color="#6a5a3a" roughness={0.85} />
+          </mesh>
+          {[0, 1, 2, 3, 4].map((j) => (
+            <mesh
+              key={j}
+              position={[
+                Math.cos((j / 5) * Math.PI * 2) * 0.55,
+                2.35,
+                Math.sin((j / 5) * Math.PI * 2) * 0.55,
+              ]}
+              rotation={[0.65, (j / 5) * Math.PI * 2, 0]}
+              castShadow
+            >
+              <boxGeometry args={[0.14, 0.95, 0.38]} />
+              <meshStandardMaterial color={PALETTE.grass} roughness={0.85} />
+            </mesh>
+          ))}
+        </>
+      ) : (
+        <>
+          <mesh position={[0, 1.0, 0]} castShadow>
+            <cylinderGeometry args={[0.09, 0.12, 2.0, 7]} />
+            <meshStandardMaterial color="#5a4028" roughness={0.88} />
+          </mesh>
+          <mesh position={[0, 2.15, 0]} castShadow>
+            <sphereGeometry args={[0.72, 9, 9]} />
+            <meshStandardMaterial color={PALETTE.shrub} roughness={0.8} />
+          </mesh>
+          <mesh position={[-0.35, 2.0, 0.2]} castShadow>
+            <sphereGeometry args={[0.4, 7, 7]} />
+            <meshStandardMaterial color="#3A7850" roughness={0.82} />
+          </mesh>
+        </>
+      )}
+      {staked ? (
+        <>
+          <mesh position={[0.18, 0.7, 0.12]} rotation={[0, 0, 0.15]}>
+            <cylinderGeometry args={[0.02, 0.02, 1.4, 5]} />
+            <meshStandardMaterial color="#c8b090" />
+          </mesh>
+          <mesh position={[-0.16, 0.55, -0.1]} rotation={[0, 0, -0.2]}>
+            <cylinderGeometry args={[0.02, 0.02, 1.1, 5]} />
+            <meshStandardMaterial color="#c8b090" />
+          </mesh>
+        </>
+      ) : null}
+    </group>
+  );
+}
+
+function Scooter({ position, yaw = 0 }: { position: [number, number, number]; yaw?: number }) {
+  return (
+    <group position={position} rotation={[0, yaw, 0]}>
+      <mesh position={[0, 0.45, 0]} castShadow>
+        <boxGeometry args={[1.15, 0.35, 0.4]} />
+        <meshStandardMaterial color="#2a4060" metalness={0.35} roughness={0.4} />
+      </mesh>
+      <mesh position={[0.35, 0.75, 0]} castShadow>
+        <boxGeometry args={[0.25, 0.45, 0.08]} />
+        <meshStandardMaterial color="#1a222c" />
+      </mesh>
+      {([-0.35, 0.4] as const).map((x) => (
+        <mesh key={x} position={[x, 0.22, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <torusGeometry args={[0.18, 0.04, 6, 12]} />
+          <meshStandardMaterial color="#1a1c1e" />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Glass automatic sliding doors + rain canopy + wall lights / CCTV. */
+function MainEntrancePortal({ position }: { position: [number, number, number] }) {
+  return (
+    <group position={position}>
+      {/* Recess reveal */}
+      <mesh position={[0, 1.35, 0.15]} castShadow>
+        <boxGeometry args={[3.6, 2.7, 0.35]} />
+        <meshStandardMaterial color={PALETTE.plinth} roughness={0.7} />
+      </mesh>
+      {/* Sliding door leaves */}
+      {([-0.72, 0.72] as const).map((x) => (
+        <mesh key={x} position={[x, 1.25, 0.35]}>
+          <boxGeometry args={[1.35, 2.35, 0.06]} />
+          <meshPhysicalMaterial
+            color={PALETTE.glass}
+            metalness={0.3}
+            roughness={0.08}
+            transparent
+            opacity={0.55}
+            transmission={0.2}
+          />
+        </mesh>
+      ))}
+      {/* Door mullion frame */}
+      <mesh position={[0, 1.25, 0.38]}>
+        <boxGeometry args={[0.08, 2.35, 0.08]} />
+        <meshStandardMaterial color={PALETTE.mullion} metalness={0.6} />
+      </mesh>
+      {/* Entrance canopy ledge */}
+      <mesh position={[0, 2.85, 0.85]} castShadow>
+        <boxGeometry args={[5.2, 0.12, 1.8]} />
+        <meshStandardMaterial color={PALETTE.panelDark} metalness={0.35} roughness={0.4} />
+      </mesh>
+      {([-2.1, 2.1] as const).map((x) => (
+        <mesh key={x} position={[x, 2.2, 1.2]}>
+          <cylinderGeometry args={[0.06, 0.07, 1.3, 8]} />
+          <meshStandardMaterial color={PALETTE.mullion} metalness={0.5} />
+        </mesh>
+      ))}
+      {/* Downlights under canopy */}
+      {([-1.2, 0, 1.2] as const).map((x) => (
+        <mesh key={x} position={[x, 2.75, 0.7]}>
+          <cylinderGeometry args={[0.08, 0.08, 0.06, 10]} />
+          <meshStandardMaterial color="#fff8e8" emissive="#fff0d0" emissiveIntensity={0.7} />
+        </mesh>
+      ))}
+      {/* Wall lights */}
+      {([-2.4, 2.4] as const).map((x) => (
+        <mesh key={x} position={[x, 2.0, 0.45]}>
+          <boxGeometry args={[0.18, 0.35, 0.12]} />
+          <meshStandardMaterial color="#e8e8e8" emissive="#ffe8c8" emissiveIntensity={0.35} />
+        </mesh>
+      ))}
+      {/* CCTV */}
+      <mesh position={[1.8, 2.55, 0.55]} rotation={[0.3, -0.4, 0]}>
+        <boxGeometry args={[0.18, 0.12, 0.28]} />
+        <meshStandardMaterial color="#1a1c1e" metalness={0.5} />
+      </mesh>
+      {/* Freestanding Intellect totem near doors */}
+      <group position={[-3.4, 0, 1.6]}>
+        <mesh position={[0, 0.9, 0]} castShadow>
+          <boxGeometry args={[0.35, 1.8, 0.2]} />
+          <meshStandardMaterial color="#161c24" metalness={0.35} />
+        </mesh>
+        <mesh position={[0, 1.35, 0.12]}>
+          <boxGeometry args={[0.28, 0.55, 0.04]} />
+          <meshStandardMaterial
+            color="#00AEEF"
+            emissive="#00AEEF"
+            emissiveIntensity={0.5}
+          />
+        </mesh>
+        <Text
+          position={[0, 1.35, 0.16]}
+          fontSize={0.12}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          Intellect
+        </Text>
+      </group>
+      <Html position={[0, 3.4, 1.2]} center distanceFactor={16}>
+        <div className="zone-badge">Main entrance · Auto glass doors</div>
+      </Html>
+    </group>
+  );
+}
+
 function PlazaAndLandscaping({ lod }: { lod: OfficeLod }) {
   const { openZ, halfW } = HQ_BOUNDS;
   const plazaZ = openZ + 8.5;
 
-  const trees = useMemo(() => {
-    const n = lod === "simple" ? 5 : 10;
-    return Array.from({ length: n }, (_, i) => ({
-      x: -halfW + 1.5 + i * 2.1 + (i % 2) * 0.3,
-      z: plazaZ + (i % 3) * 1.4 - 1.2,
-      palm: i % 3 === 0,
-    }));
-  }, [lod, halfW, plazaZ]);
-
   return (
     <group>
-      {/* Interlocking paver forecourt */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, plazaZ]} receiveShadow>
-        <planeGeometry args={[halfW * 2.2, 9]} />
-        <meshStandardMaterial color={PALETTE.paver} roughness={0.82} metalness={0.05} />
-      </mesh>
-      {/* Paver grout grid hint */}
-      {lod === "full"
-        ? [-6, -3, 0, 3, 6].map((x) => (
-            <mesh
-              key={`gx-${x}`}
-              rotation={[-Math.PI / 2, 0, 0]}
-              position={[x, 0.02, plazaZ]}
-            >
-              <planeGeometry args={[0.04, 8]} />
-              <meshStandardMaterial color="#8a8580" transparent opacity={0.35} />
-            </mesh>
-          ))
-        : null}
+      <PaverForecourt plazaZ={plazaZ} halfW={halfW} lod={lod} />
 
-      {/* White planters + hedges */}
-      {([-7, -3.5, 3.5, 7] as const).map((x) => (
-        <group key={x} position={[x, 0, plazaZ - 2.5]}>
-          <mesh position={[0, 0.28, 0]} castShadow>
-            <boxGeometry args={[2.2, 0.55, 0.85]} />
-            <meshStandardMaterial color="#f2f2f0" roughness={0.7} />
+      {/* Central approach to doors — slightly lighter path */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, openZ + 5.2]} receiveShadow>
+        <planeGeometry args={[3.4, 5.5]} />
+        <meshStandardMaterial color="#C8C0B4" roughness={0.75} metalness={0.06} />
+      </mesh>
+
+      <MainEntrancePortal position={[0, 0, openZ + 0.55]} />
+
+      {/* White stone planters — 30–50cm — with hedges */}
+      {(
+        [
+          [-6.8, plazaZ - 2.8],
+          [-3.4, plazaZ - 3.1],
+          [3.4, plazaZ - 3.1],
+          [6.8, plazaZ - 2.8],
+          [-5.0, plazaZ + 1.2],
+          [5.0, plazaZ + 1.2],
+        ] as [number, number][]
+      ).map(([x, z], i) => (
+        <group key={i} position={[x, 0, z]}>
+          <mesh position={[0, 0.22, 0]} castShadow>
+            <boxGeometry args={[2.0, 0.44, 0.8]} />
+            <meshStandardMaterial color="#F4F4F2" roughness={0.65} metalness={0.05} />
           </mesh>
-          <mesh position={[0, 0.6, 0]} castShadow>
-            <boxGeometry args={[2.0, 0.35, 0.65]} />
+          <mesh position={[0, 0.48, 0]} castShadow>
+            <boxGeometry args={[1.75, 0.28, 0.58]} />
             <meshStandardMaterial color={PALETTE.shrub} roughness={0.9} />
           </mesh>
-        </group>
-      ))}
-
-      {/* Grass patches */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-halfW - 2.8, 0.02, plazaZ]}>
-        <planeGeometry args={[4.5, 10]} />
-        <meshStandardMaterial color={PALETTE.grass} roughness={0.95} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[halfW + 2.8, 0.02, plazaZ]}>
-        <planeGeometry args={[4.5, 10]} />
-        <meshStandardMaterial color={PALETTE.grass} roughness={0.95} />
-      </mesh>
-
-      {trees.map((t, i) => (
-        <group key={i} position={[t.x, 0, t.z]}>
-          {t.palm ? (
-            <>
-              <mesh position={[0, 1.1, 0]} castShadow>
-                <cylinderGeometry args={[0.08, 0.12, 2.2, 8]} />
-                <meshStandardMaterial color="#6a5a3a" roughness={0.85} />
-              </mesh>
-              {[0, 1, 2, 3, 4].map((j) => (
-                <mesh
-                  key={j}
-                  position={[
-                    Math.cos((j / 5) * Math.PI * 2) * 0.5,
-                    2.3,
-                    Math.sin((j / 5) * Math.PI * 2) * 0.5,
-                  ]}
-                  rotation={[0.6, (j / 5) * Math.PI * 2, 0]}
-                  castShadow
-                >
-                  <boxGeometry args={[0.15, 0.9, 0.35]} />
-                  <meshStandardMaterial color={PALETTE.grass} roughness={0.85} />
-                </mesh>
-              ))}
-            </>
-          ) : (
-            <>
-              <mesh position={[0, 0.9, 0]} castShadow>
-                <cylinderGeometry args={[0.08, 0.1, 1.8, 6]} />
-                <meshStandardMaterial color="#4a3828" roughness={0.85} />
-              </mesh>
-              <mesh position={[0, 2.0, 0]} castShadow>
-                <sphereGeometry args={[0.65, 8, 8]} />
-                <meshStandardMaterial color={PALETTE.shrub} roughness={0.8} />
-              </mesh>
-            </>
-          )}
-        </group>
-      ))}
-
-      {/* Outdoor seating under trees */}
-      {lod === "full" ? (
-        <group position={[halfW + 1.5, 0, plazaZ + 1.5]}>
-          <mesh position={[0, 0.35, 0]} castShadow>
-            <cylinderGeometry args={[0.55, 0.55, 0.08, 12]} />
-            <meshStandardMaterial color="#a86a38" roughness={0.55} />
-          </mesh>
-          {([-0.5, 0.5] as const).map((x) => (
-            <mesh key={x} position={[x, 0.28, 0.45]} castShadow>
-              <boxGeometry args={[0.35, 0.08, 0.35]} />
-              <meshStandardMaterial color="#2a3240" roughness={0.7} />
+          {lod === "full" ? (
+            <mesh position={[0.35, 0.62, 0.05]}>
+              <sphereGeometry args={[0.12, 6, 6]} />
+              <meshStandardMaterial color="#C45A7A" roughness={0.7} />
             </mesh>
-          ))}
+          ) : null}
+        </group>
+      ))}
+
+      {/* Lawn panels with white curb */}
+      {([-1, 1] as const).map((side) => (
+        <group key={side} position={[side * (halfW + 2.6), 0, plazaZ]}>
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+            <planeGeometry args={[3.8, 8]} />
+            <meshStandardMaterial color={PALETTE.grass} roughness={0.95} />
+          </mesh>
+          <mesh position={[side * -1.85, 0.12, 0]}>
+            <boxGeometry args={[0.12, 0.24, 8]} />
+            <meshStandardMaterial color="#F0F0EE" roughness={0.7} />
+          </mesh>
+        </group>
+      ))}
+
+      <YoungTree position={[-7.5, 0, plazaZ - 0.5]} staked />
+      <YoungTree position={[-4.2, 0, plazaZ + 2.0]} palm />
+      <YoungTree position={[4.5, 0, plazaZ + 1.6]} palm />
+      <YoungTree position={[7.2, 0, plazaZ - 0.2]} staked />
+      {lod === "full" ? (
+        <>
+          <YoungTree position={[-2.0, 0, plazaZ + 2.8]} />
+          <YoungTree position={[1.8, 0, plazaZ + 3.0]} palm />
+        </>
+      ) : null}
+
+      {/* Scooters / light vehicles — right side */}
+      <Scooter position={[halfW - 1.2, 0, plazaZ + 2.4]} yaw={-0.4} />
+      <Scooter position={[halfW - 0.2, 0, plazaZ + 3.3]} yaw={-0.55} />
+      {lod === "full" ? (
+        <group position={[halfW - 2.8, 0, plazaZ + 3.8]} rotation={[0, -0.9, 0]}>
+          <mesh position={[0, 0.35, 0]} castShadow>
+            <boxGeometry args={[1.9, 0.45, 0.95]} />
+            <meshStandardMaterial color="#5a6068" metalness={0.35} roughness={0.4} />
+          </mesh>
         </group>
       ) : null}
 
-      {/* Modern lamp posts */}
+      {/* Lamp posts */}
       {([-8, -2.5, 2.5, 8] as const).map((x) => (
-        <group key={x} position={[x, 0, plazaZ + 3.2]}>
+        <group key={x} position={[x, 0, plazaZ + 3.4]}>
           <mesh position={[0, 1.8, 0]}>
             <cylinderGeometry args={[0.05, 0.07, 3.6, 8]} />
             <meshStandardMaterial color="#d8d8d8" metalness={0.5} roughness={0.35} />
@@ -316,11 +525,19 @@ function PlazaAndLandscaping({ lod }: { lod: OfficeLod }) {
             <meshStandardMaterial
               color="#ffffff"
               emissive="#fff8e8"
-              emissiveIntensity={0.4}
+              emissiveIntensity={0.45}
             />
           </mesh>
+          <pointLight position={[0, 3.4, 0]} intensity={0.12} distance={6} color="#fff4e0" />
         </group>
       ))}
+
+      <Html position={[0, 1.1, plazaZ + 0.5]} center distanceFactor={22}>
+        <div className="plaza-brand">
+          <strong>Entrance forecourt</strong>
+          <span>Pavers · Planters · Drop-off</span>
+        </div>
+      </Html>
     </group>
   );
 }
@@ -455,7 +672,7 @@ export function NxtLevelExterior({ lod = "full" }: { lod?: OfficeLod }) {
       <NxtLevelTowerShell lod={lod} />
       <PlazaAndLandscaping lod={lod} />
       <CompoundGate lod={lod} />
-      <DropOffCanopy position={[0, 0, openZ + 7.4]} />
+      <DropOffCanopy position={[0, 0, openZ + 10.2]} />
       <WaterBody position={[halfW + 12, 0, openZ + 6]} />
       <OmroadStrip />
       <DistantCampusLandmark lod={lod} />

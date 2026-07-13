@@ -1,6 +1,6 @@
 # AgentVerse handoff — 2026-07-14
 
-**Continue from:** PREPROD **0.3.14** (`Q1_PREPROD_OK_047`).
+**Continue from:** PREPROD **0.3.15** (`Q1_PREPROD_OK_048`).
 
 ## What’s live
 
