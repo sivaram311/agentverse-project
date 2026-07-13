@@ -258,7 +258,8 @@ export function HubScene() {
         gl={{
           antialias: profile.antialias,
           powerPreference: "high-performance",
-          toneMappingExposure: profile.lightBoost ? 1.45 : 1.28,
+          // Match PROD 0.2.2 exposure; Expanded HQ keeps city Environment on all tiers
+          toneMappingExposure: profile.lightBoost ? 1.4 : 1.28,
           stencil: false,
           depth: true,
         }}

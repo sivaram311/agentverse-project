@@ -8,16 +8,16 @@
 
 ## PREPROD
 
-- Release: `H:\releases\agentverse-0.2.8\` (H: nearly full — prefer direct E→F sync for hotfixes)
+- Release: `H:\releases\agentverse-0.2.9\` (H: nearly full — prefer direct E→F sync for hotfixes)
 - Start: `F:\apps\agentverse\start.ps1 -EnvName preprod`
-- Evidence: `H:\releases\agentverse-0.2.8\evidence\q1\`
+- Evidence: `H:\releases\agentverse-0.2.9\evidence\q1\`
 - Auth: CSS clientId `agent-portal` (shared)
 - DNS: Cloudflare A `agentverse-staging.delena.buzz` → `103.118.183.185` (proxied)
-- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.8) — **Q1_PREPROD_OK_028**
-- **0.2.8:** reverts 0.2.7 inverted label/light hotfix (restores 0.2.6 label sizing + lighting behavior)
+- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.9) — **Q1_PREPROD_OK_029**
+- **0.2.9:** PROD-matched brightness (city Environment on all perf tiers + day lights); distance-scaled name labels; tap-only summon (no proximity greet); chat opens only via Talk / CommsDock
 - **Login:** staging/prod CSS admin password (`G:\apps\css\.env` → `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` will return **401** on staging.
 - **Camera:** after login → first-person walk+look; toggle **FP / Orbit** (or Walk / Overview) for HQ orbit.
-- **Mobile:** auto perf tier (low/medium) culls team pods + drops HDR/shadows so FP walk stays interactive.
+- **Mobile:** auto perf tier still culls team pods; HDR Environment kept for brightness parity with PROD.
 
 ## PROD
 

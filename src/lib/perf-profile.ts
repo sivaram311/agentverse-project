@@ -63,11 +63,12 @@ export function resolvePerfProfile(
       dpr: [1, 1],
       antialias: false,
       shadows: false,
-      environment: false,
+      // Match PROD brightness: keep city HDR even on phones
+      environment: true,
       contactShadows: false,
       ambientWalkers: true,
       dataOrbs: false,
-      lightBoost: true,
+      lightBoost: false,
       maxTeamClusters: 6,
       maxFullClusters: 2,
       teamCullDist: 22,
@@ -75,9 +76,9 @@ export function resolvePerfProfile(
       showGlassCube: true,
       showSideConference: false,
       showSatelliteProjects: false,
-      cameraFar: 70,
-      fogNear: 22,
-      fogFar: 55,
+      cameraFar: 90,
+      fogNear: 28,
+      fogFar: 65,
     };
   }
 
@@ -88,11 +89,11 @@ export function resolvePerfProfile(
       dpr: [1, 1.25],
       antialias: false,
       shadows: false,
-      environment: false,
+      environment: true,
       contactShadows: false,
       ambientWalkers: true,
       dataOrbs: false,
-      lightBoost: true,
+      lightBoost: false,
       maxTeamClusters: 8,
       maxFullClusters: 3,
       teamCullDist: 26,
@@ -100,9 +101,9 @@ export function resolvePerfProfile(
       showGlassCube: true,
       showSideConference: true,
       showSatelliteProjects: true,
-      cameraFar: 80,
-      fogNear: 24,
-      fogFar: 58,
+      cameraFar: 95,
+      fogNear: 28,
+      fogFar: 65,
     };
   }
 

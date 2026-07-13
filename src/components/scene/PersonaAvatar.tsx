@@ -1,7 +1,6 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { Billboard, Html } from "@react-three/drei";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, Suspense } from "react";
 import type { Group, Mesh } from "three";
 import * as THREE from "three";
@@ -12,6 +11,7 @@ import type { AgentPose, PersonaId } from "@/lib/types";
 import { isHubSeat, seatWorldPosition } from "@/lib/hex-office";
 import { AVATAR_SCALE } from "@/lib/avatar-catalog";
 import { AgentDesk, MINI_FURNITURE } from "./DeskCluster";
+import { DistanceLabel } from "./DistanceLabel";
 import { HubChair } from "./HexCollabOffice";
 import { RpmAvatar } from "./RpmAvatar";
 import { HumanoidFigure } from "./HumanoidFigure";
@@ -284,47 +284,45 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
         </mesh>
 
         {showAgentLabel ? (
-          <Billboard position={[0, labelY, 0]} follow lockX={false} lockZ={false}>
-            <Html
-              center
-              distanceFactor={10}
-              style={{ pointerEvents: "none", userSelect: "none" }}
-              zIndexRange={[12, 0]}
-            >
-              <div className={`persona-tag${prominent ? " active" : ""}`}>
-                <strong>{persona.name}</strong>
-                <span>{persona.role}</span>
-                {agentState?.working || activeQuest ? (
-                  <em>{agentState?.status || "Working"}</em>
-                ) : null}
-                {progress > 0 && sitting ? (
-                  <div className="persona-progress" aria-hidden>
-                    <i
-                      style={{
-                        width: `${Math.min(100, progress)}%`,
-                        background: persona.color,
-                      }}
-                    />
-                  </div>
-                ) : null}
+          <DistanceLabel
+            position={[0, labelY, 0]}
+            distanceFactor={14}
+            zIndexRange={[12, 0]}
+            className={`persona-tag${prominent ? " active" : ""}`}
+            idealDistance={5.5}
+            minScale={0.28}
+            maxScale={1.0}
+          >
+            <strong>{persona.name}</strong>
+            <span>{persona.role}</span>
+            {agentState?.working || activeQuest ? (
+              <em>{agentState?.status || "Working"}</em>
+            ) : null}
+            {progress > 0 && sitting ? (
+              <div className="persona-progress" aria-hidden>
+                <i
+                  style={{
+                    width: `${Math.min(100, progress)}%`,
+                    background: persona.color,
+                  }}
+                />
               </div>
-            </Html>
-          </Billboard>
+            ) : null}
+          </DistanceLabel>
         ) : null}
 
         {isFocus && subtitle ? (
-          <Billboard position={[0, labelY + 0.35, 0]} follow>
-            <Html
-              center
-              distanceFactor={11}
-              style={{ pointerEvents: "none", userSelect: "none" }}
-              zIndexRange={[22, 0]}
-            >
-              <div className="persona-subtitle" role="status">
-                {subtitle}
-              </div>
-            </Html>
-          </Billboard>
+          <DistanceLabel
+            position={[0, labelY + 0.35, 0]}
+            distanceFactor={15}
+            zIndexRange={[22, 0]}
+            className="persona-subtitle"
+            idealDistance={5.5}
+            minScale={0.3}
+            maxScale={1.0}
+          >
+            <span role="status">{subtitle}</span>
+          </DistanceLabel>
         ) : null}
       </group>
     </group>

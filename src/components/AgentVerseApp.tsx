@@ -164,7 +164,7 @@ export function AgentVerseApp() {
         <div className="hero-copy" aria-hidden="true">
           <p className="brand-kicker">Siruseri floor</p>
           <h1>Digital office</h1>
-          <p>WASD / joystick to walk · approach an agent to talk</p>
+          <p>WASD / joystick to walk · tap an agent to greet · Talk to open chat</p>
         </div>
         {subtitle && focusId ? (
           <div className="verse-subtitle persona-subtitle" role="status">

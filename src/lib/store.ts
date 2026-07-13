@@ -222,11 +222,11 @@ export const useVerseStore = create<VerseState>()(
       setApiOnline: (v) => set({ apiOnline: v }),
       setLanguage: (language) => set({ language }),
       setVoiceGender: (voiceGender) => set({ voiceGender }),
-      selectPersona: (id) => set({ selectedPersona: id, chatOpen: true }),
+      // Selection / summon never auto-opens chat — Talk / CommsDock only
+      selectPersona: (id) => set({ selectedPersona: id }),
       summonPersona: (id) => {
         set({
           selectedPersona: id,
-          chatOpen: true,
           interaction: { mode: "approaching", focusId: id },
           // Keep orbit free so the player can watch / keep walking nearby
           orbitLocked: false,
@@ -401,7 +401,7 @@ export const useVerseStore = create<VerseState>()(
             s.cameraMode === "firstPerson" ? "overview" : "firstPerson",
         })),
       bumpChatFocus: () =>
-        set((s) => ({ chatFocusNonce: s.chatFocusNonce + 1, chatOpen: true })),
+        set((s) => ({ chatFocusNonce: s.chatFocusNonce + 1 })),
       setComposeDraft: (composeDraft) => set({ composeDraft }),
       consumeComposeDraft: () => {
         const text = get().composeDraft;
