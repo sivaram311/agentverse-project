@@ -1,5 +1,19 @@
 ﻿# Crew Activity â€” AgentVerse
 
+## 2026-07-13 — Q1 promote 0.2.3 (Expanded HQ) → PREPROD
+
+- Session: `agentverse-0.2.3-promote-2026-07-13`
+- Roles: EM + QA + Security + Review + field-ops + Ops (parallel crew)
+- Git: `606bf1a` Expanded Mandala HQ
+- Result: **Q1_PREPROD_OK_023** — https://agentverse-staging.delena.buzz health 0.2.3
+- Evidence: `H:\releases\agentverse-0.2.3\evidence\q1\`
+
+| Timestamp (IST) | Role | Action | Result |
+|-----------------|------|--------|--------|
+| 2026-07-13 21:00 | Promote-EM + Ops | Q1 GO agentverse **0.2.3** → PREPROD `:4310`; staging live | ok |
+| 2026-07-13 20:52 | QA/Sec/Review/field-ops | Parallel qualification PASS | ok |
+| 2026-07-13 20:48 | Lead | Commit Expanded HQ 0.2.3 (`606bf1a`) | ok |
+
 ## 2026-07-13 — Expanded HQ (Bigger Mandala) visual v1
 
 - Session: `agentverse-expanded-hq-2026-07-13`

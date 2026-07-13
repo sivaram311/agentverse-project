@@ -1,6 +1,6 @@
 # AgentVerse — Implementation Guide
 
-**Status:** LIVE — **0.2.1** on PREPROD + PROD (2026-07-13)  
+**Status:** PREPROD **0.2.3** Expanded HQ · PROD still **0.2.2** (2026-07-13)  
 **Stack:** Next.js 15 + R3F / Three.js  
 **API:** agent-portal DEV `:8080` / PREPROD `:4080` / PROD `:5080`  
 **UI ports:** DEV **3310** · PREPROD **4310** · PROD **5310**  
@@ -70,7 +70,7 @@ Isolation mounts: `/dev/office-shell`, `/dev/office-conference`, `/dev/office-te
 
 Follow MyAgent Q1/Q2 + project skill `.cursor/skills/agentverse-promote`.  
 Evidence: `H:\releases\agentverse-<ver>\evidence\`.  
-Current release: **0.2.2** PROD (Session Desk). Expanded HQ = DEV visual; promote separately when ready.
+Current release: **0.2.3** PREPROD (`Q1_PREPROD_OK_023`). PROD remains **0.2.2** until Q2.
 
 ## Crew / skills
 

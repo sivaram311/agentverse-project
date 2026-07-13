@@ -8,12 +8,12 @@
 
 ## PREPROD
 
-- Release: `H:\releases\agentverse-0.2.2\`
+- Release: `H:\releases\agentverse-0.2.3\`
 - Start: `F:\apps\agentverse\start.ps1 -EnvName preprod`
-- Evidence: `H:\releases\agentverse-0.2.2\evidence\q1\`
+- Evidence: `H:\releases\agentverse-0.2.3\evidence\q1\`
 - Auth: CSS clientId `agent-portal` (shared)
 - DNS: Cloudflare A `agentverse-staging.delena.buzz` → `103.118.183.185` (proxied)
-- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.2) — **Q1_PREPROD_OK_022**
+- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.3) — **Q1_PREPROD_OK_023**
 - **Login:** staging/prod CSS admin password (`G:\apps\css\.env` → `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` will return **401** on staging.
 
 ## PROD
