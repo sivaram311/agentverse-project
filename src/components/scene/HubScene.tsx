@@ -12,11 +12,10 @@ import {
   resolveViewMode,
   type ViewMode,
 } from "@/lib/camera-framing";
-import { CONFERENCE, TEAM_ZONES } from "@/lib/office-layout";
+import { TEAM_ZONES } from "@/lib/office-layout";
 import { personas } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
 import { AmbientWalkers } from "./AmbientWalkers";
-import { CentralConference } from "./CentralConference";
 import { DataOrbs } from "./DataOrbs";
 import { ProjectCluster } from "./DeskCluster";
 import { FramingControls } from "./FramingControls";
@@ -24,7 +23,6 @@ import { HexCollabOffice } from "./HexCollabOffice";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
 import { PlayerAvatar } from "./PlayerAvatar";
-import { SceneBootOverlay } from "./SceneBootOverlay";
 import { SiruseriOffice } from "./SiruseriOffice";
 import { TeamCluster } from "./TeamCluster";
 
@@ -56,13 +54,6 @@ function SceneInner({
       <Environment preset="city" />
       <SiruseriOffice lod={lod} reducedMotion={reducedMotion} />
       <HexCollabOffice lod={lod} />
-      <CentralConference
-        lod={lod}
-        position={CONFERENCE.origin}
-        showLabels={showLabels}
-        reducedMotion={reducedMotion}
-        occupied
-      />
       {TEAM_ZONES.map((zone) => (
         <TeamCluster
           key={zone.id}
@@ -112,7 +103,6 @@ function SceneInner({
   );
 }
 
-/** PROD-matched orbit framing + lights; FP still available via HUD toggle. */
 export function HubScene() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [narrow, setNarrow] = useState(false);
@@ -130,7 +120,6 @@ export function HubScene() {
     const sync = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      // Match PROD HubScene narrow gate
       setNarrow(w <= 360 && h > w);
       const mode = resolveViewMode(w, h);
       setViewMode(mode);
@@ -148,14 +137,13 @@ export function HubScene() {
 
   const compact =
     viewMode === "portrait-compact" || viewMode === "landscape-compact";
-  // Keep office FULL for PROD brightness (extra desks still drawn); only DPR softens
   const dpr: [number, number] = narrow || compact ? [1, 1] : [1, 1.75];
+  // Always-full office geometry (PROD + 2 teams) for consistent brightness
   const lod: "full" | "simple" = "full";
   const cam = presetForView(viewMode);
 
   return (
-    <div className="hub-canvas" data-office="prod-0.3">
-      <SceneBootOverlay />
+    <div className="hub-canvas" data-office="prod-2teams">
       <Canvas
         shadows={!narrow && viewMode === "portrait"}
         dpr={dpr}
@@ -168,7 +156,6 @@ export function HubScene() {
         gl={{
           antialias: !narrow && !compact,
           powerPreference: "high-performance",
-          // Slightly above PROD 1.28 so added teams/meeting don’t look dimmer
           toneMappingExposure: 1.32,
         }}
       >
