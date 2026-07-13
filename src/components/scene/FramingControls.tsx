@@ -53,7 +53,7 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
     if (c) {
       // Freestyle after snap — wide zoom + full rotate
       c.minDistance = 1.2;
-      c.maxDistance = 28;
+      c.maxDistance = 48;
       c.minPolarAngle = 0.12;
       c.maxPolarAngle = Math.PI / 2 - 0.04;
       c.minAzimuthAngle = -Infinity;
@@ -99,7 +99,7 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
       minPolarAngle={0.12}
       maxPolarAngle={Math.PI / 2 - 0.04}
       minDistance={1.2}
-      maxDistance={28}
+      maxDistance={48}
       enableDamping
       dampingFactor={0.1}
       rotateSpeed={isPortraitView(viewMode) ? 0.7 : 0.62}

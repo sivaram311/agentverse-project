@@ -85,23 +85,23 @@ function floorShot(
     lookY: target[1],
     fov: 42,
     minDistance: 7,
-    maxDistance: 22,
-    minPolarAngle: 0.48,
-    maxPolarAngle: Math.PI / 2.1,
+    maxDistance: 48,
+    minPolarAngle: 0.35,
+    maxPolarAngle: Math.PI / 2.05,
     world: { position, target },
   };
 }
 
 export const ORBIT_SHOTS: Record<OrbitShot, ShotFollow> = {
   /** PROD south entry — elevated overview (includes atrium) */
-  floorS: floorShot("Front", [0, 7.2, 15.5], [0, 1.35, 1.5]),
-  floorN: floorShot("Back", [0, 6.6, -13.2], [0, 1.35, -0.4]),
-  floorE: floorShot("East", [13.5, 6.6, -0.5], [0, 1.35, -0.5]),
-  floorW: floorShot("West", [-13.5, 6.6, -0.5], [0, 1.35, -0.5]),
-  floorSE: floorShot("SE", [10.5, 6.5, 10.2], [0, 1.35, -0.5]),
-  floorSW: floorShot("SW", [-10.5, 6.5, 10.2], [0, 1.35, -0.5]),
-  floorNE: floorShot("NE", [10.5, 6.5, -10.5], [0, 1.35, -0.5]),
-  floorNW: floorShot("NW", [-10.5, 6.5, -10.5], [0, 1.35, -0.5]),
+  floorS: floorShot("Front", [0, 9.5, 22], [0, 2.2, 4]),
+  floorN: floorShot("Back", [0, 8.5, -18], [0, 2, 0]),
+  floorE: floorShot("East", [22, 9, 2], [0, 2, 2]),
+  floorW: floorShot("West", [-22, 9, 2], [0, 2, 2]),
+  floorSE: floorShot("SE", [16, 8.5, 16], [0, 2, 2]),
+  floorSW: floorShot("SW", [-16, 8.5, 16], [0, 2, 2]),
+  floorNE: floorShot("NE", [16, 8.5, -14], [0, 2, 0]),
+  floorNW: floorShot("NW", [-16, 8.5, -14], [0, 2, 0]),
 
   shoulders: {
     label: "Shoulders",

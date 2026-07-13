@@ -17,6 +17,7 @@ import { AmbientWalkers } from "./AmbientWalkers";
 import { FramingControls } from "./FramingControls";
 import { IntellectBenches } from "./IntellectBenches";
 import { NxtLevelCampus } from "./NxtLevelCampus";
+import { NxtLevelExterior } from "./NxtLevelExterior";
 import { NxtLevelInfra } from "./NxtLevelInfra";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
@@ -43,7 +44,7 @@ function SceneInner({
       <color attach="background" args={["#0a1218"]} />
       <fog
         attach="fog"
-        args={portrait ? ["#0a1218", 16, 36] : ["#0a1218", 18, 40]}
+        args={portrait ? ["#0a1218", 22, 58] : ["#0a1218", 24, 65]}
       />
       <OfficeLighting reducedMotion={reducedMotion} narrow={narrow} />
       <OfficeBackdrop lod={lod} />
@@ -55,6 +56,7 @@ function SceneInner({
         showLabels={showLabels}
       />
       <NxtLevelCampus lod={lod} />
+      <NxtLevelExterior lod={lod} />
       <IntellectBenches lod={lod} />
       {/* Crew seated on Intellect benches */}
       {personas.map((p) => (
@@ -71,10 +73,10 @@ function SceneInner({
         <AmbientWalkers lod={lod} reducedMotion={reducedMotion} />
       ) : null}
       <ContactShadows
-        opacity={0.45}
-        scale={42}
-        blur={2.6}
-        far={16}
+        opacity={0.4}
+        scale={56}
+        blur={2.8}
+        far={22}
         color="#000000"
       />
       <FramingControls viewMode={viewMode} />
