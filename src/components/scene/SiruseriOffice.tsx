@@ -10,16 +10,19 @@ import {
   FocusPod,
   OfficePlant,
 } from "./OfficeDetails";
+import { ElevatorShaft } from "./ElevatorShaft";
+import { ANCHORS, HQ_BOUNDS } from "@/lib/office-layout";
 
+/** Expanded HQ shell — sync with office-layout HQ_BOUNDS */
 export const SIRUSERI = {
-  halfW: 10.5,
-  backZ: -9.2,
-  openZ: 7.4,
-  ceilingY: 4.35,
-  wallT: 0.18,
+  halfW: HQ_BOUNDS.halfW,
+  backZ: HQ_BOUNDS.backZ,
+  openZ: HQ_BOUNDS.openZ,
+  ceilingY: HQ_BOUNDS.ceilingY,
+  wallT: HQ_BOUNDS.wallT,
 } as const;
 
-function MandalaPulse({ lod }: { lod: "full" | "simple" }) {
+export function MandalaPulse({ lod }: { lod: "full" | "simple" }) {
   const spin = useRef<Group>(null);
   const glow = useRef<Mesh>(null);
   useFrame((state) => {
@@ -83,14 +86,95 @@ function MandalaPulse({ lod }: { lod: "full" | "simple" }) {
   );
 }
 
-/** Green park / IT-park canopy beyond the glass. */
+function SpineStrip() {
+  const { backZ, openZ } = SIRUSERI;
+  const midZ = (openZ + backZ) / 2;
+  const len = openZ - backZ - 2;
+  return (
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, midZ]}>
+        <planeGeometry args={[2.5, len]} />
+        <meshStandardMaterial color="#121018" metalness={0.55} roughness={0.28} />
+      </mesh>
+      {[-1.2, 1.2].map((x) => (
+        <mesh key={x} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.022, midZ]}>
+          <planeGeometry args={[0.04, len]} />
+          <meshStandardMaterial
+            color="#E8A838"
+            emissive="#E8A838"
+            emissiveIntensity={0.18}
+            transparent
+            opacity={0.5}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function WalkwayGuides({ lod }: { lod: "full" | "simple" }) {
+  const { halfW, backZ, openZ } = SIRUSERI;
+  const midZ = (openZ + backZ) / 2;
+  const len = openZ - backZ - 4;
+  const xL = -(halfW - 2.5);
+  const xR = halfW - 2.5;
+  return (
+    <group>
+      {[xL, xR].map((x) => (
+        <mesh key={x} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.018, midZ]}>
+          <planeGeometry args={[1.6, len]} />
+          <meshStandardMaterial color="#0e1218" metalness={0.6} roughness={0.25} />
+        </mesh>
+      ))}
+      {lod === "full"
+        ? [-8, 0, 6].map((z, i) => (
+            <mesh
+              key={`kolam-${i}`}
+              rotation={[-Math.PI / 2, 0, Math.PI / 8]}
+              position={[xL, 0.03, z]}
+            >
+              <ringGeometry args={[0.35, 0.45, 6]} />
+              <meshStandardMaterial
+                color="#E8A838"
+                emissive="#E8A838"
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.35}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          ))
+        : null}
+      {lod === "full"
+        ? [-8, 0, 6].map((z, i) => (
+            <mesh
+              key={`kolam-r-${i}`}
+              rotation={[-Math.PI / 2, 0, -Math.PI / 8]}
+              position={[xR, 0.03, z]}
+            >
+              <ringGeometry args={[0.35, 0.45, 6]} />
+              <meshStandardMaterial
+                color="#E8A838"
+                emissive="#E8A838"
+                emissiveIntensity={0.3}
+                transparent
+                opacity={0.35}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          ))
+        : null}
+    </group>
+  );
+}
+
 function ParkView({ lod }: { lod: "full" | "simple" }) {
   const trees = useMemo(() => {
-    const n = lod === "simple" ? 7 : 14;
+    const n = lod === "simple" ? 9 : 18;
     return Array.from({ length: n }, (_, i) => {
       const t = i / Math.max(1, n - 1);
       return {
-        x: -12 + t * 24 + (i % 3) * 0.4,
+        x: -16 + t * 32 + (i % 3) * 0.4,
         z: -14 - (i % 4) * 1.2,
         h: 1.6 + (i % 5) * 0.35,
         s: 0.7 + (i % 3) * 0.2,
@@ -100,18 +184,16 @@ function ParkView({ lod }: { lod: "full" | "simple" }) {
 
   return (
     <group position={[0, 0, SIRUSERI.backZ - 0.4]}>
-      {/* Sky wash */}
       <mesh position={[0, 3.2, -6]}>
-        <planeGeometry args={[36, 14]} />
+        <planeGeometry args={[48, 14]} />
         <meshBasicMaterial color="#6a9ab8" />
       </mesh>
-      {/* Lawn */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, -5]}>
-        <planeGeometry args={[34, 16]} />
+        <planeGeometry args={[46, 16]} />
         <meshStandardMaterial color="#1a3a28" roughness={0.95} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, -4]}>
-        <planeGeometry args={[28, 10]} />
+        <planeGeometry args={[40, 10]} />
         <meshStandardMaterial
           color="#2d6b45"
           emissive="#1a4028"
@@ -164,7 +246,6 @@ function GlassCurtain({
           side={THREE.DoubleSide}
         />
       </mesh>
-      {/* Mullions */}
       {[-0.33, 0, 0.33].map((t, i) => (
         <mesh key={i} position={[t * w, 0, 0.01]}>
           <boxGeometry args={[0.05, h, 0.04]} />
@@ -183,7 +264,6 @@ function GlassCurtain({
   );
 }
 
-/** Soft volumetric light shafts from the north glass. */
 function WindowGodRays({ reducedMotion }: { reducedMotion: boolean }) {
   const shafts = useRef<THREE.Group>(null);
   useFrame((state) => {
@@ -197,13 +277,13 @@ function WindowGodRays({ reducedMotion }: { reducedMotion: boolean }) {
 
   return (
     <group ref={shafts} position={[0, 2.2, SIRUSERI.backZ + 1.5]}>
-      {[-4, -1.5, 1.5, 4].map((x, i) => (
+      {[-8, -3, 3, 8].map((x, i) => (
         <mesh
           key={i}
           position={[x, 0, 2.5]}
           rotation={[0.55, 0, (i - 1.5) * 0.04]}
         >
-          <coneGeometry args={[0.9, 6.5, 8, 1, true]} />
+          <coneGeometry args={[1.1, 7.5, 8, 1, true]} />
           <meshBasicMaterial
             color="#fff2d0"
             transparent
@@ -218,15 +298,17 @@ function WindowGodRays({ reducedMotion }: { reducedMotion: boolean }) {
 }
 
 /**
- * Intellect Design Arena · Siruseri — open-plan fintech floor:
- * polished dark slab, glass park view, biophilia, pantry, LED canopy.
+ * Expanded Siruseri HQ shell — Bigger Mandala Office.
  */
 export function SiruseriOffice({
   lod = "full",
   reducedMotion = false,
+  showMandala = true,
 }: {
   lod?: "full" | "simple";
   reducedMotion?: boolean;
+  /** HubScene sets false when CentralConference owns the scaled mandala. */
+  showMandala?: boolean;
 }) {
   const { halfW, backZ, openZ, ceilingY } = SIRUSERI;
   const depth = openZ - backZ;
@@ -234,8 +316,8 @@ export function SiruseriOffice({
 
   const cans = useMemo(() => {
     const pts: [number, number, number][] = [];
-    for (let x = -8; x <= 8; x += 4) {
-      for (let z = -6; z <= 5; z += 3.5) {
+    for (let x = -16; x <= 16; x += 4) {
+      for (let z = -14; z <= 10; z += 3.5) {
         pts.push([x, ceilingY - 0.08, z]);
       }
     }
@@ -244,18 +326,12 @@ export function SiruseriOffice({
 
   return (
     <group>
-      {/* Polished dark floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, midZ]} receiveShadow>
         <planeGeometry args={[halfW * 2.1, depth + 1.5]} />
-        <meshStandardMaterial
-          color="#0c1016"
-          metalness={0.72}
-          roughness={0.22}
-        />
+        <meshStandardMaterial color="#0c1016" metalness={0.72} roughness={0.22} />
       </mesh>
-      {/* Subtle tile grid */}
       {lod === "full"
-        ? [-6, -2, 2, 6].map((x) => (
+        ? [-12, -6, 0, 6, 12].map((x) => (
             <mesh key={`gx-${x}`} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.015, midZ]}>
               <planeGeometry args={[0.02, depth]} />
               <meshStandardMaterial
@@ -269,10 +345,10 @@ export function SiruseriOffice({
           ))
         : null}
 
-      {/* Central golden mandala */}
-      <MandalaPulse lod={lod} />
+      <SpineStrip />
+      <WalkwayGuides lod={lod} />
+      {showMandala ? <MandalaPulse lod={lod} /> : null}
 
-      {/* Structural walls (sides + back frame) */}
       <mesh position={[-halfW, ceilingY / 2, midZ]} castShadow receiveShadow>
         <boxGeometry args={[SIRUSERI.wallT, ceilingY, depth]} />
         <meshStandardMaterial color="#161c24" metalness={0.25} roughness={0.7} />
@@ -281,7 +357,6 @@ export function SiruseriOffice({
         <boxGeometry args={[SIRUSERI.wallT, ceilingY, depth]} />
         <meshStandardMaterial color="#161c24" metalness={0.25} roughness={0.7} />
       </mesh>
-      {/* Back wall solid bands + glass */}
       <mesh position={[0, 0.35, backZ]} castShadow>
         <boxGeometry args={[halfW * 2, 0.7, SIRUSERI.wallT]} />
         <meshStandardMaterial color="#121820" metalness={0.3} roughness={0.65} />
@@ -314,13 +389,11 @@ export function SiruseriOffice({
         <WindowGodRays reducedMotion={reducedMotion} />
       ) : null}
 
-      {/* Ceiling slab */}
       <mesh position={[0, ceilingY, midZ]} receiveShadow>
         <boxGeometry args={[halfW * 2 - 0.2, 0.14, depth]} />
         <meshStandardMaterial color="#10141a" metalness={0.2} roughness={0.8} />
       </mesh>
 
-      {/* LED cans */}
       {cans.map((p, i) => (
         <group key={`can-${i}`} position={p}>
           <mesh>
@@ -346,8 +419,25 @@ export function SiruseriOffice({
         </group>
       ))}
 
-      {/* Window planters */}
-      {[-7, -3.5, 0, 3.5, 7].map((x, i) => (
+      {/* Elevators flanking spine */}
+      <ElevatorShaft
+        position={ANCHORS.elevatorL.position}
+        size={ANCHORS.elevatorL.size}
+        yaw={ANCHORS.elevatorL.yaw}
+        side="left"
+        reducedMotion={reducedMotion}
+        lod={lod}
+      />
+      <ElevatorShaft
+        position={ANCHORS.elevatorR.position}
+        size={ANCHORS.elevatorR.size}
+        yaw={ANCHORS.elevatorR.yaw}
+        side="right"
+        reducedMotion={reducedMotion}
+        lod={lod}
+      />
+
+      {[-12, -6, 0, 6, 12].map((x, i) => (
         <group key={`wp-${i}`} position={[x, 0, backZ + 0.85]}>
           <mesh position={[0, 0.28, 0]} castShadow>
             <boxGeometry args={[1.1, 0.55, 0.45]} />
@@ -357,40 +447,38 @@ export function SiruseriOffice({
         </group>
       ))}
 
-      {/* Extra biophilia along open edge + corners */}
       <OfficePlant position={[-halfW + 1.2, 0, 2]} scale={1.4} variant={1} />
       <OfficePlant position={[halfW - 1.2, 0, 2.4]} scale={1.35} variant={2} />
       <OfficePlant position={[-halfW + 1.4, 0, -3]} scale={1.25} variant={0} />
       <OfficePlant position={[halfW - 1.5, 0, -2.5]} scale={1.3} variant={3} />
       <OfficePlant position={[-4.5, 0, openZ - 1.8]} scale={1.2} variant={2} />
       <OfficePlant position={[4.5, 0, openZ - 1.6]} scale={1.25} variant={0} />
-      <OfficePlant position={[-2.2, 0, -6.2]} scale={1.15} variant={1} />
-      <OfficePlant position={[2.4, 0, -6.0]} scale={1.2} variant={3} />
+      <OfficePlant position={[-2.2, 0, -10]} scale={1.15} variant={1} />
+      <OfficePlant position={[2.4, 0, -10]} scale={1.2} variant={3} />
       {lod === "full" ? (
         <>
-          <OfficePlant position={[-8.2, 0, 0.5]} scale={1.45} variant={0} />
-          <OfficePlant position={[8.2, 0, -0.8]} scale={1.4} variant={2} />
+          <OfficePlant position={[-halfW + 2.5, 0, 0.5]} scale={1.45} variant={0} />
+          <OfficePlant position={[halfW - 2.5, 0, -0.8]} scale={1.4} variant={2} />
+          <OfficePlant position={[-halfW + 2.2, 0, 6]} scale={1.3} variant={1} />
+          <OfficePlant position={[halfW - 2.2, 0, 6]} scale={1.3} variant={3} />
         </>
       ) : null}
 
-      {/* Pantry corner — Siruseri café vibe */}
       <FilterCoffeePantry position={[halfW - 2.6, 0, openZ - 2.2]} lod={lod} />
       <FocusPod position={[-halfW + 2.2, 0, openZ - 2.8]} yaw={0.35} />
-      <FocusPod position={[-halfW + 3.6, 0, -5.5]} yaw={-0.2} />
+      <FocusPod position={[-halfW + 3.6, 0, -10]} yaw={-0.2} />
 
-      {/* Branding rail */}
       <mesh position={[0, ceilingY - 0.55, backZ + 0.35]}>
-        <boxGeometry args={[5.2, 0.35, 0.08]} />
+        <boxGeometry args={[6.5, 0.35, 0.08]} />
         <meshStandardMaterial color="#0c1016" metalness={0.45} />
       </mesh>
-      <Html position={[0, ceilingY - 0.55, backZ + 0.5]} center distanceFactor={16}>
+      <Html position={[0, ceilingY - 0.55, backZ + 0.5]} center distanceFactor={18}>
         <div className="plaza-brand">
-          <strong>Intellect Design Arena</strong>
-          <span>Siruseri · சிறுசேரி · Digital Office</span>
+          <strong>AgentVerse · Siruseri Digital Office</strong>
+          <span>Bigger Mandala HQ · சிறுசேரி</span>
         </div>
       </Html>
 
-      {/* Kolam accent near entry */}
       <mesh rotation={[-Math.PI / 2, 0, Math.PI / 8]} position={[0, 0.03, openZ - 1.2]}>
         <ringGeometry args={[0.55, 0.68, 6]} />
         <meshStandardMaterial
@@ -403,11 +491,9 @@ export function SiruseriOffice({
         />
       </mesh>
 
-      {/* Soft fill for open plan */}
-      <pointLight position={[0, 3.2, 0]} intensity={0.4} distance={14} color="#ffe6c8" />
-      <pointLight position={[-6, 2.8, -4]} intensity={0.28} distance={10} color="#c8e0ff" />
-      <pointLight position={[6, 2.8, 3]} intensity={0.25} distance={10} color="#ffd0a0" />
-      {/* Cool window light */}
+      <pointLight position={[0, 3.2, 0]} intensity={0.35} distance={22} color="#ffe6c8" />
+      <pointLight position={[-10, 2.8, -4]} intensity={0.22} distance={14} color="#c8e0ff" />
+      <pointLight position={[10, 2.8, 3]} intensity={0.22} distance={14} color="#ffd0a0" />
       <directionalLight
         position={[0, 3.5, backZ - 2]}
         intensity={0.55}

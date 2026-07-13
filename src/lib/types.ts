@@ -117,3 +117,14 @@ export type AgentEvent = {
   payload: Record<string, unknown>;
   timestamp: string;
 };
+
+/** Expanded HQ zone framing (see office-layout.ts OfficeZone). */
+export type OfficeZoneId =
+  | "overview"
+  | "central-hall"
+  | "team-wing-l"
+  | "team-wing-r"
+  | "glass-cube"
+  | "side-conference"
+  | "elevator-l"
+  | "elevator-r";

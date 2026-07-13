@@ -20,6 +20,7 @@ Crew / pre-work: `agents/`
 
 ## Features
 
+- Expanded Mandala HQ floor (X±18) — central conference, 20 team pods, glass cube, side rooms, elevators
 - Mandala office floor, holographic desks, work-loop animations
 - Click agent → stand → walk → greet → chat → return to desk
 - Multi-project desk clusters (ask Rajesh: `new project: …`)

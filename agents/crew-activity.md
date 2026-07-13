@@ -1,5 +1,17 @@
 ﻿# Crew Activity â€” AgentVerse
 
+## 2026-07-13 — Expanded HQ (Bigger Mandala) visual v1
+
+- Session: `agentverse-expanded-hq-2026-07-13`
+- Hire: `agents/hires/2026-07-13-expanded-hq.md`
+- Layout SoT: `src/lib/office-layout.ts` (S0 freeze)
+- Tracks: 0 done → A/B/C/D parallel → E integrate → Docs
+
+| Timestamp (IST) | Role | Action | Result |
+|-----------------|------|--------|--------|
+| 2026-07-13 20:50 | Lead + A–E + Docs | HubScene integrate Expanded HQ; docs/skill | ok |
+| 2026-07-13 20:35 | Lead + Track 0 + Docs | office-layout + /dev stubs + hire + arch note | ok |
+
 ## 2026-07-13 — Q2 promote 0.2.2 (Session Desk) → PROD
 
 - Session: `agentverse-0.2.2-q2-2026-07-13`

@@ -6,6 +6,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import type { Group } from "three";
 import * as THREE from "three";
 import { PLAYER_AVATAR, PLAYER_GREET_RADIUS, AVATAR_SCALE } from "@/lib/avatar-catalog";
+import { OFFICE_BOUNDS } from "@/lib/camera-framing";
 import { hexSeatPosition, seatWorldPosition } from "@/lib/hex-office";
 import { personas } from "@/lib/orchestrator";
 import { setPlayerPose } from "@/lib/player-pose";
@@ -14,7 +15,11 @@ import type { PersonaId } from "@/lib/types";
 import { RpmAvatar } from "./RpmAvatar";
 
 const MOVE_SPEED = 3.2;
-const FLOOR_HALF = 9.2;
+const MARGIN = 0.8;
+const X_MIN = -OFFICE_BOUNDS.halfW + MARGIN;
+const X_MAX = OFFICE_BOUNDS.halfW - MARGIN;
+const Z_MIN = OFFICE_BOUNDS.backZ + MARGIN;
+const Z_MAX = OFFICE_BOUNDS.openZ - MARGIN;
 const KEYS = new Set(["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"]);
 
 /**
@@ -102,13 +107,13 @@ export function PlayerAvatar({
 
       g.position.x = THREE.MathUtils.clamp(
         g.position.x + wish.x * MOVE_SPEED * clamped,
-        -FLOOR_HALF,
-        FLOOR_HALF,
+        X_MIN,
+        X_MAX,
       );
       g.position.z = THREE.MathUtils.clamp(
         g.position.z + wish.z * MOVE_SPEED * clamped,
-        -FLOOR_HALF,
-        FLOOR_HALF,
+        Z_MIN,
+        Z_MAX,
       );
       g.position.y = 0;
       g.rotation.x = 0;

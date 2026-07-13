@@ -31,3 +31,25 @@
 
 - HubScene, PersonaAvatar (low-poly + LOD-ish markers)
 - TopBar, QuestPanel, ChatPanel, LoginOverlay
+
+## Expanded HQ (Bigger Mandala) — 2026-07-13
+
+**Layout SoT:** `src/lib/office-layout.ts` (`HQ_BOUNDS` halfW 18, backZ -16, openZ 12, ceilingY 4.35)
+
+| Track | Files |
+|-------|--------|
+| Shell A | `SiruseriOffice.tsx`, `ElevatorShaft.tsx` |
+| Conference B | `CentralConference.tsx` |
+| Teams C | `TeamCluster.tsx`, `OrchestratorDesk.tsx` |
+| Cube/Rooms D | `GlassCube.tsx`, `SideConferenceBlock.tsx` |
+| Integrate E | `HubScene.tsx`, `camera-framing.ts`, player bounds |
+
+Isolation: `/dev/office-shell`, `/dev/office-conference`, `/dev/office-teams`, `/dev/office-glass`
+
+```
+         Z+ open (12)
+    WalkL | Teams L | Spine+Cube | Teams R | WalkR
+          |         | Conference |         |
+          |         | SideConfx3 |         |
+         Z- back (-16)
+```
