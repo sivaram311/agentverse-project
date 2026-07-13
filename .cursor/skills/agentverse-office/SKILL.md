@@ -40,9 +40,9 @@ description: >-
 
 ## Performance
 
-- Narrow (≤360px): `lod=simple`, lower DPR, fewer Html labels / lamps.
-- Team distance LOD: max 6 full clusters near camera (&lt;14m); rest simple.
-- Prefer Suspense around Canvas; avoid rebuilding `.next` while DEV is running.
+- Perf tiers via `src/lib/perf-profile.ts` (coarse pointer / small viewport → low|medium).
+- Low/medium: no Environment HDR, no ContactShadows, no AmbientWalkers; team pods culled + proxy pads.
+- High: distance LOD, max few full desk clusters; Suspense around Canvas.
 
 ## Crew roles
 
