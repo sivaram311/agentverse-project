@@ -1,6 +1,6 @@
 # AgentVerse — Implementation Guide
 
-**Status:** PREPROD **0.3.9** (Intellect benches + freestyle cams + PROD dark shell) · PROD still **0.2.2** (2026-07-14)  
+**Status:** PREPROD **0.3.10** (Intellect benches + freestyle cams + PROD dark shell) · PROD still **0.2.2** (2026-07-14)  
 **Stack:** Next.js 15 + R3F / Three.js  
 **API:** agent-portal DEV `:8080` / PREPROD `:4080` / PROD `:5080`  
 **UI ports:** DEV **3310** · PREPROD **4310** · PROD **5310**  
