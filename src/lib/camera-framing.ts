@@ -7,7 +7,17 @@ export type ViewMode =
   | "landscape-compact";
 
 /** User-selectable framing (menu). Default is head & shoulders. */
-export type OrbitShot = "shoulders" | "close" | "desk" | "wide";
+export type OrbitShot =
+  | "shoulders"
+  | "close"
+  | "face"
+  | "over"
+  | "desk"
+  | "sideL"
+  | "sideR"
+  | "rear"
+  | "high"
+  | "wide";
 
 export type CameraPreset = {
   position: [number, number, number];
@@ -69,6 +79,26 @@ export const ORBIT_SHOTS: Record<OrbitShot, ShotFollow> = {
     minPolarAngle: 1.05,
     maxPolarAngle: 1.5,
   },
+  face: {
+    label: "Face",
+    offset: [0.05, 1.55, 0.95],
+    lookY: 1.52,
+    fov: 38,
+    minDistance: 0.75,
+    maxDistance: 1.5,
+    minPolarAngle: 1.1,
+    maxPolarAngle: 1.55,
+  },
+  over: {
+    label: "Over",
+    offset: [-0.45, 1.62, 1.55],
+    lookY: 1.4,
+    fov: 46,
+    minDistance: 1.2,
+    maxDistance: 2.8,
+    minPolarAngle: 1.0,
+    maxPolarAngle: 1.48,
+  },
   desk: {
     label: "Desk",
     offset: [1.2, 1.65, 2.6],
@@ -78,6 +108,46 @@ export const ORBIT_SHOTS: Record<OrbitShot, ShotFollow> = {
     maxDistance: 5.5,
     minPolarAngle: 0.7,
     maxPolarAngle: 1.4,
+  },
+  sideL: {
+    label: "Left",
+    offset: [-2.4, 1.5, 0.6],
+    lookY: 1.4,
+    fov: 48,
+    minDistance: 1.8,
+    maxDistance: 4.2,
+    minPolarAngle: 0.9,
+    maxPolarAngle: 1.45,
+  },
+  sideR: {
+    label: "Right",
+    offset: [2.4, 1.5, 0.6],
+    lookY: 1.4,
+    fov: 48,
+    minDistance: 1.8,
+    maxDistance: 4.2,
+    minPolarAngle: 0.9,
+    maxPolarAngle: 1.45,
+  },
+  rear: {
+    label: "Rear",
+    offset: [0.15, 1.55, -2.3],
+    lookY: 1.4,
+    fov: 50,
+    minDistance: 1.7,
+    maxDistance: 3.8,
+    minPolarAngle: 0.95,
+    maxPolarAngle: 1.45,
+  },
+  high: {
+    label: "High",
+    offset: [0.2, 3.4, 3.2],
+    lookY: 1.2,
+    fov: 46,
+    minDistance: 3.2,
+    maxDistance: 7.5,
+    minPolarAngle: 0.55,
+    maxPolarAngle: 1.25,
   },
   wide: {
     label: "Wide",
@@ -91,7 +161,18 @@ export const ORBIT_SHOTS: Record<OrbitShot, ShotFollow> = {
   },
 };
 
-export const ORBIT_SHOT_ORDER: OrbitShot[] = ["close", "shoulders", "desk", "wide"];
+export const ORBIT_SHOT_ORDER: OrbitShot[] = [
+  "face",
+  "close",
+  "shoulders",
+  "over",
+  "desk",
+  "sideL",
+  "sideR",
+  "rear",
+  "high",
+  "wide",
+];
 
 /** Portrait — elevated view of open floor + hex desks (wide fallback). */
 export const PORTRAIT_PRESET: CameraPreset = {

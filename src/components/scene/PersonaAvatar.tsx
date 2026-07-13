@@ -286,12 +286,12 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
         {showAgentLabel ? (
           <DistanceLabel
             position={[0, labelY, 0]}
-            distanceFactor={14}
+            distanceFactor={280}
             zIndexRange={[12, 0]}
             className={`persona-tag${prominent ? " active" : ""}`}
             idealDistance={5.5}
-            minScale={0.28}
-            maxScale={1.0}
+            minScale={0.014}
+            maxScale={0.05}
           >
             <strong>{persona.name}</strong>
             <span>{persona.role}</span>
@@ -314,12 +314,12 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
         {isFocus && subtitle ? (
           <DistanceLabel
             position={[0, labelY + 0.35, 0]}
-            distanceFactor={15}
+            distanceFactor={300}
             zIndexRange={[22, 0]}
             className="persona-subtitle"
             idealDistance={5.5}
-            minScale={0.3}
-            maxScale={1.0}
+            minScale={0.015}
+            maxScale={0.05}
           >
             <span role="status">{subtitle}</span>
           </DistanceLabel>

@@ -1048,10 +1048,13 @@ body {
 
 .bubble {
   background: rgba(28, 28, 32, 0.9);
-  border-radius: 0.85rem;
-  padding: 0.55rem 0.7rem;
+  border-radius: 0.08rem;
+  padding: 0.03rem 0.04rem;
   border: 1px solid var(--av-line);
   max-width: 94%;
+  /* ~20× smaller chat transcript text */
+  font-size: 0.035rem;
+  line-height: 1.25;
   animation: bubble-in 0.22s ease;
 }
 
@@ -1059,12 +1062,12 @@ body {
   align-self: flex-end;
   border-color: color-mix(in srgb, var(--av-accent) 45%, transparent);
   background: color-mix(in srgb, var(--av-accent) 14%, rgba(20, 16, 12, 0.92));
-  border-bottom-right-radius: 0.3rem;
+  border-bottom-right-radius: 0.04rem;
 }
 
 .bubble.assistant {
   align-self: flex-start;
-  border-bottom-left-radius: 0.3rem;
+  border-bottom-left-radius: 0.04rem;
   border-color: color-mix(in srgb, var(--av-teal) 28%, var(--av-line));
 }
 
@@ -1087,20 +1090,20 @@ body {
 .bubble .role {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.03rem;
   color: var(--av-muted);
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.01rem;
 }
 
 .bubble p {
   margin: 0;
   white-space: pre-wrap;
-  font-size: 0.82rem;
-  line-height: 1.4;
+  font-size: 0.04rem;
+  line-height: 1.25;
 }
 
 .streaming {
-  font-size: 0.75rem;
+  font-size: 0.038rem;
   color: var(--av-accent);
   animation: pulse 1.2s ease-in-out infinite;
 }
@@ -1229,24 +1232,33 @@ body {
 
 .persona-tag {
   display: grid;
-  gap: 0.1rem;
-  padding: 0.3rem 0.5rem;
-  border-radius: 0.5rem;
+  gap: 0.02rem;
+  padding: 0.06rem 0.1rem;
+  border-radius: 0.12rem;
   background: rgba(10, 10, 12, 0.85);
   border: 1px solid color-mix(in srgb, var(--av-accent) 28%, var(--av-line));
   color: #fff;
-  font-size: 0.65rem;
+  /* ~20× smaller than prior 0.65rem labels */
+  font-size: 0.0325rem;
+  line-height: 1.2;
   text-align: center;
-  min-width: 4.5rem;
-  max-width: 6rem;
+  min-width: 0.22rem;
+  max-width: 0.3rem;
   pointer-events: none;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transform: scale(1);
+  transform-origin: center bottom;
+}
+
+.persona-tag strong {
+  font-size: 0.035rem;
+  font-weight: 650;
 }
 
 .persona-tag.active {
   border-color: var(--av-accent);
-  box-shadow: 0 0 18px rgba(255, 98, 0, 0.45);
+  box-shadow: 0 0 2px rgba(255, 98, 0, 0.45);
   transform: scale(1.06);
 }
 
@@ -1462,13 +1474,14 @@ body {
   pointer-events: auto;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.28rem;
+  gap: 0.22rem;
   justify-content: center;
   padding: 0.28rem;
-  border-radius: 999px;
+  border-radius: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(10, 12, 16, 0.72);
   backdrop-filter: blur(12px);
+  max-width: min(96vw, 28rem);
 }
 
 .view-angle-btn {
@@ -1683,14 +1696,15 @@ body {
 }
 
 .persona-subtitle {
-  max-width: min(70vw, 14rem);
-  padding: 0.4rem 0.55rem;
-  border-radius: 0.55rem;
+  max-width: min(70vw, 0.7rem);
+  padding: 0.02rem 0.03rem;
+  border-radius: 0.04rem;
   background: rgba(10, 10, 12, 0.9);
   border: 1px solid rgba(255, 98, 0, 0.45);
   color: #f2f5f7;
-  font-size: 0.72rem;
-  line-height: 1.35;
+  /* ~20× smaller than prior 0.72rem */
+  font-size: 0.036rem;
+  line-height: 1.2;
   text-align: center;
   pointer-events: none;
 }
@@ -1699,7 +1713,8 @@ body {
   position: absolute;
   left: 50%;
   top: 14%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scale(0.05);
+  transform-origin: top center;
   z-index: 4;
   max-width: min(88vw, 20rem);
   pointer-events: none;

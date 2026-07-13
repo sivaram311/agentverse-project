@@ -131,12 +131,12 @@ export function PlayerAvatar({
       {!hideBody ? (
         <DistanceLabel
           position={[0, 1.55, 0]}
-          distanceFactor={14}
+          distanceFactor={280}
           zIndexRange={[14, 0]}
           className="persona-tag active player-tag"
           idealDistance={5.5}
-          minScale={0.28}
-          maxScale={1.0}
+          minScale={0.014}
+          maxScale={0.05}
         >
           <strong>{label}</strong>
           <span>Logged in · You</span>
