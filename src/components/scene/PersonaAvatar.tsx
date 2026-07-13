@@ -287,7 +287,7 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
           <Billboard position={[0, labelY, 0]} follow lockX={false} lockZ={false}>
             <Html
               center
-              distanceFactor={10}
+              distanceFactor={100}
               style={{ pointerEvents: "none", userSelect: "none" }}
               zIndexRange={[12, 0]}
             >
@@ -316,7 +316,7 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
           <Billboard position={[0, labelY + 0.35, 0]} follow>
             <Html
               center
-              distanceFactor={11}
+              distanceFactor={110}
               style={{ pointerEvents: "none", userSelect: "none" }}
               zIndexRange={[22, 0]}
             >

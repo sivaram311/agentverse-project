@@ -394,10 +394,7 @@ export function SiruseriOffice({
         <meshStandardMaterial color="#10141a" metalness={0.2} roughness={0.8} />
       </mesh>
 
-      {cans.map((p, i) => {
-        // Mobile/simple: draw cans sparsely, never attach pointLights
-        if (lod === "simple" && i % 3 !== 0) return null;
-        return (
+      {cans.map((p, i) => (
         <group key={`can-${i}`} position={p}>
           <mesh>
             <cylinderGeometry args={[0.11, 0.13, 0.05, lod === "simple" ? 6 : 10]} />
@@ -411,7 +408,7 @@ export function SiruseriOffice({
               emissiveIntensity={0.8}
             />
           </mesh>
-          {lod === "full" && i % 4 === 0 ? (
+          {i % 4 === 0 ? (
             <pointLight
               position={[0, -0.2, 0]}
               intensity={0.14}
@@ -419,17 +416,8 @@ export function SiruseriOffice({
               color="#ffe8c8"
             />
           ) : null}
-          {lod === "simple" && i % 6 === 0 ? (
-            <pointLight
-              position={[0, -0.2, 0]}
-              intensity={0.22}
-              distance={6}
-              color="#ffe8c8"
-            />
-          ) : null}
         </group>
-        );
-      })}
+      ))}
 
       {/* Elevators flanking spine */}
       <ElevatorShaft
@@ -503,13 +491,9 @@ export function SiruseriOffice({
         />
       </mesh>
 
-      <pointLight position={[0, 3.2, 0]} intensity={lod === "simple" ? 0.45 : 0.35} distance={lod === "simple" ? 28 : 22} color="#ffe6c8" />
-      {lod === "full" ? (
-        <>
-          <pointLight position={[-10, 2.8, -4]} intensity={0.22} distance={14} color="#c8e0ff" />
-          <pointLight position={[10, 2.8, 3]} intensity={0.22} distance={14} color="#ffd0a0" />
-        </>
-      ) : null}
+      <pointLight position={[0, 3.2, 0]} intensity={0.35} distance={22} color="#ffe6c8" />
+      <pointLight position={[-10, 2.8, -4]} intensity={0.22} distance={14} color="#c8e0ff" />
+      <pointLight position={[10, 2.8, 3]} intensity={0.22} distance={14} color="#ffd0a0" />
       <directionalLight
         position={[0, 3.5, backZ - 2]}
         intensity={0.55}

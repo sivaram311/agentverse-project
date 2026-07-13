@@ -258,7 +258,7 @@ export function HubScene() {
         gl={{
           antialias: profile.antialias,
           powerPreference: "high-performance",
-          toneMappingExposure: profile.lightBoost ? 1.45 : 1.28,
+          toneMappingExposure: 1.28,
           stencil: false,
           depth: true,
         }}
