@@ -26,7 +26,7 @@ export const HQ_BOUNDS = {
 } as const;
 
 export const CONFERENCE = {
-  origin: [0, 0, -6.5] as [number, number, number],
+  origin: [0, 0, -6.6] as [number, number, number],
   bounds: { xMin: -2.5, xMax: 2.5, zMin: -8.5, zMax: -4.5 },
   table: { size: [4.0, 0.05, 1.3] as [number, number, number], topY: 0.55 },
   /** Local to origin group — world TV wall ≈ [0, 1.55, -8.0] */
@@ -37,19 +37,33 @@ export const CONFERENCE = {
   chairClear: 0.5,
 } as const;
 
-/** Minimal stubs for legacy GlassCube / SideConferenceBlock (off-scene in PROD 0.3.0). */
+/** Nxt Level / Intellect Design Arena — zone anchors (0.3.10+). */
 export const ANCHORS = {
   glassCube: {
-    position: [0, 0, 8.5] as [number, number, number],
-    size: 2.0,
+    position: [-4.2, 0, -5.8] as [number, number, number],
+    size: 1.85,
     yaw: 0,
   },
   sideConference: {
-    position: [0, 0, -11] as [number, number, number],
-    yaw: 0,
-    outer: { w: 4.0, d: 2.4, h: 2.4 },
-    frostFrontRatio: 0.45 as const,
-    roomCount: 1 as const,
+    position: [-8.5, 0, -5.8] as [number, number, number],
+    yaw: Math.PI / 2,
+    outer: { w: 4.2, d: 2.5, h: 2.55 },
+    frostFrontRatio: 0.42 as const,
+    roomCount: 2 as const,
+  },
+  elevatorL: {
+    position: [-9.0, 0, 5.8] as [number, number, number],
+    yaw: Math.PI / 2,
+  },
+  elevatorR: {
+    position: [9.0, 0, 5.8] as [number, number, number],
+    yaw: -Math.PI / 2,
+  },
+  reception: {
+    position: [0, 0, 6.05] as [number, number, number],
+  },
+  breakout: {
+    position: [5.2, 0, 3.6] as [number, number, number],
   },
 } as const;
 

@@ -1,25 +1,26 @@
 # AgentVerse handoff — 2026-07-14
 
-**Continue from:** PREPROD **0.3.9** shipped and smoke-OK (`Q1_PREPROD_OK_042`).
+**Continue from:** PREPROD **0.3.10** (`Q1_PREPROD_OK_043`).
 
 ## URLs
 
 - Staging: https://agentverse-staging.delena.buzz  
 - IP bypass: http://103.118.183.185:4310/  
-- Repo: https://github.com/sivaram311/agentverse-project.git (`main` @ docs+0.3.9)
+- Repo: `main` · `E:\Myworkspace\agentverse-project`
 
 ## Locked product state
 
-1. **Shell colors/lights** match PROD dark Siruseri (not bright white pillars).
-2. **Floor** dark polished slab.
-3. **Furniture:** Intellect benches + pantry; no hex/teams mounted.
-4. **Camera:** all-side floor views + freestyle after snap.
-5. **PROD app** remains **0.2.2** — no Q2 promote yet.
+1. **Shell** PROD dark Siruseri + **Nxt Level / Navalur** branding.
+2. **Open plan** Intellect benches + pantry + crew/NPCs.
+3. **Infrastructure:** dual elevators, reception, L/R glass huddles, occupied client boardroom, innovation glass cube, design-thinking breakout.
+4. **Camera** freestyle after view snap.
+5. **PROD app** remains **0.2.2**.
 
-## Next (user will direct)
+## Next ideas (user-directed)
 
-- Further photo fidelity (clothing, denser desks, cables) and/or furniture density
-- Or restore hex/teams
-- Or prepare promote pack when EM says GO
+- Cafeteria / food-court wing, atrium lobby scale-up, biometric turnstile detail
+- Quieter focus pods; more demo/fintech AV in boardroom
+- Photo-faithful clothing (dupatta etc.) on RPM/humanoids
+- Q2 promote when EM GO
 
-See [OPS.md](./OPS.md) and [IMPLEMENTATION-GUIDE.md](./IMPLEMENTATION-GUIDE.md).
+See [OPS.md](./OPS.md).

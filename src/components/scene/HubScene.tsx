@@ -16,6 +16,7 @@ import { personas } from "@/lib/orchestrator";
 import { AmbientWalkers } from "./AmbientWalkers";
 import { FramingControls } from "./FramingControls";
 import { IntellectBenches } from "./IntellectBenches";
+import { NxtLevelInfra } from "./NxtLevelInfra";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
 import { PlayerAvatar } from "./PlayerAvatar";
@@ -47,6 +48,11 @@ function SceneInner({
       <OfficeBackdrop lod={lod} />
       <Environment preset="city" />
       <SiruseriOffice lod={lod} reducedMotion={reducedMotion} />
+      <NxtLevelInfra
+        lod={lod}
+        reducedMotion={reducedMotion}
+        showLabels={showLabels}
+      />
       <IntellectBenches lod={lod} />
       {/* Crew seated on Intellect benches */}
       {personas.map((p) => (
@@ -114,7 +120,7 @@ export function HubScene() {
   const cam = presetForView(viewMode);
 
   return (
-    <div className="hub-canvas" data-office="intellect-benches">
+    <div className="hub-canvas" data-office="nxt-level-intellect">
       <Canvas
         shadows={!narrow && viewMode === "portrait"}
         dpr={dpr}

@@ -391,7 +391,7 @@ export function SiruseriOffice({
       <Html position={[0, ceilingY - 0.55, backZ + 0.5]} center distanceFactor={16}>
         <div className="plaza-brand">
           <strong>Intellect Design Arena</strong>
-          <span>Siruseri · சிறுசேரி · Digital Office</span>
+          <span>Nxt Level · Navalur / Siruseri · Digital Office</span>
         </div>
       </Html>
 

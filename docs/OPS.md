@@ -8,12 +8,11 @@
 
 ## Current PREPROD (ready for next iteration)
 
-- **Version:** **0.3.9** · git `main` · evidence `H:\releases\agentverse-0.3.9\evidence\q1\Q1_PREPROD_OK_042`
+- **Version:** **0.3.10** · git `main` · evidence `H:\releases\agentverse-0.3.10\evidence\q1\Q1_PREPROD_OK_043`
 - **Smoke:** `https://agentverse-staging.delena.buzz/health` · bypass `http://103.118.183.185:4310/`
-- **Office contents:** Siruseri shell (dark walls/pillars, glass, dark polished floor, dark LED ceiling, pantry) + **Intellect-style bench desks** (wood tops, mesh chairs, monitors/phones) + **crew seated** + NPC bench workers + aisle walkers
-- **Not in scene:** hex collab table, Team Alpha/Beta pods, Expanded HQ meeting/glass cube/elevators (code still exists under `src/components/scene/` for future reuse)
-- **Camera:** view menu snaps to Front/Back/E/W + corners (PROD floor angles) or body shots, then **freestyle rotate / zoom / pan**; **Walk** = first-person
-- **Layout SoT:** `src/lib/intellect-benches.ts` (seats) · `src/lib/office-layout.ts` (HQ bounds) · `src/lib/camera-framing.ts` (shots)
+- **Office contents:** Nxt Level / Intellect Design Arena shell — elevators, reception, glass huddles (L/R), client boardroom, innovation glass cube, design-thinking breakout, pantry, Intellect benches + crew/NPCs, PROD dark lights
+- **Camera:** floor angles all sides + freestyle rotate/zoom after snap; Walk = FP
+- **Layout SoT:** `src/lib/office-layout.ts` (ANCHORS) · `src/lib/intellect-benches.ts` · `NxtLevelInfra.tsx`
 - **PROD:** still **0.2.2** — do not promote without EM Q2 GO
 
 ## PREPROD runbook
@@ -28,7 +27,8 @@
 
 | Ver | What |
 |-----|------|
-| **0.3.9** | PROD-matched dark walls/pillars + day lights/fog/exposure; benches + freestyle kept |
+| **0.3.10** | Nxt Level infra: elevators, reception, glass huddles, boardroom, glass cube, breakout + benches |
+| 0.3.9 | PROD-matched dark walls/pillars + day lights/fog/exposure; benches + freestyle kept |
 | 0.3.8 | Freestyle orbit after view snap; Intellect benches + seated crew/NPCs |
 | 0.3.7 | PROD-style floor angles all 8 sides; default Front |
 | 0.3.6 | Dark polished floor restored (not bright epoxy) |
