@@ -24,12 +24,14 @@ Crew / pre-work: `agents/`
 - Click agent → stand → walk → greet → chat → return to desk
 - Multi-project desk clusters (ask Rajesh: `new project: …`)
 - Per-directory portal sessions (workspace picker + session tabs)
+- **Session Desk** — list / create / archive / restore portal sessions (Active & Archived)
 
 ## Prerequisites
 
 - Node.js 22+ (host has 24.x)
 - Agent Portal backend running on `http://127.0.0.1:8080`
-- CSS on `:9000` when `cssEnabled` (login: `admin` / `admin123` in DEV)
+- CSS on `:9000` when `cssEnabled` (DEV login: `admin` / `admin123`)
+- **PREPROD/PROD login:** CSS admin password from `G:\apps\css\.env` (`CSS_ADMIN_PASSWORD`) — not `admin123` (staging returns 401)
 
 ## Dev (port **3310** reserved)
 

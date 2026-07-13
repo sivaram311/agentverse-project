@@ -19,6 +19,17 @@ async function proxy(req: NextRequest, pathParts: string[]) {
   const accept = req.headers.get("accept");
   if (accept) headers.set("accept", accept);
 
+  const clientIp =
+    req.headers.get("cf-connecting-ip") ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    (req as NextRequest & { ip?: string }).ip ||
+    undefined;
+  if (clientIp) {
+    headers.set("x-forwarded-for", clientIp);
+    headers.set("x-real-ip", clientIp);
+  }
+
   const init: RequestInit = {
     method: req.method,
     headers,

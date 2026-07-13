@@ -16,6 +16,7 @@ import { FramingControls } from "./FramingControls";
 import { HexCollabOffice } from "./HexCollabOffice";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
+import { PlayerAvatar } from "./PlayerAvatar";
 import { SiruseriOffice } from "./SiruseriOffice";
 
 function SceneInner({
@@ -70,6 +71,7 @@ function SceneInner({
           lod={lod}
         />
       ))}
+      <PlayerAvatar reducedMotion={reducedMotion} />
       {lod === "full" ? (
         <AmbientWalkers lod={lod} reducedMotion={reducedMotion} />
       ) : null}

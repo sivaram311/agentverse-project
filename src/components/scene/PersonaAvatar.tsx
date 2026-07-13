@@ -9,7 +9,7 @@ import { greetingFor, type PersonaDef } from "@/lib/orchestrator";
 import { speakPersona, stopSpeaking, type VoicePrefs } from "@/lib/speech";
 import { useVerseStore } from "@/lib/store";
 import type { AgentPose, PersonaId } from "@/lib/types";
-import { isHubSeat } from "@/lib/hex-office";
+import { isHubSeat, seatWorldPosition } from "@/lib/hex-office";
 import { AVATAR_SCALE } from "@/lib/avatar-catalog";
 import { AgentDesk, MINI_FURNITURE } from "./DeskCluster";
 import { HubChair } from "./HexCollabOffice";
@@ -32,15 +32,7 @@ type Props = {
 
 /** Seat on the outside of the hex desk — matches AgentDesk chair at local −Z. */
 function chairHome(desk: [number, number, number]): [number, number, number] {
-  const len = Math.hypot(desk[0], desk[2]);
-  if (len < 0.35) {
-    // Hub: sit just south of the well, facing the collab orb
-    return [0, 0, 0.42];
-  }
-  const ox = desk[0] / len;
-  const oz = desk[2] / len;
-  const seatDist = 0.48 * MINI_FURNITURE + 0.28;
-  return [desk[0] + ox * seatDist, 0, desk[2] + oz * seatDist];
+  return seatWorldPosition(desk, 0.48 * MINI_FURNITURE + 0.32);
 }
 
 /** Yaw-only so characters never pitch into the floor. */

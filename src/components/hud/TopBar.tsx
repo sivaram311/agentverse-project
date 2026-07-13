@@ -9,7 +9,11 @@ import { MoodPicker } from "./MoodPicker";
 import { ProjectSwitcher } from "./ProjectSwitcher";
 import { VoicePicker } from "./VoicePicker";
 
-export function TopBar() {
+export function TopBar({
+  onOpenSessions,
+}: {
+  onOpenSessions?: () => void;
+} = {}) {
   const apiOnline = useVerseStore((s) => s.apiOnline);
   const authenticated = useVerseStore((s) => s.authenticated);
   const username = useVerseStore((s) => s.username);
@@ -49,6 +53,15 @@ export function TopBar() {
           )}
           <VoicePicker />
           <MoodPicker />
+          {authenticated && onOpenSessions ? (
+            <button
+              type="button"
+              className="ghost keep-mobile"
+              onClick={onOpenSessions}
+            >
+              Sessions
+            </button>
+          ) : null}
           {authenticated && session ? (
             <button
               type="button"

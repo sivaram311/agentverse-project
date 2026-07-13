@@ -1,13 +1,14 @@
 "use client";
 
 import { OrbitControls } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
+import * as THREE from "three";
 import { isPortraitView, presetForView, type ViewMode } from "@/lib/camera-framing";
 import { useVerseStore } from "@/lib/store";
 
 type ControlsApi = {
-  target: { set: (x: number, y: number, z: number) => void };
+  target: THREE.Vector3;
   minDistance: number;
   maxDistance: number;
   minPolarAngle: number;
@@ -17,12 +18,14 @@ type ControlsApi = {
   update: () => void;
 };
 
-/** Indoor framing — starts inside the office and keeps orbit within the room. */
+/** Orbit around the floor — soft-follows the logged-in player. */
 export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
   const orbitLocked = useVerseStore((s) => s.orbitLocked);
+  const playerPosition = useVerseStore((s) => s.playerPosition);
   const { camera } = useThree();
   const controls = useRef<ControlsApi | null>(null);
   const preset = presetForView(viewMode);
+  const follow = useRef(new THREE.Vector3(...preset.target));
 
   useEffect(() => {
     camera.position.set(...preset.position);
@@ -31,6 +34,7 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
       camera.updateProjectionMatrix();
     }
     const c = controls.current;
+    follow.current.set(...preset.target);
     if (c) {
       c.target.set(...preset.target);
       c.minDistance = preset.minDistance;
@@ -42,6 +46,20 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
       c.update();
     }
   }, [camera, viewMode, preset]);
+
+  useFrame((_, dt) => {
+    const c = controls.current;
+    if (!c) return;
+    // Blend look-at toward player so orbit stays useful while you walk
+    const desired = new THREE.Vector3(
+      playerPosition[0] * 0.55,
+      1.1,
+      playerPosition[2] * 0.55,
+    );
+    follow.current.lerp(desired, Math.min(1, dt * 1.8));
+    c.target.lerp(follow.current, Math.min(1, dt * 2.2));
+    c.update();
+  });
 
   return (
     <OrbitControls

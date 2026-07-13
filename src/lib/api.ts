@@ -134,6 +134,18 @@ export const portalApi = {
       { method: "POST", body: JSON.stringify(body) },
       authConfig,
     ),
+  archiveSession: (id: string, authConfig?: AuthConfig | null) =>
+    apiFetch<Session>(
+      `/sessions/${id}/archive`,
+      { method: "POST", body: "{}" },
+      authConfig,
+    ),
+  unarchiveSession: (id: string, authConfig?: AuthConfig | null) =>
+    apiFetch<Session>(
+      `/sessions/${id}/unarchive`,
+      { method: "POST", body: "{}" },
+      authConfig,
+    ),
   getMessages: (id: string, authConfig?: AuthConfig | null) =>
     apiFetch<Message[]>(`/sessions/${id}/messages`, {}, authConfig),
   cancelRun: (id: string, authConfig?: AuthConfig | null) =>

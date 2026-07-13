@@ -45,7 +45,7 @@ export function AgentDesk({
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
-    const pulse = 0.68 + Math.sin(t * 2.5 + position[0] * 2) * 0.2;
+    const pulse = 0.82 + Math.sin(t * 2.5 + position[0] * 2) * 0.18;
     for (const ref of [screenL, screenR]) {
       if (ref.current) {
         const mat = ref.current.material as { emissiveIntensity?: number };
@@ -208,12 +208,17 @@ export function AgentDesk({
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={0.65}
-          metalness={0.12}
-          roughness={0.2}
+          emissiveIntensity={0.85}
+          metalness={0.08}
+          roughness={0.18}
           transparent
-          opacity={0.92}
+          opacity={0.95}
         />
+      </mesh>
+      {/* Screen glow plane facing sitter */}
+      <mesh position={[-0.18, topY + 0.36, deskD / 2 - 0.1]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[0.4, 0.28]} />
+        <meshBasicMaterial color={color} transparent opacity={0.22} />
       </mesh>
       <mesh position={[0.2, topY + 0.1, deskD / 2 - 0.14]} castShadow>
         <cylinderGeometry args={[0.02, 0.028, 0.18, 8]} />
@@ -229,12 +234,16 @@ export function AgentDesk({
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={0.55}
-          metalness={0.12}
-          roughness={0.22}
+          emissiveIntensity={0.75}
+          metalness={0.08}
+          roughness={0.2}
           transparent
-          opacity={0.88}
+          opacity={0.92}
         />
+      </mesh>
+      <mesh position={[0.2, topY + 0.34, deskD / 2 - 0.09]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[0.34, 0.24]} />
+        <meshBasicMaterial color={color} transparent opacity={0.18} />
       </mesh>
 
       {lod === "full" ? (

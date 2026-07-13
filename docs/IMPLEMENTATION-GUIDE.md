@@ -1,6 +1,6 @@
 # AgentVerse — Implementation Guide
 
-**Status:** LIVE — **0.2.0** on PREPROD + PROD (2026-07-12)  
+**Status:** LIVE — **0.2.1** on PREPROD + PROD (2026-07-13)  
 **Stack:** Next.js 15 + R3F / Three.js  
 **API:** agent-portal DEV `:8080` / PREPROD `:4080` / PROD `:5080`  
 **UI ports:** DEV **3310** · PREPROD **4310** · PROD **5310**  

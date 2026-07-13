@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { portalApi } from "@/lib/api";
 import { getAccessToken, getStoredUser, verifyPortalAuth } from "@/lib/auth";
 import { ChatPanel } from "@/components/hud/ChatPanel";
@@ -9,8 +9,10 @@ import { CommandStrip } from "@/components/hud/CommandStrip";
 import { LoginOverlay } from "@/components/hud/LoginOverlay";
 import { OfficeSwitch } from "@/components/hud/OfficeSwitch";
 import { QuestPanel } from "@/components/hud/QuestPanel";
+import { SessionDesk } from "@/components/hud/SessionDesk";
 import { TeamMemberBar } from "@/components/hud/TeamMemberBar";
 import { TopBar } from "@/components/hud/TopBar";
+import { TouchJoystick } from "@/components/hud/TouchJoystick";
 import { useVerseStore } from "@/lib/store";
 
 const HubScene = dynamic(
@@ -28,6 +30,7 @@ export function AgentVerseApp() {
   const busy = useVerseStore((s) => s.busy);
   const officeChromeOpen = useVerseStore((s) => s.officeChromeOpen);
   const chatOpen = useVerseStore((s) => s.chatOpen);
+  const [sessionDeskOpen, setSessionDeskOpen] = useState(false);
 
   useEffect(() => {
     document.body.dataset.avFocus = focusId ?? "";
@@ -123,7 +126,9 @@ export function AgentVerseApp() {
     >
       <div className="chrome-rail">
         <OfficeSwitch />
-        {officeChromeOpen ? <TopBar /> : null}
+        {officeChromeOpen ? (
+          <TopBar onOpenSessions={() => setSessionDeskOpen(true)} />
+        ) : null}
       </div>
       <TeamMemberBar />
       <main className="verse-main">
@@ -139,15 +144,27 @@ export function AgentVerseApp() {
             </div>
             {!chatOpen ? (
               <div className="command-layer">
-                <CommandStrip />
+                <CommandStrip
+                  onOpenSessions={() => setSessionDeskOpen(true)}
+                />
               </div>
             ) : null}
+            {sessionDeskOpen ? (
+              <div className="session-desk-layer">
+                <SessionDesk
+                  open
+                  overlay
+                  onClose={() => setSessionDeskOpen(false)}
+                />
+              </div>
+            ) : null}
+            <TouchJoystick />
           </>
         )}
         <div className="hero-copy" aria-hidden="true">
           <p className="brand-kicker">Siruseri floor</p>
           <h1>Digital office</h1>
-          <p>Tap a seat to talk</p>
+          <p>WASD / joystick to walk · approach an agent to talk</p>
         </div>
         {subtitle && focusId ? (
           <div className="verse-subtitle persona-subtitle" role="status">

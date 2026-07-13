@@ -122,6 +122,10 @@ type VerseState = {
   chatOpen: boolean;
   /** Tunable office lighting mood */
   officeMood: OfficeMood;
+  /** Logged-in visitor on the floor */
+  playerPosition: [number, number, number];
+  /** WASD / joystick stick (−1..1) */
+  playerMoveInput: { x: number; z: number };
   setAuthConfig: (c: AuthConfig | null) => void;
   setAuthenticated: (v: boolean, username?: string | null) => void;
   setAccessToken: (token: string | null) => void;
@@ -161,6 +165,8 @@ type VerseState = {
   closeChat: () => void;
   setOfficeMood: (m: OfficeMood) => void;
   cycleOfficeMood: () => void;
+  setPlayerPosition: (p: [number, number, number]) => void;
+  setPlayerMoveInput: (v: { x: number; z: number }) => void;
 };
 
 export const useVerseStore = create<VerseState>()(
@@ -198,6 +204,8 @@ export const useVerseStore = create<VerseState>()(
       officeChromeOpen: false,
       chatOpen: false,
       officeMood: "day",
+      playerPosition: [0, 0, 5.2],
+      playerMoveInput: { x: 0, z: 0 },
       setAuthConfig: (c) => set({ authConfig: c }),
       setAuthenticated: (v, username = null) => set({ authenticated: v, username }),
       setAccessToken: (accessToken) => set({ accessToken }),
@@ -210,7 +218,8 @@ export const useVerseStore = create<VerseState>()(
           selectedPersona: id,
           chatOpen: true,
           interaction: { mode: "approaching", focusId: id },
-          orbitLocked: true,
+          // Keep orbit free so the player can watch / keep walking nearby
+          orbitLocked: false,
           subtitle: null,
         });
         get().setAgentState(id, {
@@ -395,6 +404,8 @@ export const useVerseStore = create<VerseState>()(
           const i = OFFICE_MOODS.indexOf(s.officeMood);
           return { officeMood: OFFICE_MOODS[(i + 1) % OFFICE_MOODS.length] };
         }),
+      setPlayerPosition: (playerPosition) => set({ playerPosition }),
+      setPlayerMoveInput: (playerMoveInput) => set({ playerMoveInput }),
     }),
     {
       name: "agentverse-office-v2",

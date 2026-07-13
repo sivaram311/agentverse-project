@@ -15,6 +15,19 @@ export function hexSeatPosition(
   return [radius * Math.cos(a), 0, radius * Math.sin(a)];
 }
 
+/** Seat world position outside a hex desk (matches PersonaAvatar chairHome). */
+export function seatWorldPosition(
+  desk: [number, number, number],
+  seatDist = 0.66,
+): [number, number, number] {
+  const len = Math.hypot(desk[0], desk[2]);
+  if (len < 0.35) return [0, 0, 0.42];
+  const ox = desk[0] / len;
+  const oz = desk[2] / len;
+  return [desk[0] + ox * seatDist, 0, desk[2] + oz * seatDist];
+}
+
 export function isHubSeat(position: [number, number, number]): boolean {
   return Math.hypot(position[0], position[2]) < 0.35;
 }
+

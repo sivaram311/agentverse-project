@@ -1,7 +1,7 @@
 # Crew Manifest — AgentVerse
 
 **Project:** AgentVerse (Tamil Nadu 3D digital office)  
-**Status:** Active — **0.2.0 LIVE** on PREPROD + PROD (2026-07-12)  
+**Status:** Active — **0.2.1 LIVE** on PREPROD + PROD (2026-07-13)  
 **Crew Lead:** Cursor CLI (Rajesh routing in-app)  
 **Workspace:** `E:\MyWorkspace\agentverse-project`  
 **Session start:** 2026-07-12
@@ -42,5 +42,6 @@ _None for 0.2.0 ship._
 ## Session History
 
 - 2026-07-12: Crew init; living hub; TN office workplace; Q1+Q2 promote 0.2.0.
+- 2026-07-13: Q1+Q2 promote 0.2.1 (player avatar + office polish) → PREPROD + PROD.
 
-**Last ship:** agentverse **0.2.0** → https://agentverse-staging.delena.buzz + https://agentverse.delena.buzz
+**Last ship:** agentverse **0.2.1** → https://agentverse-staging.delena.buzz + https://agentverse.delena.buzz

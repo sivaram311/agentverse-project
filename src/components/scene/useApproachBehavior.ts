@@ -6,12 +6,13 @@ import type { Group } from "three";
 import * as THREE from "three";
 import type { PersonaId } from "@/lib/types";
 import { useVerseStore, type InteractionMode } from "@/lib/store";
+import { playerPose } from "@/lib/player-pose";
 
-const APPROACH_SPOT = new THREE.Vector3(0, 0, 4.8);
 const ARRIVE_EPS = 0.12;
 const WALK_SPEED = 3.4;
 const RETURN_SPEED = 2.9;
 const HOME_AFTER_MS = 14000;
+const FALLBACK_APPROACH = new THREE.Vector3(0, 0, 4.8);
 
 type Args = {
   personaId: PersonaId;
@@ -127,6 +128,24 @@ export function useApproachBehavior({
     const store = useVerseStore.getState();
     const active = store.interaction.focusId === personaId;
     const m = active ? store.interaction.mode : "idle";
+    const px = playerPose.x;
+    const pz = playerPose.z;
+    // Meet the player ~0.95m away along the line from player → agent home
+    const approach = new THREE.Vector3(px, 0, pz);
+    if (Math.hypot(px, pz) < 0.05) {
+      approach.copy(FALLBACK_APPROACH);
+    } else {
+      const fromPlayer = new THREE.Vector3(
+        homeVec.current.x - px,
+        0,
+        homeVec.current.z - pz,
+      );
+      if (fromPlayer.lengthSq() < 0.04) {
+        fromPlayer.set(-px, 0, -pz);
+      }
+      fromPlayer.normalize().multiplyScalar(0.95);
+      approach.add(fromPlayer);
+    }
 
     if (m === "approaching" && standPhase.current < 0.3 && !reducedMotion) {
       standPhase.current += clampedDt;
@@ -140,12 +159,12 @@ export function useApproachBehavior({
 
     const target =
       m === "approaching" || m === "greeting" || m === "talking"
-        ? APPROACH_SPOT
+        ? approach
         : homeVec.current;
 
     if (reducedMotion && m === "approaching") {
-      g.position.set(APPROACH_SPOT.x, 0, APPROACH_SPOT.z);
-      faceYaw(g, 0, 10, 10);
+      g.position.set(approach.x, 0, approach.z);
+      faceYaw(g, px, pz, 10);
       if (!greetedRef.current) {
         greetedRef.current = true;
         onArrivedGreet();
@@ -174,12 +193,12 @@ export function useApproachBehavior({
     g.rotation.z = 0;
 
     if (m === "approaching" || m === "greeting" || m === "talking") {
-      faceYaw(g, 0, 10, clampedDt);
+      faceYaw(g, px, pz, clampedDt);
     } else if (m === "returning") {
       faceYaw(g, homeVec.current.x, homeVec.current.z, clampedDt);
     }
 
-    if (m === "approaching" && g.position.distanceTo(APPROACH_SPOT) < ARRIVE_EPS) {
+    if (m === "approaching" && g.position.distanceTo(approach) < ARRIVE_EPS + 0.15) {
       if (!greetedRef.current) {
         greetedRef.current = true;
         onPoseChange?.("standing");

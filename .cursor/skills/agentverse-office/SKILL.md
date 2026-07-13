@@ -13,7 +13,7 @@ description: >-
 - Personas: `src/prompts/personas.json` (Rajesh orchestrator + TN crew)
 - Store: `src/lib/store.ts` (language, projects, sessionsByPath, agentStates)
 - Scene: `HubScene.tsx`, `OfficeEnvironment.tsx`, `DeskCluster.tsx`, `PersonaAvatar.tsx`, `useApproachBehavior.ts`
-- HUD: LanguagePicker, ProjectSwitcher, SessionTabs, WorkspacePicker, ChatPanel
+- HUD: LanguagePicker, ProjectSwitcher, SessionTabs, WorkspacePicker, **SessionDesk**, ChatPanel
 
 ## Behavior contract
 
@@ -21,7 +21,8 @@ description: >-
 2. Click/tap → stand → walk to approach spot → greet (SpeechSynthesis, gender-aware) → focus chat → return → sit.
 3. Language: store `language` `ta` | `hi` | `en`; voice: `voiceGender` `auto` | `male` | `female`.
 4. Projects: Rajesh `new project:` → `deployProject` + satellite desk cluster.
-5. Sessions: each workspace path maps to a portal session; SessionTabs / WorkspacePicker.
+5. Sessions: each workspace path maps to a portal session; SessionTabs / WorkspacePicker / **SessionDesk** (list, create, archive, restore).
+6. Optional allowlist: `NEXT_PUBLIC_WORKSPACE_ALLOWLIST` (comma-separated); see `src/lib/workspaces.ts`.
 
 ## Visual stack
 

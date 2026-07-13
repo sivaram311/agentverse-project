@@ -3,6 +3,11 @@
 import { FormEvent, useState } from "react";
 import { ApiError, portalApi } from "@/lib/api";
 import { useVerseStore } from "@/lib/store";
+import {
+  getWorkspaceAllowlist,
+  isWorkspaceAllowed,
+  shortWorkspaceLabel,
+} from "@/lib/workspaces";
 
 /**
  * Directory picker — each path can own an independent portal session.
@@ -16,10 +21,15 @@ export function WorkspacePicker() {
   const [draft, setDraft] = useState(workspacePath);
   const [open, setOpen] = useState(false);
   const [switching, setSwitching] = useState(false);
+  const allowlist = getWorkspaceAllowlist();
 
   async function activatePath(path: string) {
     const trimmed = path.trim();
     if (!trimmed) return;
+    if (!isWorkspaceAllowed(trimmed)) {
+      useVerseStore.getState().setError("Workspace path is not allowed");
+      return;
+    }
     rememberWorkspace(trimmed);
     setOpen(false);
     setSwitching(true);
@@ -43,7 +53,7 @@ export function WorkspacePicker() {
       const created = await portalApi.createSession(
         {
           workspacePath: trimmed,
-          title: `AgentVerse · ${trimmed.replace(/\\/g, "/").split("/").pop() || "dir"}`,
+          title: `AgentVerse · ${shortWorkspaceLabel(trimmed)}`,
           provider: "cursor",
         },
         authConfig,
@@ -67,7 +77,7 @@ export function WorkspacePicker() {
     void activatePath(draft);
   }
 
-  const short = workspacePath.replace(/\\/g, "/").split("/").pop() || workspacePath;
+  const short = shortWorkspaceLabel(workspacePath);
 
   return (
     <div className="workspace-picker">
@@ -94,10 +104,21 @@ export function WorkspacePicker() {
               name="workspace"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="e.g. E:\MyWorkspace\agentverse-project"
+              placeholder="e.g. demo or F:\\apps\\agent-portal\\workspaces\\demo"
               autoComplete="off"
             />
           </label>
+          {allowlist && allowlist.length > 0 ? (
+            <ul className="workspace-recent">
+              {allowlist.map((p) => (
+                <li key={`allow-${p}`}>
+                  <button type="button" onClick={() => void activatePath(p)}>
+                    {shortWorkspaceLabel(p)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
           {recent.length > 0 ? (
             <ul className="workspace-recent">
               {recent.map((p) => (

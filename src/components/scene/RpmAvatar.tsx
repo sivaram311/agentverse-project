@@ -1,26 +1,31 @@
 "use client";
 
 import { useAnimations, useGLTF } from "@react-three/drei";
-import { useEffect, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import type { Group } from "three";
 import * as THREE from "three";
 import {
   AVATAR_BY_PERSONA,
   AVATAR_SCALE,
+  PLAYER_AVATAR,
   type AvatarClipName,
 } from "@/lib/avatar-catalog";
 import type { PersonaId } from "@/lib/types";
 
 type Props = {
-  personaId: PersonaId;
+  /** Agent persona — ignored when `url` is set. */
+  personaId?: PersonaId;
+  /** Direct GLB url (player avatar). */
+  url?: string;
   sitting: boolean;
   walking: boolean;
-  waving: boolean;
+  waving?: boolean;
   working?: boolean;
   active?: boolean;
   reducedMotion?: boolean;
-  /** Override uniform scale (desk-fit default). */
   scale?: number;
+  accent?: string;
 };
 
 function pickClip(
@@ -37,40 +42,44 @@ function pickClip(
 }
 
 /**
- * Ready Player Me–style office avatar loaded via useGLTF + useAnimations.
- * Floor-anchored (group y=0); sit/walk/greet clips baked into each GLB.
+ * Ready Player Me–style avatar via useGLTF + useAnimations.
+ * Re-clamps feet to y=0 whenever the clip/pose changes (no sink/swim).
  */
 export function RpmAvatar({
   personaId,
+  url,
   sitting,
   walking,
-  waving,
+  waving = false,
   working = true,
   active = false,
   reducedMotion = false,
   scale = AVATAR_SCALE,
+  accent = "#E8A838",
 }: Props) {
-  const def = AVATAR_BY_PERSONA[personaId];
+  const resolvedUrl =
+    url ?? (personaId ? AVATAR_BY_PERSONA[personaId].url : PLAYER_AVATAR.url);
   const group = useRef<Group>(null);
-  const { scene, animations } = useGLTF(def.url);
+  const model = useRef<Group>(null);
+  const needsClamp = useRef(true);
+  const { scene, animations } = useGLTF(resolvedUrl);
   const clone = useMemo(() => {
-    const c = skeletonSafeClone(scene);
+    const c = scene.clone(true);
     c.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
-      if (mesh.isMesh) {
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        const mats = Array.isArray(mesh.material)
-          ? mesh.material
-          : mesh.material
-            ? [mesh.material]
-            : [];
-        for (const m of mats) {
-          const std = m as THREE.MeshStandardMaterial;
-          if (std.isMeshStandardMaterial) {
-            std.envMapIntensity = 0.65;
-            std.roughness = Math.min(0.85, (std.roughness ?? 0.5) + 0.05);
-          }
+      if (!mesh.isMesh) return;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      const mats = Array.isArray(mesh.material)
+        ? mesh.material
+        : mesh.material
+          ? [mesh.material]
+          : [];
+      for (const m of mats) {
+        const std = m as THREE.MeshStandardMaterial;
+        if (std.isMeshStandardMaterial) {
+          std.envMapIntensity = 0.7;
+          std.roughness = Math.min(0.82, (std.roughness ?? 0.5) + 0.04);
         }
       }
     });
@@ -86,8 +95,7 @@ export function RpmAvatar({
     if (current.current === name) return;
 
     const next = actions[name];
-    const prevName = current.current;
-    const prev = prevName ? actions[prevName] : null;
+    const prev = current.current ? actions[current.current] : null;
 
     if (next) {
       next.reset();
@@ -98,31 +106,61 @@ export function RpmAvatar({
         next.play();
         next.paused = true;
       } else {
-        next.setLoop(name === "Greet" ? THREE.LoopOnce : THREE.LoopRepeat, name === "Greet" ? 1 : Infinity);
+        next.setLoop(
+          name === "Greet" ? THREE.LoopOnce : THREE.LoopRepeat,
+          name === "Greet" ? 1 : Infinity,
+        );
         next.clampWhenFinished = name === "Greet";
-        next.fadeIn(0.25).play();
+        next.fadeIn(0.2).play();
       }
     }
-    if (prev && prev !== next && !reducedMotion) {
-      prev.fadeOut(0.25);
-    }
+    if (prev && prev !== next && !reducedMotion) prev.fadeOut(0.2);
     current.current = name;
+    needsClamp.current = true;
 
     return () => {
-      if (!reducedMotion) next?.fadeOut(0.1);
+      if (!reducedMotion) next?.fadeOut(0.08);
     };
   }, [actions, mixer, sitting, walking, waving, working, reducedMotion]);
 
-  // Soft accent ring under feet for selection
+  useLayoutEffect(() => {
+    needsClamp.current = true;
+  }, [scale, sitting, walking]);
+
+  useFrame(() => {
+    if (!group.current || !model.current) return;
+    const targetMin = sitting ? 0.012 : 0.0;
+    if (needsClamp.current) {
+      // Hard re-baseline after clip / scale change
+      model.current.position.y = 0;
+      group.current.updateMatrixWorld(true);
+      const box = new THREE.Box3().setFromObject(model.current);
+      if (!Number.isFinite(box.min.y)) return;
+      model.current.position.y = targetMin - box.min.y;
+      needsClamp.current = false;
+      return;
+    }
+    // Soft correct walk bob / sit drift so soles stay planted
+    group.current.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(model.current);
+    if (!Number.isFinite(box.min.y)) return;
+    const err = targetMin - box.min.y;
+    if (Math.abs(err) > 0.005) {
+      model.current.position.y += err * 0.65;
+    }
+  });
+
   return (
-    <group ref={group} scale={scale} position={[0, 0, 0]}>
-      <primitive object={clone} />
+    <group ref={group} scale={scale}>
+      <group ref={model}>
+        <primitive object={clone} />
+      </group>
       {active ? (
         <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[0.28, 0.4, 28]} />
+          <ringGeometry args={[0.3, 0.42, 28]} />
           <meshStandardMaterial
-            color="#E8A838"
-            emissive="#E8A838"
+            color={accent}
+            emissive={accent}
             emissiveIntensity={0.55}
             transparent
             opacity={0.45}
@@ -134,11 +172,6 @@ export function RpmAvatar({
   );
 }
 
-/** Clone hierarchy without sharing skeletons incorrectly. */
-function skeletonSafeClone(source: THREE.Object3D) {
-  return source.clone(true);
-}
-
 useGLTF.preload("/avatars/rajesh.glb");
 useGLTF.preload("/avatars/karthik.glb");
 useGLTF.preload("/avatars/lavanya.glb");
@@ -146,3 +179,4 @@ useGLTF.preload("/avatars/aravind.glb");
 useGLTF.preload("/avatars/meenakshi.glb");
 useGLTF.preload("/avatars/muthu.glb");
 useGLTF.preload("/avatars/kabilan.glb");
+useGLTF.preload("/avatars/player.glb");

@@ -1,7 +1,10 @@
 import type { PersonaId } from "@/lib/types";
 
-/** Desk-proportioned scale — seated hips land on chair (~0.38). */
-export const AVATAR_SCALE = 0.78;
+/**
+ * Desk-fit scale — seated hips ≈ chair top (~0.38).
+ * Feet are re-clamped to the floor at runtime in RpmAvatar.
+ */
+export const AVATAR_SCALE = 0.72;
 
 export type AvatarClipName =
   | "SitIdle"
@@ -26,4 +29,16 @@ export const AVATAR_BY_PERSONA: Record<PersonaId, AvatarDef> = {
   kabilan: { url: "/avatars/kabilan.glb", gender: "male" },
 };
 
-export const ALL_AVATAR_URLS = Object.values(AVATAR_BY_PERSONA).map((a) => a.url);
+/** Controllable logged-in visitor on the office floor. */
+export const PLAYER_AVATAR: AvatarDef = {
+  url: "/avatars/player.glb",
+  gender: "male",
+};
+
+export const ALL_AVATAR_URLS = [
+  ...Object.values(AVATAR_BY_PERSONA).map((a) => a.url),
+  PLAYER_AVATAR.url,
+];
+
+/** How close the player must be to trigger an agent greeting. */
+export const PLAYER_GREET_RADIUS = 1.45;

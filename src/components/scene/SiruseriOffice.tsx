@@ -3,7 +3,7 @@
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
-import type { Mesh } from "three";
+import type { Group, Mesh } from "three";
 import * as THREE from "three";
 import {
   FilterCoffeePantry,
@@ -18,6 +18,70 @@ export const SIRUSERI = {
   ceilingY: 4.35,
   wallT: 0.18,
 } as const;
+
+function MandalaPulse({ lod }: { lod: "full" | "simple" }) {
+  const spin = useRef<Group>(null);
+  const glow = useRef<Mesh>(null);
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    if (spin.current) spin.current.rotation.y = t * 0.06;
+    if (glow.current) {
+      const mat = glow.current.material as THREE.MeshStandardMaterial;
+      mat.emissiveIntensity = 0.22 + Math.sin(t * 1.4) * 0.08;
+    }
+  });
+
+  return (
+    <group position={[0, 0.025, 0]}>
+      <mesh ref={glow} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[3.55, lod === "simple" ? 32 : 64]} />
+        <meshStandardMaterial
+          color="#141018"
+          metalness={0.55}
+          roughness={0.32}
+          emissive="#5a3a12"
+          emissiveIntensity={0.25}
+        />
+      </mesh>
+      <group ref={spin}>
+        {[1.05, 1.75, 2.45, 3.15].map((r, i) => (
+          <mesh key={r} rotation={[-Math.PI / 2, 0, Math.PI / 12]}>
+            <ringGeometry args={[r, r + (i === 2 ? 0.11 : 0.055), i === 1 ? 6 : 72]} />
+            <meshStandardMaterial
+              color="#E8A838"
+              emissive="#E8A838"
+              emissiveIntensity={0.75 - i * 0.08}
+              transparent
+              opacity={0.75 - i * 0.1}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        ))}
+        {lod === "full"
+          ? Array.from({ length: 12 }, (_, i) => {
+              const a = (i / 12) * Math.PI * 2;
+              return (
+                <mesh
+                  key={`petal-${i}`}
+                  rotation={[-Math.PI / 2, 0, a]}
+                  position={[Math.cos(a) * 2.05, 0.012, Math.sin(a) * 2.05]}
+                >
+                  <circleGeometry args={[0.24, 3]} />
+                  <meshStandardMaterial
+                    color="#C4A35A"
+                    emissive="#E8A838"
+                    emissiveIntensity={0.5}
+                    transparent
+                    opacity={0.5}
+                  />
+                </mesh>
+              );
+            })
+          : null}
+      </group>
+    </group>
+  );
+}
 
 /** Green park / IT-park canopy beyond the glass. */
 function ParkView({ lod }: { lod: "full" | "simple" }) {
@@ -206,52 +270,7 @@ export function SiruseriOffice({
         : null}
 
       {/* Central golden mandala */}
-      <group position={[0, 0.025, 0]}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[3.4, lod === "simple" ? 32 : 64]} />
-          <meshStandardMaterial
-            color="#141018"
-            metalness={0.55}
-            roughness={0.35}
-            emissive="#3a2810"
-            emissiveIntensity={0.2}
-          />
-        </mesh>
-        {[1.1, 1.85, 2.55, 3.2].map((r, i) => (
-          <mesh key={r} rotation={[-Math.PI / 2, 0, Math.PI / 12]}>
-            <ringGeometry args={[r, r + (i === 2 ? 0.1 : 0.055), i === 1 ? 6 : 72]} />
-            <meshStandardMaterial
-              color="#E8A838"
-              emissive="#E8A838"
-              emissiveIntensity={0.65 - i * 0.08}
-              transparent
-              opacity={0.7 - i * 0.1}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-        ))}
-        {lod === "full"
-          ? Array.from({ length: 12 }, (_, i) => {
-              const a = (i / 12) * Math.PI * 2;
-              return (
-                <mesh
-                  key={`petal-${i}`}
-                  rotation={[-Math.PI / 2, 0, a]}
-                  position={[Math.cos(a) * 2.0, 0.01, Math.sin(a) * 2.0]}
-                >
-                  <circleGeometry args={[0.22, 3]} />
-                  <meshStandardMaterial
-                    color="#C4A35A"
-                    emissive="#E8A838"
-                    emissiveIntensity={0.4}
-                    transparent
-                    opacity={0.45}
-                  />
-                </mesh>
-              );
-            })
-          : null}
-      </group>
+      <MandalaPulse lod={lod} />
 
       {/* Structural walls (sides + back frame) */}
       <mesh position={[-halfW, ceilingY / 2, midZ]} castShadow receiveShadow>
@@ -338,11 +357,21 @@ export function SiruseriOffice({
         </group>
       ))}
 
-      {/* Side biophilia */}
+      {/* Extra biophilia along open edge + corners */}
       <OfficePlant position={[-halfW + 1.2, 0, 2]} scale={1.4} variant={1} />
       <OfficePlant position={[halfW - 1.2, 0, 2.4]} scale={1.35} variant={2} />
       <OfficePlant position={[-halfW + 1.4, 0, -3]} scale={1.25} variant={0} />
       <OfficePlant position={[halfW - 1.5, 0, -2.5]} scale={1.3} variant={3} />
+      <OfficePlant position={[-4.5, 0, openZ - 1.8]} scale={1.2} variant={2} />
+      <OfficePlant position={[4.5, 0, openZ - 1.6]} scale={1.25} variant={0} />
+      <OfficePlant position={[-2.2, 0, -6.2]} scale={1.15} variant={1} />
+      <OfficePlant position={[2.4, 0, -6.0]} scale={1.2} variant={3} />
+      {lod === "full" ? (
+        <>
+          <OfficePlant position={[-8.2, 0, 0.5]} scale={1.45} variant={0} />
+          <OfficePlant position={[8.2, 0, -0.8]} scale={1.4} variant={2} />
+        </>
+      ) : null}
 
       {/* Pantry corner — Siruseri café vibe */}
       <FilterCoffeePantry position={[halfW - 2.6, 0, openZ - 2.2]} lod={lod} />

@@ -16,7 +16,11 @@ function initials(name: string): string {
  * Single bottom command strip for portrait immersion:
  * agent pulse + live status + open-chat (replaces separate status + comms).
  */
-export function CommandStrip() {
+export function CommandStrip({
+  onOpenSessions,
+}: {
+  onOpenSessions?: () => void;
+} = {}) {
   const selected = useVerseStore((s) => s.selectedPersona);
   const busy = useVerseStore((s) => s.busy);
   const streamingHint = useVerseStore((s) => s.streamingHint);
@@ -82,6 +86,16 @@ export function CommandStrip() {
       </div>
 
       <div className="command-actions">
+        {onOpenSessions ? (
+          <button
+            type="button"
+            className="chip command-chip"
+            onClick={onOpenSessions}
+            title="Sessions — create, archive, restore"
+          >
+            Sessions
+          </button>
+        ) : null}
         <button
           type="button"
           className="chip command-chip"
