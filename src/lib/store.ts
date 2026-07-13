@@ -216,7 +216,8 @@ export const useVerseStore = create<VerseState>()(
         set({
           authenticated: v,
           username,
-          cameraMode: v ? "firstPerson" : "overview",
+          // PROD-like default orbit overview (FP remains via toggle)
+          cameraMode: "overview",
         }),
       setAccessToken: (accessToken) => set({ accessToken }),
       setApiOnline: (v) => set({ apiOnline: v }),

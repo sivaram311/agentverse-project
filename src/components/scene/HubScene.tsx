@@ -56,7 +56,6 @@ function SceneInner({
       <Environment preset="city" />
       <SiruseriOffice lod={lod} reducedMotion={reducedMotion} />
       <HexCollabOffice lod={lod} />
-      {/* 15-seat meeting room at back of PROD floor */}
       <CentralConference
         lod={lod}
         position={CONFERENCE.origin}
@@ -64,7 +63,6 @@ function SceneInner({
         reducedMotion={reducedMotion}
         occupied
       />
-      {/* Two team pods fitted beside hex ring */}
       {TEAM_ZONES.map((zone) => (
         <TeamCluster
           key={zone.id}
@@ -114,6 +112,7 @@ function SceneInner({
   );
 }
 
+/** PROD-matched orbit framing + lights; FP still available via HUD toggle. */
 export function HubScene() {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [narrow, setNarrow] = useState(false);
@@ -131,9 +130,10 @@ export function HubScene() {
     const sync = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
+      // Match PROD HubScene narrow gate
+      setNarrow(w <= 360 && h > w);
       const mode = resolveViewMode(w, h);
       setViewMode(mode);
-      setNarrow(w < 720 || mode.includes("compact"));
       document.body.dataset.avView = mode;
       document.body.dataset.avLandscape = isPortraitView(mode) ? "0" : "1";
     };
@@ -146,29 +146,31 @@ export function HubScene() {
     };
   }, []);
 
+  const compact =
+    viewMode === "portrait-compact" || viewMode === "landscape-compact";
+  // Keep office FULL for PROD brightness (extra desks still drawn); only DPR softens
+  const dpr: [number, number] = narrow || compact ? [1, 1] : [1, 1.75];
+  const lod: "full" | "simple" = "full";
   const cam = presetForView(viewMode);
-  const lod: "full" | "simple" = narrow ? "simple" : "full";
 
   return (
     <div className="hub-canvas" data-office="prod-0.3">
       <SceneBootOverlay />
       <Canvas
-        shadows
-        dpr={narrow ? [1, 1.25] : [1, 1.5]}
+        shadows={!narrow && viewMode === "portrait"}
+        dpr={dpr}
         camera={{
           position: cam.position,
           fov: cam.fov,
-          near: 0.15,
-          far: 80,
+          near: 0.1,
+          far: 100,
         }}
         gl={{
-          antialias: !narrow,
+          antialias: !narrow && !compact,
           powerPreference: "high-performance",
-          toneMappingExposure: 1.28,
-          stencil: false,
-          depth: true,
+          // Slightly above PROD 1.28 so added teams/meeting don’t look dimmer
+          toneMappingExposure: 1.32,
         }}
-        performance={{ min: 0.5 }}
       >
         <Suspense fallback={null}>
           <SceneInner

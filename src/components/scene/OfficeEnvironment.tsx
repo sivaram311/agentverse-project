@@ -124,23 +124,22 @@ const MOOD: Record<OfficeMood, MoodPalette> = {
     spotI: 0.5,
   },
   day: {
-    // Aligned with PROD 0.2.2 day mood (Expanded HQ still uses same intensities)
-    ambient: 0.52,
+    ambient: 0.55,
     hemiSky: "#d8e8f8",
     hemiGround: "#1a1810",
-    hemi: 0.45,
+    hemi: 0.48,
     key: "#fff8ec",
-    keyI: 1.12,
+    keyI: 1.18,
     fill: "#9ec4ff",
-    fillI: 0.58,
+    fillI: 0.62,
     left: "#b8d8ff",
-    leftI: 0.34,
+    leftI: 0.36,
     right: "#ffd0a0",
-    rightI: 0.3,
+    rightI: 0.32,
     hub: "#E8A838",
-    hubI: 0.65,
+    hubI: 0.72,
     spot: "#ffeac8",
-    spotI: 0.6,
+    spotI: 0.65,
   },
   evening: {
     ambient: 0.28,
@@ -165,83 +164,59 @@ const MOOD: Record<OfficeMood, MoodPalette> = {
 export function OfficeLighting({
   reducedMotion,
   narrow,
-  boost = false,
 }: {
   reducedMotion: boolean;
   narrow?: boolean;
-  /** Mobile/simple scenes without HDR — lift exposure via brighter lights. */
-  boost?: boolean;
 }) {
   const mood = useVerseStore((s) => s.officeMood);
   const palette = useMemo(() => MOOD[mood], [mood]);
   const flicker = useRef<THREE.PointLight>(null);
   const keyRef = useRef<THREE.DirectionalLight>(null);
   const ambientRef = useRef<THREE.AmbientLight>(null);
-  const mul = boost ? 1.55 : 1;
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     if (flicker.current && !reducedMotion) {
-      flicker.current.intensity = palette.hubI * mul + Math.sin(t * 1.8) * 0.08;
+      flicker.current.intensity = palette.hubI + Math.sin(t * 1.8) * 0.08;
     }
     if (ambientRef.current) {
       ambientRef.current.intensity =
-        palette.ambient * mul + (reducedMotion ? 0 : Math.sin(t * 0.35) * 0.02);
+        palette.ambient + (reducedMotion ? 0 : Math.sin(t * 0.35) * 0.02);
     }
     if (keyRef.current) {
       keyRef.current.intensity =
-        palette.keyI * mul + (reducedMotion ? 0 : Math.sin(t * 0.25) * 0.03);
+        palette.keyI + (reducedMotion ? 0 : Math.sin(t * 0.25) * 0.03);
     }
   });
 
   return (
     <>
-      <ambientLight ref={ambientRef} intensity={palette.ambient * mul} />
-      <hemisphereLight
-        args={[palette.hemiSky, palette.hemiGround, palette.hemi * (boost ? 1.35 : 1)]}
-      />
+      <ambientLight ref={ambientRef} intensity={palette.ambient} />
+      <hemisphereLight args={[palette.hemiSky, palette.hemiGround, palette.hemi]} />
       <directionalLight
         ref={keyRef}
         castShadow={!reducedMotion && !narrow}
         position={[5, 14, 8]}
-        intensity={palette.keyI * mul}
+        intensity={palette.keyI}
         color={palette.key}
         shadow-mapSize={narrow ? [512, 512] : [1024, 1024]}
         shadow-bias={-0.0002}
       />
-      <directionalLight
-        position={[0, 6, -14]}
-        intensity={palette.fillI * mul}
-        color={palette.fill}
-      />
-      <directionalLight
-        position={[-10, 8, 2]}
-        intensity={palette.leftI * mul}
-        color={palette.left}
-      />
-      <directionalLight
-        position={[10, 8, 2]}
-        intensity={palette.rightI * mul}
-        color={palette.right}
-      />
+      <directionalLight position={[0, 6, -14]} intensity={palette.fillI} color={palette.fill} />
+      <directionalLight position={[-10, 8, 2]} intensity={palette.leftI} color={palette.left} />
+      <directionalLight position={[10, 8, 2]} intensity={palette.rightI} color={palette.right} />
       <pointLight
         ref={flicker}
         position={[0, 5.5, 0]}
-        intensity={palette.hubI * mul}
+        intensity={palette.hubI}
         color={palette.hub}
-        distance={boost ? 32 : 22}
-      />
-      <pointLight
-        position={[0, 3.2, 4]}
-        intensity={boost ? 0.55 : 0.2}
-        color="#ffe6c8"
-        distance={boost ? 24 : 12}
+        distance={22}
       />
       <spotLight
         position={[0, 10, 4]}
         angle={0.7}
         penumbra={0.55}
-        intensity={palette.spotI * mul}
+        intensity={palette.spotI}
         color={palette.spot}
         castShadow={!narrow}
       />
