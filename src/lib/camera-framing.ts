@@ -6,6 +6,9 @@ export type ViewMode =
   | "landscape"
   | "landscape-compact";
 
+/** User-selectable framing (menu). Default is head & shoulders. */
+export type OrbitShot = "shoulders" | "close" | "desk" | "wide";
+
 export type CameraPreset = {
   position: [number, number, number];
   fov: number;
@@ -30,7 +33,67 @@ export const OFFICE_BOUNDS = {
   },
 } as const;
 
-/** Portrait — elevated view of open floor + hex desks. */
+/** Follow-cam offsets relative to player (x,y,z) → look at head. */
+export type ShotFollow = {
+  label: string;
+  /** Camera offset from player feet */
+  offset: [number, number, number];
+  /** Look-at height (head ~1.45, chest ~1.2) */
+  lookY: number;
+  fov: number;
+  minDistance: number;
+  maxDistance: number;
+  minPolarAngle: number;
+  maxPolarAngle: number;
+};
+
+export const ORBIT_SHOTS: Record<OrbitShot, ShotFollow> = {
+  /** Default — head & shoulders */
+  shoulders: {
+    label: "Shoulders",
+    offset: [0.35, 1.48, 2.15],
+    lookY: 1.42,
+    fov: 48,
+    minDistance: 1.6,
+    maxDistance: 3.4,
+    minPolarAngle: 0.95,
+    maxPolarAngle: 1.45,
+  },
+  close: {
+    label: "Close",
+    offset: [0.2, 1.5, 1.35],
+    lookY: 1.48,
+    fov: 42,
+    minDistance: 1.1,
+    maxDistance: 2.2,
+    minPolarAngle: 1.05,
+    maxPolarAngle: 1.5,
+  },
+  desk: {
+    label: "Desk",
+    offset: [1.2, 1.65, 2.6],
+    lookY: 1.15,
+    fov: 50,
+    minDistance: 2.2,
+    maxDistance: 5.5,
+    minPolarAngle: 0.7,
+    maxPolarAngle: 1.4,
+  },
+  wide: {
+    label: "Wide",
+    offset: [0, 5.8, 11.2],
+    lookY: 1.3,
+    fov: 42,
+    minDistance: 7,
+    maxDistance: 18,
+    minPolarAngle: 0.5,
+    maxPolarAngle: Math.PI / 2.12,
+  },
+};
+
+export const ORBIT_SHOT_ORDER: OrbitShot[] = ["close", "shoulders", "desk", "wide"];
+
+/** Portrait — elevated view of open floor + hex desks (wide fallback). */
 export const PORTRAIT_PRESET: CameraPreset = {
   position: [0, 6.8, 12.5],
   fov: 42,

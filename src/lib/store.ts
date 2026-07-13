@@ -114,8 +114,10 @@ type VerseState = {
   greetOnce: Partial<Record<PersonaId, boolean>>;
   subtitle: string | null;
   orbitLocked: boolean;
-  /** firstPerson = eye-level walk+look after login; overview = orbit HQ */
+  /** firstPerson = eye-level walk+look; overview = framed orbit shots */
   cameraMode: "firstPerson" | "overview";
+  /** Framed orbit angle when overview (default head & shoulders) */
+  orbitShot: import("@/lib/camera-framing").OrbitShot;
   chatFocusNonce: number;
   composeDraft: string;
   /** Full top chrome (lang, API, share, projects) — off by default for immersion */
@@ -158,6 +160,11 @@ type VerseState = {
   setSubtitle: (text: string | null) => void;
   setOrbitLocked: (v: boolean) => void;
   setCameraMode: (m: "firstPerson" | "overview") => void;
+  setOrbitShot: (shot: import("@/lib/camera-framing").OrbitShot) => void;
+  /** Menu picker: framed shots or walk */
+  pickCameraView: (
+    view: import("@/lib/camera-framing").OrbitShot | "walk",
+  ) => void;
   toggleCameraMode: () => void;
   bumpChatFocus: () => void;
   setComposeDraft: (text: string) => void;
@@ -204,6 +211,7 @@ export const useVerseStore = create<VerseState>()(
       subtitle: null,
       orbitLocked: false,
       cameraMode: "overview",
+      orbitShot: "shoulders",
       chatFocusNonce: 0,
       composeDraft: "",
       officeChromeOpen: false,
@@ -396,6 +404,14 @@ export const useVerseStore = create<VerseState>()(
       setSubtitle: (text) => set({ subtitle: text }),
       setOrbitLocked: (v) => set({ orbitLocked: v }),
       setCameraMode: (m) => set({ cameraMode: m }),
+      setOrbitShot: (orbitShot) => set({ orbitShot, cameraMode: "overview" }),
+      pickCameraView: (view) => {
+        if (view === "walk") {
+          set({ cameraMode: "firstPerson" });
+          return;
+        }
+        set({ cameraMode: "overview", orbitShot: view });
+      },
       toggleCameraMode: () =>
         set((s) => ({
           cameraMode:
@@ -442,6 +458,7 @@ export const useVerseStore = create<VerseState>()(
         greetOnce: s.greetOnce,
         officeMood: s.officeMood,
         cameraMode: s.cameraMode,
+        orbitShot: s.orbitShot,
       }),
     },
   ),

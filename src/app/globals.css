@@ -1454,6 +1454,44 @@ body {
   z-index: 4;
   width: min(94vw, 26rem);
   pointer-events: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.view-angles {
+  pointer-events: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  justify-content: center;
+  padding: 0.28rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 12, 16, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.view-angle-btn {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(230, 234, 240, 0.85);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.view-angle-btn.active {
+  border-color: rgba(255, 98, 0, 0.65);
+  background: rgba(255, 98, 0, 0.22);
+  color: #fff;
+}
+
+.view-angle-btn.walk.active {
+  border-color: rgba(77, 163, 255, 0.7);
+  background: rgba(77, 163, 255, 0.22);
 }
 
 .command-strip {

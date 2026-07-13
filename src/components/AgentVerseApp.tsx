@@ -13,6 +13,7 @@ import { SessionDesk } from "@/components/hud/SessionDesk";
 import { TeamMemberBar } from "@/components/hud/TeamMemberBar";
 import { TopBar } from "@/components/hud/TopBar";
 import { TouchJoystick } from "@/components/hud/TouchJoystick";
+import { ViewAngles } from "@/components/hud/ViewAngles";
 import { useVerseStore } from "@/lib/store";
 
 const HubScene = dynamic(
@@ -144,6 +145,7 @@ export function AgentVerseApp() {
             </div>
             {!chatOpen ? (
               <div className="command-layer">
+                <ViewAngles />
                 <CommandStrip
                   onOpenSessions={() => setSessionDeskOpen(true)}
                 />
