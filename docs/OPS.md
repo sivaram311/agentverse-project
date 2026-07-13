@@ -14,10 +14,11 @@
 - Auth: CSS clientId `agent-portal` (shared)
 - DNS: Cloudflare A `agentverse-staging.delena.buzz` → `103.118.183.185` (proxied)
 - **Bypass CF:** `http://103.118.183.185:4310/`
-- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.3.0) — **Q1_PREPROD_OK_033**
-- **0.3.0:** PROD-sized Siruseri + HexCollab office restored; **2 team pods** (Alpha/Beta); **1 meeting room** with 15 occupied chairs + TV; keep FP walk, Mathura, tap-only chat, distance labels, CORS/no-store
+- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.3.1) — **Q1_PREPROD_OK_034**
+- **0.3.1:** PROD-like orbit camera on login; brighter day lights + exposure; joystick hard-reset (window pointerup / lost capture)
+- **0.3.0:** PROD-sized Siruseri + HexCollab; 2 team pods; 15-seat occupied meeting + TV; FP/Mathura/tap/CORS retained
 - **Login:** staging/prod CSS admin password (`G:\apps\css\.env` → `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` will return **401** on staging.
-- **Camera:** after login → first-person walk+look; toggle **FP / Orbit** (or Walk / Overview) for HQ orbit.
+- **Camera:** default **overview** (PROD orbit); toggle FP / Orbit when you want walk.
 
 ## PROD
 
