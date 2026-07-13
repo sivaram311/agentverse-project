@@ -2,17 +2,15 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, Suspense } from "react";
-import type { Group, Mesh } from "three";
+import type { Group } from "three";
 import * as THREE from "three";
 import { greetingFor, type PersonaDef } from "@/lib/orchestrator";
 import { speakPersona, stopSpeaking, type VoicePrefs } from "@/lib/speech";
 import { useVerseStore } from "@/lib/store";
 import type { AgentPose, PersonaId } from "@/lib/types";
-import { isHubSeat, seatWorldPosition } from "@/lib/hex-office";
+import { isHubSeat } from "@/lib/hex-office";
 import { AVATAR_SCALE } from "@/lib/avatar-catalog";
-import { AgentDesk, MINI_FURNITURE } from "./DeskCluster";
 import { DistanceLabel } from "./DistanceLabel";
-import { HubChair } from "./HexCollabOffice";
 import { RpmAvatar } from "./RpmAvatar";
 import { HumanoidFigure } from "./HumanoidFigure";
 import { useApproachBehavior } from "./useApproachBehavior";
@@ -30,11 +28,6 @@ type Props = {
   showLabels: boolean;
   lod: "full" | "simple";
 };
-
-/** Seat on the outside of the hex desk — matches AgentDesk chair at local −Z. */
-function chairHome(desk: [number, number, number]): [number, number, number] {
-  return seatWorldPosition(desk, 0.48 * MINI_FURNITURE + 0.32);
-}
 
 /** Yaw-only so characters never pitch into the floor. */
 function setYawToward(
@@ -60,32 +53,10 @@ function setYawToward(
   g.rotation.z = 0;
 }
 
-function DeskOrb({ color, y = 1.45 }: { color: string; y?: number }) {
-  const ref = useRef<Mesh>(null);
-  useFrame((state) => {
-    if (!ref.current) return;
-    const t = state.clock.elapsedTime;
-    ref.current.position.y = y + Math.sin(t * 1.6 + y) * 0.06;
-    ref.current.rotation.y = t * 0.8;
-  });
-  return (
-    <mesh ref={ref} position={[0, y, 0]} castShadow>
-      <octahedronGeometry args={[0.09, 0]} />
-      <meshStandardMaterial
-        color={color}
-        emissive={color}
-        emissiveIntensity={0.45}
-        metalness={0.55}
-        roughness={0.25}
-      />
-    </mesh>
-  );
-}
-
 export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props) {
   const group = useRef<Group>(null);
   const [wavePhase, setWavePhase] = useState(0);
-  const [localPose, setLocalPose] = useState<AgentPose>("sitting");
+  const [localPose, setLocalPose] = useState<AgentPose>("standing");
 
   const selected = useVerseStore((s) => s.selectedPersona);
   const focusId = useVerseStore((s) => s.interaction.focusId);
@@ -98,28 +69,31 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
 
   const isSelected = selected === persona.id;
   const isFocus = focusId === persona.id;
-  const pose = isFocus ? localPose : agentState?.pose ?? "sitting";
+  // Empty floor: stand at station (no chairs/desks)
+  const pose = isFocus ? localPose : agentState?.pose === "walking" ? "walking" : "standing";
   const walking = pose === "walking";
-  const sitting = pose === "sitting";
+  const sitting = false;
 
   const deskPos = useMemo(
     () => persona.position as [number, number, number],
     [persona.position],
   );
-  const home = useMemo(() => chairHome(deskPos), [deskPos]);
+  const home = useMemo(
+    () => [deskPos[0], 0, deskPos[2]] as [number, number, number],
+    [deskPos],
+  );
   const hub = isHubSeat(deskPos);
 
   useLayoutEffect(() => {
     if (!group.current) return;
     group.current.position.set(home[0], 0, home[2]);
-    // Face the desk / hub (toward center for ring seats)
     const faceX = hub ? 0 : deskPos[0] * 0.35;
     const faceZ = hub ? -0.15 : deskPos[2] * 0.35;
     setYawToward(group.current, group.current.position, faceX, faceZ, 1);
   }, [home, deskPos, hub]);
 
   const onPoseChange = useCallback((p: AgentPose) => {
-    setLocalPose(p);
+    setLocalPose(p === "sitting" ? "standing" : p);
   }, []);
 
   const onArrivedGreet = useCallback(() => {
@@ -180,7 +154,7 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
 
   useFrame((_, dt) => {
     if (!group.current || isFocus) return;
-    if (!sitting) return;
+    if (walking) return;
     group.current.position.y = 0;
     const faceX = hub ? 0 : deskPos[0] * 0.35;
     const faceZ = hub ? -0.15 : deskPos[2] * 0.35;
@@ -188,7 +162,7 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
   });
 
   const progress = agentState?.progress ?? (activeQuest ? 40 : 0);
-  const labelY = sitting ? 1.15 : 1.55;
+  const labelY = 1.55;
   const prominent = isSelected || isFocus;
   const showAgentLabel = showLabels || prominent;
 
@@ -200,23 +174,6 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
 
   return (
     <group>
-      {hub ? (
-        <HubChair color={persona.color} />
-      ) : (
-        <>
-          <AgentDesk
-            position={deskPos}
-            color={persona.color}
-            progress={sitting ? progress : 0}
-            lod={lod}
-            faceCenter
-          />
-          <group position={deskPos}>
-            <DeskOrb color={persona.color} />
-          </group>
-        </>
-      )}
-
       <mesh
         position={[home[0], 0.75, home[2]]}
         onClick={summon}
@@ -298,7 +255,7 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
             {agentState?.working || activeQuest ? (
               <em>{agentState?.status || "Working"}</em>
             ) : null}
-            {progress > 0 && sitting ? (
+            {progress > 0 ? (
               <div className="persona-progress" aria-hidden>
                 <i
                   style={{

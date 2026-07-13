@@ -12,19 +12,13 @@ import {
   resolveViewMode,
   type ViewMode,
 } from "@/lib/camera-framing";
-import { TEAM_ZONES } from "@/lib/office-layout";
 import { personas } from "@/lib/orchestrator";
-import { useVerseStore } from "@/lib/store";
 import { AmbientWalkers } from "./AmbientWalkers";
-import { DataOrbs } from "./DataOrbs";
-import { ProjectCluster } from "./DeskCluster";
 import { FramingControls } from "./FramingControls";
-import { HexCollabOffice } from "./HexCollabOffice";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { SiruseriOffice } from "./SiruseriOffice";
-import { TeamCluster } from "./TeamCluster";
 
 function SceneInner({
   reducedMotion,
@@ -39,45 +33,20 @@ function SceneInner({
   narrow: boolean;
   viewMode: ViewMode;
 }) {
-  const projects = useVerseStore((s) => s.projects);
   const portrait = isPortraitView(viewMode);
 
   return (
     <>
-      <color attach="background" args={["#0a1218"]} />
+      <color attach="background" args={["#c8d6e4"]} />
       <fog
         attach="fog"
-        args={portrait ? ["#0a1218", 16, 36] : ["#0a1218", 18, 40]}
+        args={portrait ? ["#d0dce8", 22, 48] : ["#d0dce8", 24, 52]}
       />
       <OfficeLighting reducedMotion={reducedMotion} narrow={narrow} />
       <OfficeBackdrop lod={lod} />
-      <Environment preset="city" />
+      <Environment preset="warehouse" />
       <SiruseriOffice lod={lod} reducedMotion={reducedMotion} />
-      <HexCollabOffice lod={lod} />
-      {TEAM_ZONES.map((zone) => (
-        <TeamCluster
-          key={zone.id}
-          zone={zone}
-          lod={lod}
-          proxy={false}
-          showLabels={showLabels}
-          furnitureScale={0.78}
-        />
-      ))}
-      <group position={[0, 3.6, 0]}>
-        <DataOrbs showLabels={showLabels && viewMode !== "portrait-compact"} />
-      </group>
-      {projects
-        .filter((p) => p.id !== "hub")
-        .map((p) => (
-          <ProjectCluster
-            key={p.id}
-            project={p}
-            showLabels={showLabels}
-            lod={lod}
-            satellite
-          />
-        ))}
+      {/* Empty floor: crew only — no desks / hex / team furniture */}
       {personas.map((p) => (
         <PersonaAvatar
           key={p.id}
@@ -92,11 +61,11 @@ function SceneInner({
         <AmbientWalkers lod={lod} reducedMotion={reducedMotion} />
       ) : null}
       <ContactShadows
-        opacity={0.5}
+        opacity={0.28}
         scale={26}
-        blur={2.4}
+        blur={2.8}
         far={12}
-        color="#000000"
+        color="#6a7888"
       />
       <FramingControls viewMode={viewMode} />
     </>
@@ -143,7 +112,7 @@ export function HubScene() {
   const cam = presetForView(viewMode);
 
   return (
-    <div className="hub-canvas" data-office="prod-2teams">
+    <div className="hub-canvas" data-office="empty-intellect">
       <Canvas
         shadows={!narrow && viewMode === "portrait"}
         dpr={dpr}
@@ -156,7 +125,7 @@ export function HubScene() {
         gl={{
           antialias: !narrow && !compact,
           powerPreference: "high-performance",
-          toneMappingExposure: 1.32,
+          toneMappingExposure: 1.55,
         }}
       >
         <Suspense fallback={null}>

@@ -3,13 +3,9 @@
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
-import type { Group, Mesh } from "three";
+import type { Mesh } from "three";
 import * as THREE from "three";
-import {
-  FilterCoffeePantry,
-  FocusPod,
-  OfficePlant,
-} from "./OfficeDetails";
+import { FilterCoffeePantry } from "./OfficeDetails";
 
 export const SIRUSERI = {
   halfW: 10.5,
@@ -19,8 +15,9 @@ export const SIRUSERI = {
   wallT: 0.18,
 } as const;
 
+/** Kept for CentralConference / legacy scenes — not used on empty floor. */
 export function MandalaPulse({ lod }: { lod: "full" | "simple" }) {
-  const spin = useRef<Group>(null);
+  const spin = useRef<THREE.Group>(null);
   const glow = useRef<Mesh>(null);
   useFrame((state) => {
     const t = state.clock.elapsedTime;
@@ -57,33 +54,12 @@ export function MandalaPulse({ lod }: { lod: "full" | "simple" }) {
             />
           </mesh>
         ))}
-        {lod === "full"
-          ? Array.from({ length: 12 }, (_, i) => {
-              const a = (i / 12) * Math.PI * 2;
-              return (
-                <mesh
-                  key={`petal-${i}`}
-                  rotation={[-Math.PI / 2, 0, a]}
-                  position={[Math.cos(a) * 2.05, 0.012, Math.sin(a) * 2.05]}
-                >
-                  <circleGeometry args={[0.24, 3]} />
-                  <meshStandardMaterial
-                    color="#C4A35A"
-                    emissive="#E8A838"
-                    emissiveIntensity={0.5}
-                    transparent
-                    opacity={0.5}
-                  />
-                </mesh>
-              );
-            })
-          : null}
       </group>
     </group>
   );
 }
 
-/** Green park / IT-park canopy beyond the glass. */
+/** Daylit park wash beyond the glass (Intellect open-plan natural light). */
 function ParkView({ lod }: { lod: "full" | "simple" }) {
   const trees = useMemo(() => {
     const n = lod === "simple" ? 7 : 14;
@@ -100,22 +76,20 @@ function ParkView({ lod }: { lod: "full" | "simple" }) {
 
   return (
     <group position={[0, 0, SIRUSERI.backZ - 0.4]}>
-      {/* Sky wash */}
       <mesh position={[0, 3.2, -6]}>
         <planeGeometry args={[36, 14]} />
-        <meshBasicMaterial color="#6a9ab8" />
+        <meshBasicMaterial color="#a8c8e0" />
       </mesh>
-      {/* Lawn */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, -5]}>
         <planeGeometry args={[34, 16]} />
-        <meshStandardMaterial color="#1a3a28" roughness={0.95} />
+        <meshStandardMaterial color="#3a6b48" roughness={0.95} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, -4]}>
         <planeGeometry args={[28, 10]} />
         <meshStandardMaterial
-          color="#2d6b45"
-          emissive="#1a4028"
-          emissiveIntensity={0.15}
+          color="#4a8a5c"
+          emissive="#2a5038"
+          emissiveIntensity={0.12}
           roughness={0.9}
         />
       </mesh>
@@ -123,12 +97,12 @@ function ParkView({ lod }: { lod: "full" | "simple" }) {
         <group key={i} position={[tr.x, 0, tr.z]}>
           <mesh position={[0, tr.h * 0.35, 0]} castShadow>
             <cylinderGeometry args={[0.08, 0.12, tr.h * 0.7, 6]} />
-            <meshStandardMaterial color="#3a2818" roughness={0.85} />
+            <meshStandardMaterial color="#4a3828" roughness={0.85} />
           </mesh>
           <mesh position={[0, tr.h * 0.85, 0]} castShadow>
             <sphereGeometry args={[tr.s, 7, 7]} />
             <meshStandardMaterial
-              color={i % 2 === 0 ? "#1f5a38" : "#2a7048"}
+              color={i % 2 === 0 ? "#2a7048" : "#3a8858"}
               roughness={0.75}
             />
           </mesh>
@@ -155,35 +129,33 @@ function GlassCurtain({
       <mesh>
         <planeGeometry args={[w, h]} />
         <meshPhysicalMaterial
-          color="#9ec8dc"
+          color="#c8e0f0"
           transparent
-          opacity={0.18}
-          transmission={lod === "full" ? 0.55 : 0}
-          roughness={0.08}
-          metalness={0.05}
+          opacity={0.14}
+          transmission={lod === "full" ? 0.62 : 0}
+          roughness={0.06}
+          metalness={0.04}
           side={THREE.DoubleSide}
         />
       </mesh>
-      {/* Mullions */}
       {[-0.33, 0, 0.33].map((t, i) => (
         <mesh key={i} position={[t * w, 0, 0.01]}>
-          <boxGeometry args={[0.05, h, 0.04]} />
-          <meshStandardMaterial color="#1a222c" metalness={0.55} roughness={0.35} />
+          <boxGeometry args={[0.04, h, 0.035]} />
+          <meshStandardMaterial color="#e8ecef" metalness={0.35} roughness={0.4} />
         </mesh>
       ))}
       <mesh position={[0, h / 2 - 0.04, 0.01]}>
-        <boxGeometry args={[w, 0.08, 0.05]} />
-        <meshStandardMaterial color="#121820" metalness={0.5} />
+        <boxGeometry args={[w, 0.07, 0.04]} />
+        <meshStandardMaterial color="#f2f4f6" metalness={0.25} roughness={0.45} />
       </mesh>
       <mesh position={[0, -h / 2 + 0.04, 0.01]}>
-        <boxGeometry args={[w, 0.08, 0.05]} />
-        <meshStandardMaterial color="#121820" metalness={0.5} />
+        <boxGeometry args={[w, 0.07, 0.04]} />
+        <meshStandardMaterial color="#f2f4f6" metalness={0.25} roughness={0.45} />
       </mesh>
     </group>
   );
 }
 
-/** Soft volumetric light shafts from the north glass. */
 function WindowGodRays({ reducedMotion }: { reducedMotion: boolean }) {
   const shafts = useRef<THREE.Group>(null);
   useFrame((state) => {
@@ -191,7 +163,7 @@ function WindowGodRays({ reducedMotion }: { reducedMotion: boolean }) {
     const t = state.clock.elapsedTime;
     shafts.current.children.forEach((child, i) => {
       const m = (child as Mesh).material as THREE.MeshBasicMaterial;
-      if (m) m.opacity = 0.04 + Math.sin(t * 0.4 + i) * 0.015;
+      if (m) m.opacity = 0.05 + Math.sin(t * 0.4 + i) * 0.018;
     });
   });
 
@@ -205,9 +177,9 @@ function WindowGodRays({ reducedMotion }: { reducedMotion: boolean }) {
         >
           <coneGeometry args={[0.9, 6.5, 8, 1, true]} />
           <meshBasicMaterial
-            color="#fff2d0"
+            color="#fff8e8"
             transparent
-            opacity={0.055}
+            opacity={0.06}
             side={THREE.DoubleSide}
             depthWrite={false}
           />
@@ -218,8 +190,8 @@ function WindowGodRays({ reducedMotion }: { reducedMotion: boolean }) {
 }
 
 /**
- * Intellect Design Arena Â· Siruseri â€” open-plan fintech floor:
- * polished dark slab, glass park view, biophilia, pantry, LED canopy.
+ * Intellect Design Arena · Siruseri — empty open plan:
+ * bright epoxy floor, white pillars / glass, dark exposed ceiling + LEDs, pantry only.
  */
 export function SiruseriOffice({
   lod = "full",
@@ -234,61 +206,71 @@ export function SiruseriOffice({
 
   const cans = useMemo(() => {
     const pts: [number, number, number][] = [];
-    for (let x = -8; x <= 8; x += 4) {
-      for (let z = -6; z <= 5; z += 3.5) {
-        pts.push([x, ceilingY - 0.08, z]);
+    for (let x = -8.5; x <= 8.5; x += 2.1) {
+      for (let z = -7; z <= 5.5; z += 2.2) {
+        pts.push([x, ceilingY - 0.12, z]);
       }
     }
     return pts;
   }, [ceilingY]);
 
+  const beams = useMemo(() => {
+    const xs: number[] = [];
+    for (let x = -9; x <= 9; x += 3) xs.push(x);
+    return xs;
+  }, []);
+
+  const pillars = useMemo(
+    () =>
+      [
+        [-5.5, -4.2],
+        [5.5, -4.2],
+        [-5.5, 1.8],
+        [5.5, 1.8],
+        [-2.2, -6.8],
+        [2.2, -6.8],
+        [0, 4.2],
+      ] as [number, number][],
+    [],
+  );
+
   return (
     <group>
-      {/* Polished dark floor */}
+      {/* Polished light epoxy / vinyl — mirrors LEDs */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, midZ]} receiveShadow>
         <planeGeometry args={[halfW * 2.1, depth + 1.5]} />
         <meshStandardMaterial
-          color="#0c1016"
-          metalness={0.72}
-          roughness={0.22}
+          color="#e8ecf0"
+          metalness={0.55}
+          roughness={0.12}
         />
       </mesh>
-      {/* Subtle tile grid */}
-      {lod === "full"
-        ? [-6, -2, 2, 6].map((x) => (
-            <mesh key={`gx-${x}`} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.015, midZ]}>
-              <planeGeometry args={[0.02, depth]} />
-              <meshStandardMaterial
-                color="#1a2430"
-                emissive="#E8A838"
-                emissiveIntensity={0.08}
-                transparent
-                opacity={0.35}
-              />
-            </mesh>
-          ))
-        : null}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, midZ]} receiveShadow>
+        <planeGeometry args={[halfW * 2.05, depth + 1.2]} />
+        <meshStandardMaterial
+          color="#f4f6f8"
+          metalness={0.62}
+          roughness={0.08}
+          envMapIntensity={1.4}
+        />
+      </mesh>
 
-      {/* Central golden mandala */}
-      <MandalaPulse lod={lod} />
-
-      {/* Structural walls (sides + back frame) */}
+      {/* Side walls — light corporate shell */}
       <mesh position={[-halfW, ceilingY / 2, midZ]} castShadow receiveShadow>
         <boxGeometry args={[SIRUSERI.wallT, ceilingY, depth]} />
-        <meshStandardMaterial color="#161c24" metalness={0.25} roughness={0.7} />
+        <meshStandardMaterial color="#f0f2f4" metalness={0.08} roughness={0.78} />
       </mesh>
       <mesh position={[halfW, ceilingY / 2, midZ]} castShadow receiveShadow>
         <boxGeometry args={[SIRUSERI.wallT, ceilingY, depth]} />
-        <meshStandardMaterial color="#161c24" metalness={0.25} roughness={0.7} />
+        <meshStandardMaterial color="#f0f2f4" metalness={0.08} roughness={0.78} />
       </mesh>
-      {/* Back wall solid bands + glass */}
       <mesh position={[0, 0.35, backZ]} castShadow>
         <boxGeometry args={[halfW * 2, 0.7, SIRUSERI.wallT]} />
-        <meshStandardMaterial color="#121820" metalness={0.3} roughness={0.65} />
+        <meshStandardMaterial color="#eceef0" metalness={0.1} roughness={0.72} />
       </mesh>
       <mesh position={[0, ceilingY - 0.25, backZ]} castShadow>
         <boxGeometry args={[halfW * 2, 0.5, SIRUSERI.wallT]} />
-        <meshStandardMaterial color="#121820" metalness={0.3} roughness={0.65} />
+        <meshStandardMaterial color="#e6e8ea" metalness={0.1} roughness={0.7} />
       </mesh>
 
       <GlassCurtain
@@ -309,109 +291,113 @@ export function SiruseriOffice({
         lod={lod}
       />
 
+      {/* Interior glass partition strips */}
+      {lod === "full" ? (
+        <>
+          <GlassCurtain
+            position={[-3.2, 1.55, -1.2]}
+            size={[4.2, 2.6]}
+            yaw={0.08}
+            lod={lod}
+          />
+          <GlassCurtain
+            position={[3.4, 1.55, 0.8]}
+            size={[3.6, 2.6]}
+            yaw={-0.12}
+            lod={lod}
+          />
+        </>
+      ) : null}
+
       <ParkView lod={lod} />
       {lod === "full" && !reducedMotion ? (
         <WindowGodRays reducedMotion={reducedMotion} />
       ) : null}
 
-      {/* Ceiling slab */}
-      <mesh position={[0, ceilingY, midZ]} receiveShadow>
-        <boxGeometry args={[halfW * 2 - 0.2, 0.14, depth]} />
-        <meshStandardMaterial color="#10141a" metalness={0.2} roughness={0.8} />
+      {/* White structural pillars */}
+      {pillars.map(([x, z], i) => (
+        <mesh key={`p-${i}`} position={[x, ceilingY / 2, z]} castShadow receiveShadow>
+          <boxGeometry args={[0.42, ceilingY - 0.08, 0.42]} />
+          <meshStandardMaterial color="#f7f8fa" metalness={0.12} roughness={0.55} />
+        </mesh>
+      ))}
+
+      {/* Dark exposed ceiling slab */}
+      <mesh position={[0, ceilingY + 0.08, midZ]} receiveShadow>
+        <boxGeometry args={[halfW * 2 - 0.15, 0.22, depth]} />
+        <meshStandardMaterial color="#1a1c1e" metalness={0.35} roughness={0.75} />
       </mesh>
 
-      {/* LED cans */}
+      {/* Black beams */}
+      {beams.map((x) => (
+        <mesh key={`beam-${x}`} position={[x, ceilingY - 0.28, midZ]} castShadow>
+          <boxGeometry args={[0.16, 0.28, depth - 0.4]} />
+          <meshStandardMaterial color="#121416" metalness={0.55} roughness={0.4} />
+        </mesh>
+      ))}
+
+      {/* Duct runs */}
+      {lod === "full"
+        ? [-3, 3].map((x) => (
+            <mesh
+              key={`duct-${x}`}
+              position={[x, ceilingY - 0.55, midZ]}
+              rotation={[Math.PI / 2, 0, 0]}
+            >
+              <cylinderGeometry args={[0.18, 0.18, depth * 0.72, 10]} />
+              <meshStandardMaterial color="#2a2e32" metalness={0.65} roughness={0.35} />
+            </mesh>
+          ))
+        : null}
+
+      {/* Dense circular recessed / pendant LEDs */}
       {cans.map((p, i) => (
         <group key={`can-${i}`} position={p}>
           <mesh>
-            <cylinderGeometry args={[0.11, 0.13, 0.05, 10]} />
-            <meshStandardMaterial color="#0a0e14" />
+            <cylinderGeometry args={[0.14, 0.16, 0.06, 12]} />
+            <meshStandardMaterial color="#0e1012" metalness={0.4} />
           </mesh>
-          <mesh position={[0, -0.03, 0]}>
-            <circleGeometry args={[0.08, 10]} />
+          <mesh position={[0, -0.035, 0]}>
+            <circleGeometry args={[0.11, 12]} />
             <meshStandardMaterial
-              color="#fff2d6"
-              emissive="#ffe6b0"
-              emissiveIntensity={0.8}
+              color="#ffffff"
+              emissive="#fff6e0"
+              emissiveIntensity={1.15}
             />
           </mesh>
-          {lod === "full" && i % 4 === 0 ? (
+          {lod === "full" && i % 5 === 0 ? (
             <pointLight
-              position={[0, -0.2, 0]}
-              intensity={0.14}
-              distance={4.5}
-              color="#ffe8c8"
+              position={[0, -0.25, 0]}
+              intensity={0.22}
+              distance={5.2}
+              color="#fff4e0"
             />
           ) : null}
         </group>
       ))}
 
-      {/* Window planters */}
-      {[-7, -3.5, 0, 3.5, 7].map((x, i) => (
-        <group key={`wp-${i}`} position={[x, 0, backZ + 0.85]}>
-          <mesh position={[0, 0.28, 0]} castShadow>
-            <boxGeometry args={[1.1, 0.55, 0.45]} />
-            <meshStandardMaterial color="#1a222c" metalness={0.35} roughness={0.5} />
-          </mesh>
-          <OfficePlant position={[0, 0.55, 0]} scale={1.15} variant={i} />
-        </group>
-      ))}
-
-      {/* Extra biophilia along open edge + corners */}
-      <OfficePlant position={[-halfW + 1.2, 0, 2]} scale={1.4} variant={1} />
-      <OfficePlant position={[halfW - 1.2, 0, 2.4]} scale={1.35} variant={2} />
-      <OfficePlant position={[-halfW + 1.4, 0, -3]} scale={1.25} variant={0} />
-      <OfficePlant position={[halfW - 1.5, 0, -2.5]} scale={1.3} variant={3} />
-      <OfficePlant position={[-4.5, 0, openZ - 1.8]} scale={1.2} variant={2} />
-      <OfficePlant position={[4.5, 0, openZ - 1.6]} scale={1.25} variant={0} />
-      <OfficePlant position={[-2.2, 0, -6.2]} scale={1.15} variant={1} />
-      <OfficePlant position={[2.4, 0, -6.0]} scale={1.2} variant={3} />
-      {lod === "full" ? (
-        <>
-          <OfficePlant position={[-8.2, 0, 0.5]} scale={1.45} variant={0} />
-          <OfficePlant position={[8.2, 0, -0.8]} scale={1.4} variant={2} />
-        </>
-      ) : null}
-
-      {/* Pantry corner â€” Siruseri cafÃ© vibe */}
+      {/* Pantry only — keep crew staging / café corner */}
       <FilterCoffeePantry position={[halfW - 2.6, 0, openZ - 2.2]} lod={lod} />
-      <FocusPod position={[-halfW + 2.2, 0, openZ - 2.8]} yaw={0.35} />
-      <FocusPod position={[-halfW + 3.6, 0, -5.5]} yaw={-0.2} />
 
-      {/* Branding rail */}
       <mesh position={[0, ceilingY - 0.55, backZ + 0.35]}>
-        <boxGeometry args={[5.2, 0.35, 0.08]} />
-        <meshStandardMaterial color="#0c1016" metalness={0.45} />
+        <boxGeometry args={[5.2, 0.32, 0.06]} />
+        <meshStandardMaterial color="#f4f5f7" metalness={0.2} roughness={0.5} />
       </mesh>
       <Html position={[0, ceilingY - 0.55, backZ + 0.5]} center distanceFactor={16}>
         <div className="plaza-brand">
           <strong>Intellect Design Arena</strong>
-          <span>Siruseri Â· à®šà®¿à®±à¯à®šà¯‡à®°à®¿ Â· Digital Office</span>
+          <span>Siruseri · சிறுசேரி · Open plan</span>
         </div>
       </Html>
 
-      {/* Kolam accent near entry */}
-      <mesh rotation={[-Math.PI / 2, 0, Math.PI / 8]} position={[0, 0.03, openZ - 1.2]}>
-        <ringGeometry args={[0.55, 0.68, 6]} />
-        <meshStandardMaterial
-          color="#E8A838"
-          emissive="#E8A838"
-          emissiveIntensity={0.35}
-          transparent
-          opacity={0.4}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* Soft fill for open plan */}
-      <pointLight position={[0, 3.2, 0]} intensity={0.4} distance={14} color="#ffe6c8" />
-      <pointLight position={[-6, 2.8, -4]} intensity={0.28} distance={10} color="#c8e0ff" />
-      <pointLight position={[6, 2.8, 3]} intensity={0.25} distance={10} color="#ffd0a0" />
-      {/* Cool window light */}
+      {/* Bright even wash */}
+      <pointLight position={[0, 3.4, 0]} intensity={0.55} distance={16} color="#fff8ec" />
+      <pointLight position={[-6, 3.0, -4]} intensity={0.35} distance={12} color="#e8f2ff" />
+      <pointLight position={[6, 3.0, 3]} intensity={0.32} distance={12} color="#fff0d8" />
       <directionalLight
-        position={[0, 3.5, backZ - 2]}
-        intensity={0.55}
-        color="#d8ecff"
+        position={[0, 3.8, backZ - 2]}
+        intensity={0.85}
+        color="#f0f6ff"
       />
     </group>
   );
