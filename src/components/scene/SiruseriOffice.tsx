@@ -394,14 +394,17 @@ export function SiruseriOffice({
         <meshStandardMaterial color="#10141a" metalness={0.2} roughness={0.8} />
       </mesh>
 
-      {cans.map((p, i) => (
+      {cans.map((p, i) => {
+        // Mobile/simple: draw cans sparsely, never attach pointLights
+        if (lod === "simple" && i % 3 !== 0) return null;
+        return (
         <group key={`can-${i}`} position={p}>
           <mesh>
-            <cylinderGeometry args={[0.11, 0.13, 0.05, 10]} />
+            <cylinderGeometry args={[0.11, 0.13, 0.05, lod === "simple" ? 6 : 10]} />
             <meshStandardMaterial color="#0a0e14" />
           </mesh>
           <mesh position={[0, -0.03, 0]}>
-            <circleGeometry args={[0.08, 10]} />
+            <circleGeometry args={[0.08, lod === "simple" ? 6 : 10]} />
             <meshStandardMaterial
               color="#fff2d6"
               emissive="#ffe6b0"
@@ -417,7 +420,8 @@ export function SiruseriOffice({
             />
           ) : null}
         </group>
-      ))}
+        );
+      })}
 
       {/* Elevators flanking spine */}
       <ElevatorShaft
@@ -491,9 +495,13 @@ export function SiruseriOffice({
         />
       </mesh>
 
-      <pointLight position={[0, 3.2, 0]} intensity={0.35} distance={22} color="#ffe6c8" />
-      <pointLight position={[-10, 2.8, -4]} intensity={0.22} distance={14} color="#c8e0ff" />
-      <pointLight position={[10, 2.8, 3]} intensity={0.22} distance={14} color="#ffd0a0" />
+      <pointLight position={[0, 3.2, 0]} intensity={lod === "simple" ? 0.45 : 0.35} distance={lod === "simple" ? 28 : 22} color="#ffe6c8" />
+      {lod === "full" ? (
+        <>
+          <pointLight position={[-10, 2.8, -4]} intensity={0.22} distance={14} color="#c8e0ff" />
+          <pointLight position={[10, 2.8, 3]} intensity={0.22} distance={14} color="#ffd0a0" />
+        </>
+      ) : null}
       <directionalLight
         position={[0, 3.5, backZ - 2]}
         intensity={0.55}
