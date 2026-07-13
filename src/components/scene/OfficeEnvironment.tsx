@@ -124,22 +124,22 @@ const MOOD: Record<OfficeMood, MoodPalette> = {
     spotI: 0.5,
   },
   day: {
-    ambient: 0.78,
-    hemiSky: "#eef4ff",
-    hemiGround: "#c8c0b0",
-    hemi: 0.62,
-    key: "#ffffff",
-    keyI: 1.45,
-    fill: "#c8dcff",
-    fillI: 0.78,
-    left: "#d0e4ff",
-    leftI: 0.48,
-    right: "#ffe8c8",
-    rightI: 0.42,
-    hub: "#fff4dc",
-    hubI: 0.55,
-    spot: "#ffffff",
-    spotI: 0.85,
+    ambient: 0.48,
+    hemiSky: "#d8e8f8",
+    hemiGround: "#1a1810",
+    hemi: 0.42,
+    key: "#fff8ec",
+    keyI: 1.05,
+    fill: "#9ec4ff",
+    fillI: 0.55,
+    left: "#b8d8ff",
+    leftI: 0.32,
+    right: "#ffd0a0",
+    rightI: 0.28,
+    hub: "#E8A838",
+    hubI: 0.62,
+    spot: "#ffeac8",
+    spotI: 0.58,
   },
   evening: {
     ambient: 0.28,
@@ -224,16 +224,16 @@ export function OfficeLighting({
   );
 }
 
-/** Soft daylight shell beyond the glass — bright Intellect open-plan. */
+/** Night exterior beyond the glass — subtle city void, not a game void. */
 export function OfficeBackdrop({ lod = "full" }: { lod?: "full" | "simple" }) {
   return (
     <group>
       <mesh position={[0, 2.5, 0]}>
         <sphereGeometry args={[22, lod === "simple" ? 16 : 32, lod === "simple" ? 12 : 24]} />
         <meshStandardMaterial
-          color="#b8cce0"
-          emissive="#90a8c0"
-          emissiveIntensity={0.45}
+          color="#060a12"
+          emissive="#0c1828"
+          emissiveIntensity={0.35}
           side={THREE.BackSide}
           roughness={1}
           metalness={0}
@@ -242,12 +242,12 @@ export function OfficeBackdrop({ lod = "full" }: { lod?: "full" | "simple" }) {
       <mesh position={[0, 0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[16, 21, lod === "simple" ? 24 : 48]} />
         <meshStandardMaterial
-          color="#d8e0e8"
-          emissive="#a8b8c8"
-          emissiveIntensity={0.2}
+          color="#101828"
+          emissive="#1a3048"
+          emissiveIntensity={0.25}
           side={THREE.DoubleSide}
           transparent
-          opacity={0.55}
+          opacity={0.7}
         />
       </mesh>
     </group>

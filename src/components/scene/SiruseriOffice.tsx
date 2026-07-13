@@ -78,18 +78,18 @@ function ParkView({ lod }: { lod: "full" | "simple" }) {
     <group position={[0, 0, SIRUSERI.backZ - 0.4]}>
       <mesh position={[0, 3.2, -6]}>
         <planeGeometry args={[36, 14]} />
-        <meshBasicMaterial color="#a8c8e0" />
+        <meshBasicMaterial color="#6a9ab8" />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, -5]}>
         <planeGeometry args={[34, 16]} />
-        <meshStandardMaterial color="#3a6b48" roughness={0.95} />
+        <meshStandardMaterial color="#1a3a28" roughness={0.95} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, -4]}>
         <planeGeometry args={[28, 10]} />
         <meshStandardMaterial
-          color="#4a8a5c"
-          emissive="#2a5038"
-          emissiveIntensity={0.12}
+          color="#2d6b45"
+          emissive="#1a4028"
+          emissiveIntensity={0.15}
           roughness={0.9}
         />
       </mesh>
@@ -97,12 +97,12 @@ function ParkView({ lod }: { lod: "full" | "simple" }) {
         <group key={i} position={[tr.x, 0, tr.z]}>
           <mesh position={[0, tr.h * 0.35, 0]} castShadow>
             <cylinderGeometry args={[0.08, 0.12, tr.h * 0.7, 6]} />
-            <meshStandardMaterial color="#4a3828" roughness={0.85} />
+            <meshStandardMaterial color="#3a2818" roughness={0.85} />
           </mesh>
           <mesh position={[0, tr.h * 0.85, 0]} castShadow>
             <sphereGeometry args={[tr.s, 7, 7]} />
             <meshStandardMaterial
-              color={i % 2 === 0 ? "#2a7048" : "#3a8858"}
+              color={i % 2 === 0 ? "#1f5a38" : "#2a7048"}
               roughness={0.75}
             />
           </mesh>
@@ -129,28 +129,28 @@ function GlassCurtain({
       <mesh>
         <planeGeometry args={[w, h]} />
         <meshPhysicalMaterial
-          color="#c8e0f0"
+          color="#9ec8dc"
           transparent
-          opacity={0.14}
-          transmission={lod === "full" ? 0.62 : 0}
-          roughness={0.06}
-          metalness={0.04}
+          opacity={0.18}
+          transmission={lod === "full" ? 0.55 : 0}
+          roughness={0.08}
+          metalness={0.05}
           side={THREE.DoubleSide}
         />
       </mesh>
       {[-0.33, 0, 0.33].map((t, i) => (
         <mesh key={i} position={[t * w, 0, 0.01]}>
-          <boxGeometry args={[0.04, h, 0.035]} />
-          <meshStandardMaterial color="#e8ecef" metalness={0.35} roughness={0.4} />
+          <boxGeometry args={[0.05, h, 0.04]} />
+          <meshStandardMaterial color="#1a222c" metalness={0.55} roughness={0.35} />
         </mesh>
       ))}
       <mesh position={[0, h / 2 - 0.04, 0.01]}>
-        <boxGeometry args={[w, 0.07, 0.04]} />
-        <meshStandardMaterial color="#f2f4f6" metalness={0.25} roughness={0.45} />
+        <boxGeometry args={[w, 0.08, 0.05]} />
+        <meshStandardMaterial color="#121820" metalness={0.5} />
       </mesh>
       <mesh position={[0, -h / 2 + 0.04, 0.01]}>
-        <boxGeometry args={[w, 0.07, 0.04]} />
-        <meshStandardMaterial color="#f2f4f6" metalness={0.25} roughness={0.45} />
+        <boxGeometry args={[w, 0.08, 0.05]} />
+        <meshStandardMaterial color="#121820" metalness={0.5} />
       </mesh>
     </group>
   );
@@ -260,22 +260,22 @@ export function SiruseriOffice({
           ))
         : null}
 
-      {/* Side walls — light corporate shell */}
+      {/* Side walls — PROD dark shell */}
       <mesh position={[-halfW, ceilingY / 2, midZ]} castShadow receiveShadow>
         <boxGeometry args={[SIRUSERI.wallT, ceilingY, depth]} />
-        <meshStandardMaterial color="#f0f2f4" metalness={0.08} roughness={0.78} />
+        <meshStandardMaterial color="#161c24" metalness={0.25} roughness={0.7} />
       </mesh>
       <mesh position={[halfW, ceilingY / 2, midZ]} castShadow receiveShadow>
         <boxGeometry args={[SIRUSERI.wallT, ceilingY, depth]} />
-        <meshStandardMaterial color="#f0f2f4" metalness={0.08} roughness={0.78} />
+        <meshStandardMaterial color="#161c24" metalness={0.25} roughness={0.7} />
       </mesh>
       <mesh position={[0, 0.35, backZ]} castShadow>
         <boxGeometry args={[halfW * 2, 0.7, SIRUSERI.wallT]} />
-        <meshStandardMaterial color="#eceef0" metalness={0.1} roughness={0.72} />
+        <meshStandardMaterial color="#121820" metalness={0.3} roughness={0.65} />
       </mesh>
       <mesh position={[0, ceilingY - 0.25, backZ]} castShadow>
         <boxGeometry args={[halfW * 2, 0.5, SIRUSERI.wallT]} />
-        <meshStandardMaterial color="#e6e8ea" metalness={0.1} roughness={0.7} />
+        <meshStandardMaterial color="#121820" metalness={0.3} roughness={0.65} />
       </mesh>
 
       <GlassCurtain
@@ -319,25 +319,25 @@ export function SiruseriOffice({
         <WindowGodRays reducedMotion={reducedMotion} />
       ) : null}
 
-      {/* White structural pillars */}
+      {/* Structural pillars — PROD dark charcoal (not bright white) */}
       {pillars.map(([x, z], i) => (
         <mesh key={`p-${i}`} position={[x, ceilingY / 2, z]} castShadow receiveShadow>
           <boxGeometry args={[0.42, ceilingY - 0.08, 0.42]} />
-          <meshStandardMaterial color="#f7f8fa" metalness={0.12} roughness={0.55} />
+          <meshStandardMaterial color="#161c24" metalness={0.3} roughness={0.65} />
         </mesh>
       ))}
 
-      {/* Dark exposed ceiling slab */}
+      {/* Ceiling slab — PROD */}
       <mesh position={[0, ceilingY + 0.08, midZ]} receiveShadow>
         <boxGeometry args={[halfW * 2 - 0.15, 0.22, depth]} />
-        <meshStandardMaterial color="#1a1c1e" metalness={0.35} roughness={0.75} />
+        <meshStandardMaterial color="#10141a" metalness={0.2} roughness={0.8} />
       </mesh>
 
       {/* Black beams */}
       {beams.map((x) => (
         <mesh key={`beam-${x}`} position={[x, ceilingY - 0.28, midZ]} castShadow>
           <boxGeometry args={[0.16, 0.28, depth - 0.4]} />
-          <meshStandardMaterial color="#121416" metalness={0.55} roughness={0.4} />
+          <meshStandardMaterial color="#0a0e14" metalness={0.55} roughness={0.4} />
         </mesh>
       ))}
 
@@ -365,17 +365,17 @@ export function SiruseriOffice({
           <mesh position={[0, -0.035, 0]}>
             <circleGeometry args={[0.11, 12]} />
             <meshStandardMaterial
-              color="#ffffff"
-              emissive="#fff6e0"
-              emissiveIntensity={1.15}
+              color="#fff2d6"
+              emissive="#ffe6b0"
+              emissiveIntensity={0.8}
             />
           </mesh>
-          {lod === "full" && i % 5 === 0 ? (
+          {lod === "full" && i % 4 === 0 ? (
             <pointLight
-              position={[0, -0.25, 0]}
-              intensity={0.22}
-              distance={5.2}
-              color="#fff4e0"
+              position={[0, -0.2, 0]}
+              intensity={0.14}
+              distance={4.5}
+              color="#ffe8c8"
             />
           ) : null}
         </group>
@@ -385,24 +385,24 @@ export function SiruseriOffice({
       <FilterCoffeePantry position={[halfW - 2.6, 0, openZ - 2.2]} lod={lod} />
 
       <mesh position={[0, ceilingY - 0.55, backZ + 0.35]}>
-        <boxGeometry args={[5.2, 0.32, 0.06]} />
-        <meshStandardMaterial color="#f4f5f7" metalness={0.2} roughness={0.5} />
+        <boxGeometry args={[5.2, 0.35, 0.08]} />
+        <meshStandardMaterial color="#0c1016" metalness={0.45} />
       </mesh>
       <Html position={[0, ceilingY - 0.55, backZ + 0.5]} center distanceFactor={16}>
         <div className="plaza-brand">
           <strong>Intellect Design Arena</strong>
-          <span>Siruseri · சிறுசேரி · Open plan</span>
+          <span>Siruseri · சிறுசேரி · Digital Office</span>
         </div>
       </Html>
 
-      {/* Bright even wash */}
-      <pointLight position={[0, 3.4, 0]} intensity={0.55} distance={16} color="#fff8ec" />
-      <pointLight position={[-6, 3.0, -4]} intensity={0.35} distance={12} color="#e8f2ff" />
-      <pointLight position={[6, 3.0, 3]} intensity={0.32} distance={12} color="#fff0d8" />
+      {/* Soft fill — PROD levels */}
+      <pointLight position={[0, 3.2, 0]} intensity={0.4} distance={14} color="#ffe6c8" />
+      <pointLight position={[-6, 2.8, -4]} intensity={0.28} distance={10} color="#c8e0ff" />
+      <pointLight position={[6, 2.8, 3]} intensity={0.25} distance={10} color="#ffd0a0" />
       <directionalLight
-        position={[0, 3.8, backZ - 2]}
-        intensity={0.85}
-        color="#f0f6ff"
+        position={[0, 3.5, backZ - 2]}
+        intensity={0.55}
+        color="#d8ecff"
       />
     </group>
   );

@@ -38,14 +38,14 @@ function SceneInner({
 
   return (
     <>
-      <color attach="background" args={["#c8d6e4"]} />
+      <color attach="background" args={["#0a1218"]} />
       <fog
         attach="fog"
-        args={portrait ? ["#d0dce8", 22, 48] : ["#d0dce8", 24, 52]}
+        args={portrait ? ["#0a1218", 16, 36] : ["#0a1218", 18, 40]}
       />
       <OfficeLighting reducedMotion={reducedMotion} narrow={narrow} />
       <OfficeBackdrop lod={lod} />
-      <Environment preset="warehouse" />
+      <Environment preset="city" />
       <SiruseriOffice lod={lod} reducedMotion={reducedMotion} />
       <IntellectBenches lod={lod} />
       {/* Crew seated on Intellect benches */}
@@ -127,7 +127,7 @@ export function HubScene() {
         gl={{
           antialias: !narrow && !compact,
           powerPreference: "high-performance",
-          toneMappingExposure: 1.55,
+          toneMappingExposure: 1.32,
         }}
       >
         <Suspense fallback={null}>
