@@ -8,14 +8,15 @@
 
 ## PREPROD
 
-- Release: `H:\releases\agentverse-0.2.4\`
+- Release: `H:\releases\agentverse-0.2.5\`
 - Start: `F:\apps\agentverse\start.ps1 -EnvName preprod`
-- Evidence: `H:\releases\agentverse-0.2.4\evidence\q1\`
+- Evidence: `H:\releases\agentverse-0.2.5\evidence\q1\`
 - Auth: CSS clientId `agent-portal` (shared)
 - DNS: Cloudflare A `agentverse-staging.delena.buzz` → `103.118.183.185` (proxied)
-- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.4) — **Q1_PREPROD_OK_024**
+- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.5) — **Q1_PREPROD_OK_025**
 - **Login:** staging/prod CSS admin password (`G:\apps\css\.env` → `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` will return **401** on staging.
 - **Camera:** after login → first-person walk+look; toggle **FP / Orbit** (or Walk / Overview) for HQ orbit.
+- **Mobile:** auto perf tier (low/medium) culls team pods + drops HDR/shadows so FP walk stays interactive.
 
 ## PROD
 
