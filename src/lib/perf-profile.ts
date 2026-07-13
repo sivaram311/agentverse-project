@@ -12,13 +12,10 @@ export type PerfProfile = {
   contactShadows: boolean;
   ambientWalkers: boolean;
   dataOrbs: boolean;
-  /** Max team pods mounted at once (rest culled). */
+  lightBoost: boolean;
   maxTeamClusters: number;
-  /** Max pods with full desk detail. */
   maxFullClusters: number;
-  /** Cull teams beyond this distance (m). */
   teamCullDist: number;
-  /** Full detail within this distance (m). */
   teamNearDist: number;
   showGlassCube: boolean;
   showSideConference: boolean;
@@ -68,18 +65,19 @@ export function resolvePerfProfile(
       shadows: false,
       environment: false,
       contactShadows: false,
-      ambientWalkers: false,
+      ambientWalkers: true,
       dataOrbs: false,
-      maxTeamClusters: 4,
-      maxFullClusters: 1,
-      teamCullDist: 16,
-      teamNearDist: 10,
+      lightBoost: true,
+      maxTeamClusters: 6,
+      maxFullClusters: 2,
+      teamCullDist: 22,
+      teamNearDist: 14,
       showGlassCube: true,
       showSideConference: false,
       showSatelliteProjects: false,
-      cameraFar: 55,
-      fogNear: 12,
-      fogFar: 38,
+      cameraFar: 70,
+      fogNear: 22,
+      fogFar: 55,
     };
   }
 
@@ -92,18 +90,19 @@ export function resolvePerfProfile(
       shadows: false,
       environment: false,
       contactShadows: false,
-      ambientWalkers: false,
+      ambientWalkers: true,
       dataOrbs: false,
-      maxTeamClusters: 6,
-      maxFullClusters: 2,
-      teamCullDist: 20,
-      teamNearDist: 12,
+      lightBoost: true,
+      maxTeamClusters: 8,
+      maxFullClusters: 3,
+      teamCullDist: 26,
+      teamNearDist: 16,
       showGlassCube: true,
       showSideConference: true,
       showSatelliteProjects: true,
-      cameraFar: 70,
-      fogNear: 18,
-      fogFar: 48,
+      cameraFar: 80,
+      fogNear: 24,
+      fogFar: 58,
     };
   }
 
@@ -117,10 +116,11 @@ export function resolvePerfProfile(
     contactShadows: true,
     ambientWalkers: true,
     dataOrbs: true,
-    maxTeamClusters: 12,
-    maxFullClusters: 4,
-    teamCullDist: 28,
-    teamNearDist: 14,
+    lightBoost: false,
+    maxTeamClusters: 10,
+    maxFullClusters: 5,
+    teamCullDist: 32,
+    teamNearDist: 16,
     showGlassCube: true,
     showSideConference: true,
     showSatelliteProjects: true,

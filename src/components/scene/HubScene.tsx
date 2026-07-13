@@ -128,21 +128,25 @@ function SceneInner({
         attach="fog"
         args={["#0a1218", profile.fogNear, profile.fogFar]}
       />
-      <OfficeLighting reducedMotion={reducedMotion || narrow} narrow={narrow} />
+      <OfficeLighting
+        reducedMotion={reducedMotion}
+        narrow={narrow}
+        boost={profile.lightBoost}
+      />
       <OfficeBackdrop lod={lod} />
       {profile.environment ? <Environment preset="city" /> : null}
-      <SiruseriOffice lod={lod} reducedMotion={reducedMotion || narrow} showMandala={false} />
+      <SiruseriOffice lod={lod} reducedMotion={reducedMotion} showMandala={false} />
       <CentralConference
         lod={lod}
-        showLabels={showLabels && profile.tier === "high"}
-        reducedMotion={reducedMotion || narrow}
+        showLabels={showLabels && profile.tier !== "low"}
+        reducedMotion={reducedMotion}
       />
       {profile.showGlassCube ? (
         <GlassCube
           position={ANCHORS.glassCube.position}
           size={ANCHORS.glassCube.size}
           lod={lod}
-          reducedMotion={reducedMotion || narrow}
+          reducedMotion={reducedMotion}
         />
       ) : null}
       {profile.showSideConference ? (
@@ -180,13 +184,13 @@ function SceneInner({
           key={p.id}
           persona={p}
           reducedMotion={reducedMotion || narrow}
-          showLabels={showLabels && profile.tier === "high"}
+          showLabels={showLabels && profile.tier !== "low"}
           lod={lod}
         />
       ))}
-      <PlayerAvatar reducedMotion={reducedMotion || narrow} />
-      {profile.ambientWalkers && lod === "full" ? (
-        <AmbientWalkers lod={lod} reducedMotion={reducedMotion} />
+      <PlayerAvatar reducedMotion={reducedMotion} />
+      {profile.ambientWalkers ? (
+        <AmbientWalkers lod={lod === "full" ? "full" : "simple"} reducedMotion={reducedMotion} />
       ) : null}
       {profile.contactShadows ? (
         <ContactShadows
@@ -254,7 +258,7 @@ export function HubScene() {
         gl={{
           antialias: profile.antialias,
           powerPreference: "high-performance",
-          toneMappingExposure: profile.tier === "high" ? 1.28 : 1.15,
+          toneMappingExposure: profile.lightBoost ? 1.45 : 1.28,
           stencil: false,
           depth: true,
         }}

@@ -85,7 +85,7 @@ export function routeQuest(userText: string): {
   }
   if (bestScore === 0 && !projectIdea) {
     if (/^(hi|hello|hey|vanakkam|வணக்கம்|thanks)\b/i.test(lower)) {
-      best = "meenakshi";
+      best = "mathura";
     } else {
       best = "aravind";
     }

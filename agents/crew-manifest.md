@@ -14,7 +14,7 @@
 | Research (Karthik) | Active | `personas.json` |
 | Creative (Lavanya) | Active | `personas.json` |
 | Coder (Aravind) | Active | Implementation |
-| Companion (Meenakshi) | Active | Onboarding / morale |
+| Companion (Mathura) | Active | Onboarding / morale |
 | Project Manager (Muthu) | Active | Desk clusters + milestones — `agents/roles/muthu-project-manager.md` |
 | Device Lab QA (Kabilan) | Active | Realme P2 Pro; `agents/roles/kabilan-device-lab-qa.md` |
 | Docs-Keeper | Active | README / OPS / IMPLEMENTATION-GUIDE |

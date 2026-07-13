@@ -10,7 +10,7 @@ Next.js + React Three Fiber **Tamil Nadu digital office** — agents sit at desk
 | Karthik | Research |
 | Lavanya | Creative |
 | Aravind | Coder |
-| Meenakshi | Companion |
+| Mathura | Companion |
 | Muthu | Project Manager |
 | Kabilan | Device Lab QA (Chrome DevTools) |
 

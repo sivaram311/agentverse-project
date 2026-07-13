@@ -164,59 +164,83 @@ const MOOD: Record<OfficeMood, MoodPalette> = {
 export function OfficeLighting({
   reducedMotion,
   narrow,
+  boost = false,
 }: {
   reducedMotion: boolean;
   narrow?: boolean;
+  /** Mobile/simple scenes without HDR — lift exposure via brighter lights. */
+  boost?: boolean;
 }) {
   const mood = useVerseStore((s) => s.officeMood);
   const palette = useMemo(() => MOOD[mood], [mood]);
   const flicker = useRef<THREE.PointLight>(null);
   const keyRef = useRef<THREE.DirectionalLight>(null);
   const ambientRef = useRef<THREE.AmbientLight>(null);
+  const mul = boost ? 1.55 : 1;
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     if (flicker.current && !reducedMotion) {
-      flicker.current.intensity = palette.hubI + Math.sin(t * 1.8) * 0.08;
+      flicker.current.intensity = palette.hubI * mul + Math.sin(t * 1.8) * 0.08;
     }
     if (ambientRef.current) {
       ambientRef.current.intensity =
-        palette.ambient + (reducedMotion ? 0 : Math.sin(t * 0.35) * 0.02);
+        palette.ambient * mul + (reducedMotion ? 0 : Math.sin(t * 0.35) * 0.02);
     }
     if (keyRef.current) {
       keyRef.current.intensity =
-        palette.keyI + (reducedMotion ? 0 : Math.sin(t * 0.25) * 0.03);
+        palette.keyI * mul + (reducedMotion ? 0 : Math.sin(t * 0.25) * 0.03);
     }
   });
 
   return (
     <>
-      <ambientLight ref={ambientRef} intensity={palette.ambient} />
-      <hemisphereLight args={[palette.hemiSky, palette.hemiGround, palette.hemi]} />
+      <ambientLight ref={ambientRef} intensity={palette.ambient * mul} />
+      <hemisphereLight
+        args={[palette.hemiSky, palette.hemiGround, palette.hemi * (boost ? 1.35 : 1)]}
+      />
       <directionalLight
         ref={keyRef}
         castShadow={!reducedMotion && !narrow}
         position={[5, 14, 8]}
-        intensity={palette.keyI}
+        intensity={palette.keyI * mul}
         color={palette.key}
         shadow-mapSize={narrow ? [512, 512] : [1024, 1024]}
         shadow-bias={-0.0002}
       />
-      <directionalLight position={[0, 6, -14]} intensity={palette.fillI} color={palette.fill} />
-      <directionalLight position={[-10, 8, 2]} intensity={palette.leftI} color={palette.left} />
-      <directionalLight position={[10, 8, 2]} intensity={palette.rightI} color={palette.right} />
+      <directionalLight
+        position={[0, 6, -14]}
+        intensity={palette.fillI * mul}
+        color={palette.fill}
+      />
+      <directionalLight
+        position={[-10, 8, 2]}
+        intensity={palette.leftI * mul}
+        color={palette.left}
+      />
+      <directionalLight
+        position={[10, 8, 2]}
+        intensity={palette.rightI * mul}
+        color={palette.right}
+      />
       <pointLight
         ref={flicker}
         position={[0, 5.5, 0]}
-        intensity={palette.hubI}
+        intensity={palette.hubI * mul}
         color={palette.hub}
-        distance={22}
+        distance={boost ? 32 : 22}
+      />
+      <pointLight
+        position={[0, 3.2, 4]}
+        intensity={boost ? 0.55 : 0.2}
+        color="#ffe6c8"
+        distance={boost ? 24 : 12}
       />
       <spotLight
         position={[0, 10, 4]}
         angle={0.7}
         penumbra={0.55}
-        intensity={palette.spotI}
+        intensity={palette.spotI * mul}
         color={palette.spot}
         castShadow={!narrow}
       />

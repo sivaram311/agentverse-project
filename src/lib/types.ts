@@ -66,7 +66,7 @@ export type PersonaId =
   | "karthik"
   | "lavanya"
   | "aravind"
-  | "meenakshi"
+  | "mathura"
   | "muthu"
   | "kabilan";
 

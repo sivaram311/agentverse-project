@@ -14,6 +14,7 @@ import { AVATAR_SCALE } from "@/lib/avatar-catalog";
 import { AgentDesk, MINI_FURNITURE } from "./DeskCluster";
 import { HubChair } from "./HexCollabOffice";
 import { RpmAvatar } from "./RpmAvatar";
+import { HumanoidFigure } from "./HumanoidFigure";
 import { useApproachBehavior } from "./useApproachBehavior";
 
 type Props = {
@@ -240,7 +241,25 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
           document.body.style.cursor = "auto";
         }}
       >
-        <Suspense fallback={null}>
+        <Suspense
+          fallback={
+            <HumanoidFigure
+              look={{
+                accent: persona.color,
+                skin: persona.skin || "#E0C4A8",
+                hair: persona.hair || "#2A1F14",
+                gender: persona.gender || "male",
+                lod,
+              }}
+              sitting={sitting}
+              walking={walking}
+              wavePhase={wavePhase}
+              working={agentState?.working ?? true}
+              active={prominent}
+              scale={AVATAR_SCALE}
+            />
+          }
+        >
           <RpmAvatar
             personaId={persona.id as PersonaId}
             sitting={sitting}

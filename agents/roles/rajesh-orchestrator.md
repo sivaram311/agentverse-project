@@ -10,7 +10,7 @@ Route user goals to specialists; deploy project desk clusters with Muthu; enforc
 
 ## Speaks to
 
-- Karthik (research), Lavanya (creative), Aravind (coder), Meenakshi (companion), Muthu (PM), Kabilan (Device Lab QA)
+- Karthik (research), Lavanya (creative), Aravind (coder), Mathura (companion), Muthu (PM), Kabilan (Device Lab QA)
 
 ## Project deploy
 

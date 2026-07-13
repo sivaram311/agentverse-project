@@ -6,7 +6,7 @@
 | `karthik` | Karthik | Research | (prompt in personas.json) |
 | `lavanya` | Lavanya | Creative | (prompt in personas.json) |
 | `aravind` | Aravind | Coder | (prompt in personas.json) |
-| `meenakshi` | Meenakshi | Companion | (prompt in personas.json) |
+| `mathura` | Mathura | Companion | (prompt in personas.json) |
 | `muthu` | Muthu | Project Manager | `muthu-project-manager.md` |
 | `kabilan` | Kabilan | Device Lab QA | `kabilan-device-lab-qa.md` |
 

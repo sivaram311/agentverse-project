@@ -54,7 +54,7 @@ const HUB_PROJECT: OfficeProject = {
     "karthik",
     "lavanya",
     "aravind",
-    "meenakshi",
+    "mathura",
     "muthu",
     "kabilan",
   ],
@@ -67,7 +67,7 @@ function defaultAgentStates(): Record<PersonaId, AgentRuntimeState> {
     "karthik",
     "lavanya",
     "aravind",
-    "meenakshi",
+    "mathura",
     "muthu",
     "kabilan",
   ];

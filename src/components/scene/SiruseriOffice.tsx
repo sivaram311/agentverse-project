@@ -419,6 +419,14 @@ export function SiruseriOffice({
               color="#ffe8c8"
             />
           ) : null}
+          {lod === "simple" && i % 6 === 0 ? (
+            <pointLight
+              position={[0, -0.2, 0]}
+              intensity={0.22}
+              distance={6}
+              color="#ffe8c8"
+            />
+          ) : null}
         </group>
         );
       })}

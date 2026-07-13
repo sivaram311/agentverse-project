@@ -92,8 +92,9 @@ function buildTeamZones(): TeamZone[] {
   const xR = 13.2;
   const z0 = -11.5;
   const z1 = 7.5;
-  for (let i = 0; i < 10; i++) {
-    const t = i / 9;
+  // 5 left + 5 right = 10 teams (half of original 20)
+  for (let i = 0; i < 5; i++) {
+    const t = i / 4;
     const z = z0 + t * (z1 - z0);
     const bow = 0.35 * Math.sin(t * Math.PI);
     const accent = TEAM_ACCENTS[i % TEAM_ACCENTS.length]!;
@@ -106,8 +107,8 @@ function buildTeamZones(): TeamZone[] {
       wing: "left",
     });
     zones.push({
-      id: `team-${String(i + 10).padStart(2, "0")}`,
-      name: `Team ${i + 11}`,
+      id: `team-${String(i + 5).padStart(2, "0")}`,
+      name: `Team ${i + 6}`,
       origin: [xR - bow, 0, z],
       yaw: -Math.PI / 2,
       accentColor: TEAM_ACCENTS[(i + 2) % TEAM_ACCENTS.length]!,

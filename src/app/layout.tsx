@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "AgentVerse",
   description:
-    "3D Tamil Nadu digital office — Rajesh orchestrates Karthik, Lavanya, Aravind, Meenakshi, Muthu, and Kabilan.",
+    "3D Tamil Nadu digital office — Rajesh orchestrates Karthik, Lavanya, Aravind, Mathura, Muthu, and Kabilan.",
   applicationName: "AgentVerse",
   manifest: "/manifest.webmanifest",
   appleWebApp: {

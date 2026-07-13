@@ -4,7 +4,7 @@
 **Stack:** Next.js 15 + R3F / Three.js  
 **API:** agent-portal DEV `:8080` / PREPROD `:4080` / PROD `:5080`  
 **UI ports:** DEV **3310** · PREPROD **4310** · PROD **5310**  
-**Personas:** Rajesh, Karthik, Lavanya, Aravind, Meenakshi, Muthu, Kabilan (`src/prompts/personas.json`)
+**Personas:** Rajesh, Karthik, Lavanya, Aravind, Mathura, Muthu, Kabilan (`src/prompts/personas.json`)
 
 ## Run
 
