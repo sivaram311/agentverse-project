@@ -61,11 +61,11 @@ function SceneInner({
         <AmbientWalkers lod={lod} reducedMotion={reducedMotion} />
       ) : null}
       <ContactShadows
-        opacity={0.28}
+        opacity={0.45}
         scale={26}
-        blur={2.8}
+        blur={2.4}
         far={12}
-        color="#6a7888"
+        color="#000000"
       />
       <FramingControls viewMode={viewMode} />
     </>

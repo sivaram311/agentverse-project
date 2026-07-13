@@ -236,24 +236,29 @@ export function SiruseriOffice({
 
   return (
     <group>
-      {/* Polished light epoxy / vinyl — mirrors LEDs */}
+      {/* Polished dark slab — same coloring as pre-empty shell */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, midZ]} receiveShadow>
         <planeGeometry args={[halfW * 2.1, depth + 1.5]} />
         <meshStandardMaterial
-          color="#e8ecf0"
-          metalness={0.55}
-          roughness={0.12}
+          color="#0c1016"
+          metalness={0.72}
+          roughness={0.22}
         />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.014, midZ]} receiveShadow>
-        <planeGeometry args={[halfW * 2.05, depth + 1.2]} />
-        <meshStandardMaterial
-          color="#f4f6f8"
-          metalness={0.62}
-          roughness={0.08}
-          envMapIntensity={1.4}
-        />
-      </mesh>
+      {lod === "full"
+        ? [-6, -2, 2, 6].map((x) => (
+            <mesh key={`gx-${x}`} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.015, midZ]}>
+              <planeGeometry args={[0.02, depth]} />
+              <meshStandardMaterial
+                color="#1a2430"
+                emissive="#E8A838"
+                emissiveIntensity={0.08}
+                transparent
+                opacity={0.35}
+              />
+            </mesh>
+          ))
+        : null}
 
       {/* Side walls — light corporate shell */}
       <mesh position={[-halfW, ceilingY / 2, midZ]} castShadow receiveShadow>
