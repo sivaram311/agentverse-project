@@ -8,7 +8,7 @@ import {
 import { useVerseStore } from "@/lib/store";
 
 /**
- * Quick view picker — Close / Shoulders / Desk / Wide / Walk.
+ * Quick view picker — PROD floor sides (all 8) + body shots + Walk.
  */
 export function ViewAngles() {
   const cameraMode = useVerseStore((s) => s.cameraMode);

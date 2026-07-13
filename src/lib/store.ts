@@ -211,7 +211,7 @@ export const useVerseStore = create<VerseState>()(
       subtitle: null,
       orbitLocked: false,
       cameraMode: "overview",
-      orbitShot: "shoulders",
+      orbitShot: "floorS",
       chatFocusNonce: 0,
       composeDraft: "",
       officeChromeOpen: false,

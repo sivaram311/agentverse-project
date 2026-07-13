@@ -14,7 +14,8 @@
 - Auth: CSS clientId `agent-portal` (shared)
 - DNS: Cloudflare A `agentverse-staging.delena.buzz` → `103.118.183.185` (proxied)
 - **Bypass CF:** `http://103.118.183.185:4310/`
-- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.3.6) — **Q1_PREPROD_OK_039**
+- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.3.7) — **Q1_PREPROD_OK_040**
+- **0.3.7:** View menu — PROD-style floor angles all sides (Front/Back/E/W + corners) + body shots; default Front
 - **0.3.6:** Same empty Intellect shell as 0.3.5; restore prior dark polished floor coloring (not bright epoxy)
 - **0.3.5:** Empty Intellect open plan — walls + glass + pantry + crew only; white pillars, dark LED ceiling; no desks/hex/teams furniture
 - **0.3.4:** More camera views; labels/transcript ~20× smaller

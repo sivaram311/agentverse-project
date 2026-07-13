@@ -64,15 +64,19 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
     if (firstPerson) return;
     const c = controls.current;
     if (!c) return;
-    const [px, , pz] = useVerseStore.getState().playerPosition;
     const desiredTarget = follow.current;
-    desiredTarget.set(px, shot.lookY, pz);
     const desiredPos = pos.current;
-    desiredPos.set(
-      px + shot.offset[0],
-      shot.offset[1],
-      pz + shot.offset[2],
-    );
+
+    if (shot.world) {
+      const [wx, wy, wz] = shot.world.position;
+      const [tx, ty, tz] = shot.world.target;
+      desiredTarget.set(tx, ty, tz);
+      desiredPos.set(wx, wy, wz);
+    } else {
+      const [px, , pz] = useVerseStore.getState().playerPosition;
+      desiredTarget.set(px, shot.lookY, pz);
+      desiredPos.set(px + shot.offset[0], shot.offset[1], pz + shot.offset[2]);
+    }
 
     const k = snap.current ? 1 : Math.min(1, dt * 4.5);
     c.target.lerp(desiredTarget, k);

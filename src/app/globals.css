@@ -1481,7 +1481,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(10, 12, 16, 0.72);
   backdrop-filter: blur(12px);
-  max-width: min(96vw, 28rem);
+  max-width: min(96vw, 36rem);
 }
 
 .view-angle-btn {

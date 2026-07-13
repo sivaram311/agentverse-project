@@ -6,8 +6,20 @@ export type ViewMode =
   | "landscape"
   | "landscape-compact";
 
-/** User-selectable framing (menu). Default is head & shoulders. */
+/**
+ * User-selectable framing (menu).
+ * Floor_* = PROD-style elevated whole-floor angles (all sides).
+ * Others = character follow shots.
+ */
 export type OrbitShot =
+  | "floorS"
+  | "floorN"
+  | "floorE"
+  | "floorW"
+  | "floorSE"
+  | "floorSW"
+  | "floorNE"
+  | "floorNW"
   | "shoulders"
   | "close"
   | "face"
@@ -43,22 +55,54 @@ export const OFFICE_BOUNDS = {
   },
 } as const;
 
-/** Follow-cam offsets relative to player (x,y,z) → look at head. */
+const FLOOR_LOOK: [number, number, number] = [0, 1.35, -0.6];
+
 export type ShotFollow = {
   label: string;
-  /** Camera offset from player feet */
+  /** Camera offset from player feet (ignored when world is set) */
   offset: [number, number, number];
-  /** Look-at height (head ~1.45, chest ~1.2) */
   lookY: number;
   fov: number;
   minDistance: number;
   maxDistance: number;
   minPolarAngle: number;
   maxPolarAngle: number;
+  /** PROD-like fixed floor view — world camera + look-at */
+  world?: {
+    position: [number, number, number];
+    target: [number, number, number];
+  };
 };
 
+function floorShot(
+  label: string,
+  position: [number, number, number],
+  target: [number, number, number] = FLOOR_LOOK,
+): ShotFollow {
+  return {
+    label,
+    offset: [0, position[1], 8],
+    lookY: target[1],
+    fov: 42,
+    minDistance: 7,
+    maxDistance: 22,
+    minPolarAngle: 0.48,
+    maxPolarAngle: Math.PI / 2.1,
+    world: { position, target },
+  };
+}
+
 export const ORBIT_SHOTS: Record<OrbitShot, ShotFollow> = {
-  /** Default — head & shoulders */
+  /** PROD south entry — elevated overview */
+  floorS: floorShot("Front", [0, 6.8, 12.5], [0, 1.4, -0.5]),
+  floorN: floorShot("Back", [0, 6.6, -13.2], [0, 1.35, -0.4]),
+  floorE: floorShot("East", [13.5, 6.6, -0.5], [0, 1.35, -0.5]),
+  floorW: floorShot("West", [-13.5, 6.6, -0.5], [0, 1.35, -0.5]),
+  floorSE: floorShot("SE", [10.5, 6.5, 10.2], [0, 1.35, -0.5]),
+  floorSW: floorShot("SW", [-10.5, 6.5, 10.2], [0, 1.35, -0.5]),
+  floorNE: floorShot("NE", [10.5, 6.5, -10.5], [0, 1.35, -0.5]),
+  floorNW: floorShot("NW", [-10.5, 6.5, -10.5], [0, 1.35, -0.5]),
+
   shoulders: {
     label: "Shoulders",
     offset: [0.35, 1.48, 2.15],
@@ -161,10 +205,19 @@ export const ORBIT_SHOTS: Record<OrbitShot, ShotFollow> = {
   },
 };
 
+/** Menu order — PROD floor sides first, then body shots */
 export const ORBIT_SHOT_ORDER: OrbitShot[] = [
-  "face",
-  "close",
+  "floorS",
+  "floorN",
+  "floorE",
+  "floorW",
+  "floorSE",
+  "floorSW",
+  "floorNE",
+  "floorNW",
   "shoulders",
+  "close",
+  "face",
   "over",
   "desk",
   "sideL",
@@ -174,7 +227,7 @@ export const ORBIT_SHOT_ORDER: OrbitShot[] = [
   "wide",
 ];
 
-/** Portrait — elevated view of open floor + hex desks (wide fallback). */
+/** Portrait — elevated view of open floor (wide fallback). */
 export const PORTRAIT_PRESET: CameraPreset = {
   position: [0, 6.8, 12.5],
   fov: 42,
