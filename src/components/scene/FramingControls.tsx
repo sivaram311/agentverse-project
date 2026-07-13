@@ -22,7 +22,6 @@ type ControlsApi = {
 /** Orbit overview OR first-person eye-level (after login). */
 export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
   const orbitLocked = useVerseStore((s) => s.orbitLocked);
-  const playerPosition = useVerseStore((s) => s.playerPosition);
   const cameraMode = useVerseStore((s) => s.cameraMode);
   const authenticated = useVerseStore((s) => s.authenticated);
   const firstPerson = authenticated && cameraMode === "firstPerson";
@@ -57,6 +56,7 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
     if (firstPerson) return;
     const c = controls.current;
     if (!c) return;
+    const playerPosition = useVerseStore.getState().playerPosition;
     const desired = new THREE.Vector3(
       playerPosition[0] * 0.55,
       1.1,

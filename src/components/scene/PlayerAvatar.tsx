@@ -32,7 +32,6 @@ export function PlayerAvatar({
   const keys = useRef<Record<string, boolean>>({});
   const [walking, setWalking] = useState(false);
 
-  const moveInput = useVerseStore((s) => s.playerMoveInput);
   const setPlayerPos = useVerseStore((s) => s.setPlayerPosition);
   const username = useVerseStore((s) => s.username);
   const authenticated = useVerseStore((s) => s.authenticated);
@@ -60,6 +59,9 @@ export function PlayerAvatar({
     const g = group.current;
     if (!g) return;
 
+    // Read stick each frame — avoid React re-renders on every touch sample (mobile).
+    const moveInput = useVerseStore.getState().playerMoveInput;
+
     const wish = new THREE.Vector3();
     if (keys.current.w || keys.current.arrowup) wish.z -= 1;
     if (keys.current.s || keys.current.arrowdown) wish.z += 1;
@@ -70,7 +72,7 @@ export function PlayerAvatar({
 
     const len = wish.length();
     const moving = len > 0.05;
-    setWalking(moving);
+    if (walking !== moving) setWalking(moving);
 
     if (moving) {
       wish.multiplyScalar(1 / len);

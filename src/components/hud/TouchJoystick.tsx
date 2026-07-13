@@ -52,6 +52,7 @@ export function TouchJoystick() {
       }}
       onPointerUp={end}
       onPointerCancel={end}
+      onLostPointerCapture={end}
     >
       <div className="touch-joystick-base" aria-hidden>
         <div ref={knob} className="touch-joystick-knob" />

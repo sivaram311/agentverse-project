@@ -16,7 +16,6 @@ const PITCH_MAX = 1.35;
  * Position follows playerPosition from the store each frame.
  */
 export function FirstPersonControls() {
-  const playerPosition = useVerseStore((s) => s.playerPosition);
   const orbitLocked = useVerseStore((s) => s.orbitLocked);
   const { camera, gl } = useThree();
   const yaw = useRef(0);
@@ -102,7 +101,7 @@ export function FirstPersonControls() {
   }, [gl, orbitLocked]);
 
   useFrame(() => {
-    const [x, , z] = playerPosition;
+    const [x, , z] = useVerseStore.getState().playerPosition;
     camera.position.set(x, EYE_Y, z);
     euler.current.set(pitch.current, yaw.current, 0);
     camera.quaternion.setFromEuler(euler.current);

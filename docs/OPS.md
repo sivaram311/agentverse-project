@@ -8,12 +8,13 @@
 
 ## PREPROD
 
-- Release: `H:\releases\agentverse-0.2.10\` (H: nearly full — prefer direct E→F sync for hotfixes)
+- Release: `H:\releases\agentverse-0.2.11\` (H: nearly full — prefer direct E→F sync for hotfixes)
 - Start: `F:\apps\agentverse\start.ps1 -EnvName preprod`
-- Evidence: `H:\releases\agentverse-0.2.10\evidence\q1\`
+- Evidence: `H:\releases\agentverse-0.2.11\evidence\q1\`
 - Auth: CSS clientId `agent-portal` (shared)
 - DNS: Cloudflare A `agentverse-staging.delena.buzz` → `103.118.183.185` (proxied)
-- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.10) — **Q1_PREPROD_OK_030**
+- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.11) — **Q1_PREPROD_OK_031**
+- **0.2.11:** mobile input fix only (PROD-like visuals kept) — joystick `lostpointercapture`; move/camera read store via `getState()` in `useFrame` (no React churn). No LOD/cull/proxy rollback.
 - **0.2.10:** always-full Expanded HQ like PROD — no team cull / proxy / distance streaming; load progress bar until scene ready; HQ + FP retained; 0.2.9 brightness/labels/tap-only retained
 - **Login:** staging/prod CSS admin password (`G:\apps\css\.env` → `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` will return **401** on staging.
 - **Camera:** after login → first-person walk+look; toggle **FP / Orbit** (or Walk / Overview) for HQ orbit.
