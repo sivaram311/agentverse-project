@@ -1,10 +1,11 @@
-/** Mobile / low-end render budget for AgentVerse HQ. */
+/** GPU knobs only — office geometry is always PROD-full (no distance streaming). */
 
 export type PerfTier = "high" | "medium" | "low";
 
 export type PerfProfile = {
   tier: PerfTier;
-  lod: "full" | "simple";
+  /** Always "full" — Expanded HQ is constructed like PROD. */
+  lod: "full";
   dpr: [number, number];
   antialias: boolean;
   shadows: boolean;
@@ -13,10 +14,6 @@ export type PerfProfile = {
   ambientWalkers: boolean;
   dataOrbs: boolean;
   lightBoost: boolean;
-  maxTeamClusters: number;
-  maxFullClusters: number;
-  teamCullDist: number;
-  teamNearDist: number;
   showGlassCube: boolean;
   showSideConference: boolean;
   showSatelliteProjects: boolean;
@@ -43,7 +40,11 @@ function saveData(): boolean {
   return !!conn?.saveData;
 }
 
-/** Resolve once per resize — phones/tablets default to low/medium. */
+/**
+ * Resolve once per resize.
+ * Visual construction is identical on all devices (full LOD, all pods, glass, walkers).
+ * Only DPR / AA / shadow maps soften on weak GPUs.
+ */
 export function resolvePerfProfile(
   width: number,
   height: number,
@@ -59,24 +60,19 @@ export function resolvePerfProfile(
   if (low) {
     return {
       tier: "low",
-      lod: "simple",
+      lod: "full",
       dpr: [1, 1],
       antialias: false,
-      shadows: false,
-      // Match PROD brightness: keep city HDR even on phones
+      shadows: true,
       environment: true,
-      contactShadows: false,
+      contactShadows: true,
       ambientWalkers: true,
-      dataOrbs: false,
+      dataOrbs: true,
       lightBoost: false,
-      maxTeamClusters: 6,
-      maxFullClusters: 2,
-      teamCullDist: 22,
-      teamNearDist: 14,
       showGlassCube: true,
-      showSideConference: false,
-      showSatelliteProjects: false,
-      cameraFar: 90,
+      showSideConference: true,
+      showSatelliteProjects: true,
+      cameraFar: 100,
       fogNear: 28,
       fogFar: 65,
     };
@@ -85,23 +81,19 @@ export function resolvePerfProfile(
   if (mobileLike) {
     return {
       tier: "medium",
-      lod: "simple",
+      lod: "full",
       dpr: [1, 1.25],
       antialias: false,
-      shadows: false,
+      shadows: true,
       environment: true,
-      contactShadows: false,
+      contactShadows: true,
       ambientWalkers: true,
-      dataOrbs: false,
+      dataOrbs: true,
       lightBoost: false,
-      maxTeamClusters: 8,
-      maxFullClusters: 3,
-      teamCullDist: 26,
-      teamNearDist: 16,
       showGlassCube: true,
       showSideConference: true,
       showSatelliteProjects: true,
-      cameraFar: 95,
+      cameraFar: 100,
       fogNear: 28,
       fogFar: 65,
     };
@@ -118,10 +110,6 @@ export function resolvePerfProfile(
     ambientWalkers: true,
     dataOrbs: true,
     lightBoost: false,
-    maxTeamClusters: 10,
-    maxFullClusters: 5,
-    teamCullDist: 32,
-    teamNearDist: 16,
     showGlassCube: true,
     showSideConference: true,
     showSatelliteProjects: true,

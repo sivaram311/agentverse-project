@@ -4,19 +4,15 @@ import {
   ContactShadows,
   Environment,
 } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import { Suspense, useEffect, useState } from "react";
 import {
   isPortraitView,
   presetForView,
   resolveViewMode,
   type ViewMode,
 } from "@/lib/camera-framing";
-import {
-  ANCHORS,
-  TEAM_ZONES,
-  type OfficeLod,
-} from "@/lib/office-layout";
+import { ANCHORS, TEAM_ZONES } from "@/lib/office-layout";
 import { resolvePerfProfile, type PerfProfile } from "@/lib/perf-profile";
 import { personas } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
@@ -29,79 +25,24 @@ import { GlassCube } from "./GlassCube";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
 import { PlayerAvatar } from "./PlayerAvatar";
+import { SceneBootOverlay } from "./SceneBootOverlay";
 import { SideConferenceBlock } from "./SideConferenceBlock";
 import { SiruseriOffice } from "./SiruseriOffice";
 import { TeamCluster } from "./TeamCluster";
 
-type ClusterVis = { id: string; lod: OfficeLod; proxy: boolean };
-
-function TeamClustersLayer({
-  baseLod,
-  showLabels,
-  profile,
-}: {
-  baseLod: OfficeLod;
-  showLabels: boolean;
-  profile: PerfProfile;
-}) {
-  const { camera } = useThree();
-  const lastKey = useRef("");
-  const [vis, setVis] = useState<ClusterVis[]>([]);
-  const accum = useRef(0);
-
-  useFrame((_, dt) => {
-    accum.current += dt;
-    // Throttle React updates — remounting 20×6 desks every frame freezes mobile.
-    if (accum.current < 0.2) return;
-    accum.current = 0;
-
-    const scored = TEAM_ZONES.map((z) => {
-      const dx = camera.position.x - z.origin[0];
-      const dz = camera.position.z - z.origin[2];
-      return { id: z.id, dist: Math.hypot(dx, dz), zone: z };
-    }).sort((a, b) => a.dist - b.dist);
-
-    const next: ClusterVis[] = [];
-    let desksLeft = profile.maxFullClusters;
-    for (let i = 0; i < scored.length && next.length < profile.maxTeamClusters; i++) {
-      const s = scored[i]!;
-      if (s.dist > profile.teamCullDist) continue;
-      const withDesks = desksLeft > 0 && s.dist <= profile.teamNearDist;
-      if (withDesks) desksLeft -= 1;
-      next.push({
-        id: s.id,
-        lod: withDesks && baseLod === "full" ? "full" : "simple",
-        proxy: !withDesks,
-      });
-    }
-
-    const key = next.map((n) => `${n.id}:${n.lod}:${n.proxy ? 1 : 0}`).join("|");
-    if (key !== lastKey.current) {
-      lastKey.current = key;
-      setVis(next);
-    }
-  });
-
-  const byId = useMemo(() => {
-    const m = new Map(TEAM_ZONES.map((z) => [z.id, z]));
-    return m;
-  }, []);
-
+/** Always-full pods — no distance cull / proxy (PROD realism). */
+function TeamClustersLayer({ showLabels }: { showLabels: boolean }) {
   return (
     <>
-      {vis.map((v) => {
-        const zone = byId.get(v.id);
-        if (!zone) return null;
-        return (
-          <TeamCluster
-            key={v.id}
-            zone={zone}
-            lod={v.lod}
-            proxy={v.proxy}
-            showLabels={showLabels && v.lod === "full" && !v.proxy}
-          />
-        );
-      })}
+      {TEAM_ZONES.map((zone) => (
+        <TeamCluster
+          key={zone.id}
+          zone={zone}
+          lod="full"
+          proxy={false}
+          showLabels={showLabels}
+        />
+      ))}
     </>
   );
 }
@@ -119,7 +60,7 @@ function SceneInner({
 }) {
   const projects = useVerseStore((s) => s.projects);
   const lod = profile.lod;
-  const narrow = profile.tier !== "high";
+  const narrow = profile.tier === "low";
 
   return (
     <>
@@ -138,7 +79,7 @@ function SceneInner({
       <SiruseriOffice lod={lod} reducedMotion={reducedMotion} showMandala={false} />
       <CentralConference
         lod={lod}
-        showLabels={showLabels && profile.tier !== "low"}
+        showLabels={showLabels}
         reducedMotion={reducedMotion}
       />
       {profile.showGlassCube ? (
@@ -156,11 +97,7 @@ function SceneInner({
           lod={lod}
         />
       ) : null}
-      <TeamClustersLayer
-        baseLod={lod}
-        showLabels={showLabels && profile.tier !== "low"}
-        profile={profile}
-      />
+      <TeamClustersLayer showLabels={showLabels} />
       {profile.dataOrbs ? (
         <group position={[0, 3.6, 0]}>
           <DataOrbs showLabels={showLabels && viewMode !== "portrait-compact"} />
@@ -183,14 +120,14 @@ function SceneInner({
         <PersonaAvatar
           key={p.id}
           persona={p}
-          reducedMotion={reducedMotion || narrow}
-          showLabels={showLabels && profile.tier !== "low"}
+          reducedMotion={reducedMotion}
+          showLabels={showLabels}
           lod={lod}
         />
       ))}
       <PlayerAvatar reducedMotion={reducedMotion} />
       {profile.ambientWalkers ? (
-        <AmbientWalkers lod={lod === "full" ? "full" : "simple"} reducedMotion={reducedMotion} />
+        <AmbientWalkers lod="full" reducedMotion={reducedMotion} />
       ) : null}
       {profile.contactShadows ? (
         <ContactShadows
@@ -246,8 +183,9 @@ export function HubScene() {
 
   return (
     <div className="hub-canvas" data-perf={profile.tier}>
+      <SceneBootOverlay />
       <Canvas
-        shadows={profile.shadows && viewMode === "portrait"}
+        shadows={profile.shadows}
         dpr={profile.dpr}
         camera={{
           position: cam.position,
@@ -258,17 +196,16 @@ export function HubScene() {
         gl={{
           antialias: profile.antialias,
           powerPreference: "high-performance",
-          // Match PROD 0.2.2 exposure; Expanded HQ keeps city Environment on all tiers
           toneMappingExposure: profile.lightBoost ? 1.4 : 1.28,
           stencil: false,
           depth: true,
         }}
-        performance={{ min: profile.tier === "low" ? 0.4 : 0.5 }}
+        performance={{ min: 0.5 }}
       >
         <Suspense fallback={null}>
           <SceneInner
             reducedMotion={reducedMotion}
-            showLabels={profile.tier !== "low"}
+            showLabels
             viewMode={viewMode}
             profile={profile}
           />
