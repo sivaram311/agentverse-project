@@ -1,5 +1,13 @@
 ﻿# Crew Activity â€” AgentVerse
 
+## 2026-07-13 — Q2 promote 0.2.2 (Session Desk) → PROD
+
+- Session: `agentverse-0.2.2-q2-2026-07-13`
+- Roles: EM + QA + Security + Review + field-ops + Ops (parallel crew)
+- Git: `2fa29a1` committed+pushed before gate
+- Result: **Q2_PROD_OK_022** — https://agentverse.delena.buzz health 0.2.2
+- Evidence: `H:\releases\agentverse-0.2.2\evidence\q2\`
+
 ## 2026-07-13 — Q1 promote 0.2.2 (Session Desk) → PREPROD
 
 - Session: `agentverse-0.2.2-promote-2026-07-13`
@@ -9,6 +17,8 @@
 
 | Timestamp (IST) | Role | Action | Result |
 |-----------------|------|--------|--------|
+| 2026-07-13 20:10 | Promote-EM + crew | Q2 GO agentverse **0.2.2** → PROD `:5310`; agentverse.delena.buzz live | ok |
+| 2026-07-13 19:55 | Lead | Commit+push Session Desk 0.2.2 (`2fa29a1`) | ok |
 | 2026-07-13 02:15 | Muthu + Aravind + Docs | Session Desk: multi-workspace create/archive/restore via portal APIs | ok |
 | 2026-07-13 00:45 | Promote-EM + Ops/QA | Q2 GO agentverse **0.2.1** â†’ PROD `:5310`; agentverse.delena.buzz live | ok |
 | 2026-07-13 00:20 | Promote-EM + Ops/QA | Q1 GO agentverse **0.2.1** â†’ PREPROD `:4310` (player avatar + polish); staging live | ok |
