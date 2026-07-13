@@ -16,6 +16,7 @@ import { personas } from "@/lib/orchestrator";
 import { AmbientWalkers } from "./AmbientWalkers";
 import { FramingControls } from "./FramingControls";
 import { IntellectBenches } from "./IntellectBenches";
+import { NxtLevelCampus } from "./NxtLevelCampus";
 import { NxtLevelInfra } from "./NxtLevelInfra";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
@@ -53,6 +54,7 @@ function SceneInner({
         reducedMotion={reducedMotion}
         showLabels={showLabels}
       />
+      <NxtLevelCampus lod={lod} />
       <IntellectBenches lod={lod} />
       {/* Crew seated on Intellect benches */}
       {personas.map((p) => (
@@ -70,9 +72,9 @@ function SceneInner({
       ) : null}
       <ContactShadows
         opacity={0.45}
-        scale={26}
-        blur={2.4}
-        far={12}
+        scale={42}
+        blur={2.6}
+        far={16}
         color="#000000"
       />
       <FramingControls viewMode={viewMode} />

@@ -93,8 +93,8 @@ function floorShot(
 }
 
 export const ORBIT_SHOTS: Record<OrbitShot, ShotFollow> = {
-  /** PROD south entry — elevated overview */
-  floorS: floorShot("Front", [0, 6.8, 12.5], [0, 1.4, -0.5]),
+  /** PROD south entry — elevated overview (includes atrium) */
+  floorS: floorShot("Front", [0, 7.2, 15.5], [0, 1.35, 1.5]),
   floorN: floorShot("Back", [0, 6.6, -13.2], [0, 1.35, -0.4]),
   floorE: floorShot("East", [13.5, 6.6, -0.5], [0, 1.35, -0.5]),
   floorW: floorShot("West", [-13.5, 6.6, -0.5], [0, 1.35, -0.5]),

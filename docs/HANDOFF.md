@@ -1,26 +1,25 @@
 # AgentVerse handoff — 2026-07-14
 
-**Continue from:** PREPROD **0.3.10** (`Q1_PREPROD_OK_043`).
+**Continue from:** PREPROD **0.3.11** (`Q1_PREPROD_OK_044`).
 
 ## URLs
 
 - Staging: https://agentverse-staging.delena.buzz  
 - IP bypass: http://103.118.183.185:4310/  
-- Repo: `main` · `E:\Myworkspace\agentverse-project`
 
 ## Locked product state
 
-1. **Shell** PROD dark Siruseri + **Nxt Level / Navalur** branding.
-2. **Open plan** Intellect benches + pantry + crew/NPCs.
-3. **Infrastructure:** dual elevators, reception, L/R glass huddles, occupied client boardroom, innovation glass cube, design-thinking breakout.
-4. **Camera** freestyle after view snap.
-5. **PROD app** remains **0.2.2**.
+1. PROD-dark Siruseri shell + Intellect benches + crew.
+2. Nxt Level infra (elevators, reception, huddles, boardroom, cube, breakout).
+3. **Campus amenities:** atrium lobby, turnstiles, cafeteria, quiet focus pods, SIPCOT parking/lights.
+4. Freestyle camera after view snap; Front sees atrium.
+5. PROD app still **0.2.2**.
 
-## Next ideas (user-directed)
+## Possible next
 
-- Cafeteria / food-court wing, atrium lobby scale-up, biometric turnstile detail
-- Quieter focus pods; more demo/fintech AV in boardroom
-- Photo-faithful clothing (dupatta etc.) on RPM/humanoids
+- More atrium visitor lounge seating / digital wayfinding
+- Expanded cafeteria cuisine counters
+- Street View–style OMR facade detail
 - Q2 promote when EM GO
 
 See [OPS.md](./OPS.md).

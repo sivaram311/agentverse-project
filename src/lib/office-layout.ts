@@ -65,6 +65,15 @@ export const ANCHORS = {
   breakout: {
     position: [5.2, 0, 3.6] as [number, number, number],
   },
+  atrium: {
+    depth: 7.2,
+  },
+  cafeteria: {
+    position: [-7.1, 0, 11.0] as [number, number, number],
+  },
+  parking: {
+    padZ: 18.9,
+  },
 } as const;
 
 /** Local seats for a TeamCluster (arc; +Z = aisle). */
