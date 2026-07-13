@@ -19,6 +19,8 @@ export function TopBar({
   const username = useVerseStore((s) => s.username);
   const authConfig = useVerseStore((s) => s.authConfig);
   const setAuthenticated = useVerseStore((s) => s.setAuthenticated);
+  const cameraMode = useVerseStore((s) => s.cameraMode);
+  const toggleCameraMode = useVerseStore((s) => s.toggleCameraMode);
   const session = useVerseStore((s) => s.session);
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -53,6 +55,25 @@ export function TopBar({
           )}
           <VoicePicker />
           <MoodPicker />
+          {authenticated ? (
+            <button
+              type="button"
+              className="ghost keep-mobile"
+              onClick={toggleCameraMode}
+              title={
+                cameraMode === "firstPerson"
+                  ? "Switch to orbit overview"
+                  : "Switch to first-person walk"
+              }
+              aria-label={
+                cameraMode === "firstPerson"
+                  ? "Camera: first person. Switch to orbit."
+                  : "Camera: orbit. Switch to first person."
+              }
+            >
+              {cameraMode === "firstPerson" ? "Walk" : "Overview"}
+            </button>
+          ) : null}
           {authenticated && onOpenSessions ? (
             <button
               type="button"

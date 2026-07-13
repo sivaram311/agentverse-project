@@ -41,9 +41,11 @@ export function PlayerAvatar({
   const setPlayerPos = useVerseStore((s) => s.setPlayerPosition);
   const username = useVerseStore((s) => s.username);
   const authenticated = useVerseStore((s) => s.authenticated);
+  const cameraMode = useVerseStore((s) => s.cameraMode);
   const focusId = useVerseStore((s) => s.interaction.focusId);
   const interactionMode = useVerseStore((s) => s.interaction.mode);
   const lastStorePos = useRef({ x: 0, z: 5.2 });
+  const hideBody = authenticated && cameraMode === "firstPerson";
 
   const seats = useMemo(
     () =>
@@ -163,7 +165,7 @@ export function PlayerAvatar({
     : "Guest";
 
   return (
-    <group ref={group} position={[0, 0, 5.2]}>
+    <group ref={group} position={[0, 0, 5.2]} visible={!hideBody}>
       <Suspense fallback={null}>
         <RpmAvatar
           url={PLAYER_AVATAR.url}
@@ -177,14 +179,16 @@ export function PlayerAvatar({
           accent="#FF6200"
         />
       </Suspense>
-      <Billboard position={[0, 1.55, 0]} follow>
-        <Html center distanceFactor={10} style={{ pointerEvents: "none" }} zIndexRange={[14, 0]}>
-          <div className="persona-tag active player-tag">
-            <strong>{label}</strong>
-            <span>Logged in · You</span>
-          </div>
-        </Html>
-      </Billboard>
+      {!hideBody ? (
+        <Billboard position={[0, 1.55, 0]} follow>
+          <Html center distanceFactor={10} style={{ pointerEvents: "none" }} zIndexRange={[14, 0]}>
+            <div className="persona-tag active player-tag">
+              <strong>{label}</strong>
+              <span>Logged in · You</span>
+            </div>
+          </Html>
+        </Billboard>
+      ) : null}
     </group>
   );
 }

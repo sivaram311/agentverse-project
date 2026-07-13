@@ -65,6 +65,7 @@ Isolation mounts: `/dev/office-shell`, `/dev/office-conference`, `/dev/office-te
 2. Click → stand → walk → greet (ta/hi/en) → chat focus → return → sit.
 3. `new project: …` via Rajesh → satellite desk cluster + crew assignment.
 4. Each directory can own a portal session (WorkspacePicker + SessionTabs).
+5. Auth → first-person eye-level look+walk; toggle Overview (orbit HQ) via camera mode.
 
 ## Promote
 

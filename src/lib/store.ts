@@ -114,6 +114,8 @@ type VerseState = {
   greetOnce: Partial<Record<PersonaId, boolean>>;
   subtitle: string | null;
   orbitLocked: boolean;
+  /** firstPerson = eye-level walk+look after login; overview = orbit HQ */
+  cameraMode: "firstPerson" | "overview";
   chatFocusNonce: number;
   composeDraft: string;
   /** Full top chrome (lang, API, share, projects) — off by default for immersion */
@@ -155,6 +157,8 @@ type VerseState = {
   markGreeted: (id: PersonaId) => void;
   setSubtitle: (text: string | null) => void;
   setOrbitLocked: (v: boolean) => void;
+  setCameraMode: (m: "firstPerson" | "overview") => void;
+  toggleCameraMode: () => void;
   bumpChatFocus: () => void;
   setComposeDraft: (text: string) => void;
   consumeComposeDraft: () => string;
@@ -199,6 +203,7 @@ export const useVerseStore = create<VerseState>()(
       greetOnce: {},
       subtitle: null,
       orbitLocked: false,
+      cameraMode: "overview",
       chatFocusNonce: 0,
       composeDraft: "",
       officeChromeOpen: false,
@@ -207,7 +212,12 @@ export const useVerseStore = create<VerseState>()(
       playerPosition: [0, 0, 5.2],
       playerMoveInput: { x: 0, z: 0 },
       setAuthConfig: (c) => set({ authConfig: c }),
-      setAuthenticated: (v, username = null) => set({ authenticated: v, username }),
+      setAuthenticated: (v, username = null) =>
+        set({
+          authenticated: v,
+          username,
+          cameraMode: v ? "firstPerson" : "overview",
+        }),
       setAccessToken: (accessToken) => set({ accessToken }),
       setApiOnline: (v) => set({ apiOnline: v }),
       setLanguage: (language) => set({ language }),
@@ -384,6 +394,12 @@ export const useVerseStore = create<VerseState>()(
         set((s) => ({ greetOnce: { ...s.greetOnce, [id]: true } })),
       setSubtitle: (text) => set({ subtitle: text }),
       setOrbitLocked: (v) => set({ orbitLocked: v }),
+      setCameraMode: (m) => set({ cameraMode: m }),
+      toggleCameraMode: () =>
+        set((s) => ({
+          cameraMode:
+            s.cameraMode === "firstPerson" ? "overview" : "firstPerson",
+        })),
       bumpChatFocus: () =>
         set((s) => ({ chatFocusNonce: s.chatFocusNonce + 1, chatOpen: true })),
       setComposeDraft: (composeDraft) => set({ composeDraft }),
@@ -424,6 +440,7 @@ export const useVerseStore = create<VerseState>()(
         quests: s.quests,
         greetOnce: s.greetOnce,
         officeMood: s.officeMood,
+        cameraMode: s.cameraMode,
       }),
     },
   ),

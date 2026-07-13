@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { isPortraitView, presetForView, type ViewMode } from "@/lib/camera-framing";
 import { useVerseStore } from "@/lib/store";
+import { FirstPersonControls } from "./FirstPersonControls";
 
 type ControlsApi = {
   target: THREE.Vector3;
@@ -18,16 +19,21 @@ type ControlsApi = {
   update: () => void;
 };
 
-/** Orbit around the floor — soft-follows the logged-in player. */
+/** Orbit overview OR first-person eye-level (after login). */
 export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
   const orbitLocked = useVerseStore((s) => s.orbitLocked);
   const playerPosition = useVerseStore((s) => s.playerPosition);
+  const cameraMode = useVerseStore((s) => s.cameraMode);
+  const authenticated = useVerseStore((s) => s.authenticated);
+  const firstPerson = authenticated && cameraMode === "firstPerson";
+
   const { camera } = useThree();
   const controls = useRef<ControlsApi | null>(null);
   const preset = presetForView(viewMode);
   const follow = useRef(new THREE.Vector3(...preset.target));
 
   useEffect(() => {
+    if (firstPerson) return;
     camera.position.set(...preset.position);
     if ("fov" in camera) {
       (camera as typeof camera & { fov: number }).fov = preset.fov;
@@ -45,12 +51,12 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
       c.maxAzimuthAngle = preset.maxAzimuthAngle ?? Infinity;
       c.update();
     }
-  }, [camera, viewMode, preset]);
+  }, [camera, viewMode, preset, firstPerson]);
 
   useFrame((_, dt) => {
+    if (firstPerson) return;
     const c = controls.current;
     if (!c) return;
-    // Blend look-at toward player so orbit stays useful while you walk
     const desired = new THREE.Vector3(
       playerPosition[0] * 0.55,
       1.1,
@@ -60,6 +66,10 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
     c.target.lerp(follow.current, Math.min(1, dt * 2.2));
     c.update();
   });
+
+  if (firstPerson) {
+    return <FirstPersonControls />;
+  }
 
   return (
     <OrbitControls

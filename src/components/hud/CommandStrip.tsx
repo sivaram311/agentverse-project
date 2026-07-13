@@ -22,6 +22,9 @@ export function CommandStrip({
   onOpenSessions?: () => void;
 } = {}) {
   const selected = useVerseStore((s) => s.selectedPersona);
+  const authenticated = useVerseStore((s) => s.authenticated);
+  const cameraMode = useVerseStore((s) => s.cameraMode);
+  const toggleCameraMode = useVerseStore((s) => s.toggleCameraMode);
   const busy = useVerseStore((s) => s.busy);
   const streamingHint = useVerseStore((s) => s.streamingHint);
   const quests = useVerseStore((s) => s.quests);
@@ -86,6 +89,25 @@ export function CommandStrip({
       </div>
 
       <div className="command-actions">
+        {authenticated ? (
+          <button
+            type="button"
+            className="chip command-chip"
+            onClick={toggleCameraMode}
+            title={
+              cameraMode === "firstPerson"
+                ? "Switch to orbit overview"
+                : "Switch to first-person walk"
+            }
+            aria-label={
+              cameraMode === "firstPerson"
+                ? "Camera: first person. Switch to orbit."
+                : "Camera: orbit. Switch to first person."
+            }
+          >
+            {cameraMode === "firstPerson" ? "FP" : "Orbit"}
+          </button>
+        ) : null}
         {onOpenSessions ? (
           <button
             type="button"
