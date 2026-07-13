@@ -25,7 +25,7 @@ description: >-
 4. Projects: Rajesh `new project:` → `deployProject` + satellite desk cluster.
 5. Sessions: each workspace path maps to a portal session; SessionTabs / WorkspacePicker / **SessionDesk** (list, create, archive, restore).
 6. Optional allowlist: `NEXT_PUBLIC_WORKSPACE_ALLOWLIST` (comma-separated); see `src/lib/workspaces.ts`.
-7. Expanded HQ visual: central conference + 20 team clusters + glass cube + side conference block; HexCollab not mounted in HubScene (keep `HubChair` export).
+7. Expanded HQ visual: central conference + 10 team clusters + glass cube + side conference block; HexCollab not mounted in HubScene (keep `HubChair` export).
 8. Auth → `cameraMode: firstPerson` (eye-level look+walk); toggle Overview (`overview` orbit HQ) via `toggleCameraMode`.
 
 ## Visual stack

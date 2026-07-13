@@ -80,7 +80,7 @@ agents/
 ## AgentVerse office crew (in-app)
 
 Tamil Nadu digital office personas live in `src/prompts/personas.json` and `agents/roles/office-crew.md`:
-Rajesh, Karthik, Lavanya, Aravind, Meenakshi, Muthu, Kabilan.
+Rajesh, Karthik, Lavanya, Aravind, Mathura, Muthu, Kabilan.
 
 Project skills: `agentverse-office`, `agentverse-promote`.
 

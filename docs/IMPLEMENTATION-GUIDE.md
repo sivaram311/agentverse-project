@@ -46,7 +46,7 @@ Floor ≈ X±18, Z −16…+12 (`ceilingY` 4.35). Aesthetic lock: walls `#161c24
 |------|-----------|
 | Shell + elevators + spine | `SiruseriOffice` + `ElevatorShaft` |
 | Central conference (15 seats, TV, ideas) | `CentralConference` |
-| 20 team pods (5 desks + orchestrator) | `TeamCluster` / `OrchestratorDesk` |
+| 10 team pods (5 desks + orchestrator) | `TeamCluster` / `OrchestratorDesk` |
 | Glass cube + 3 side rooms | `GlassCube` / `SideConferenceBlock` |
 
 Isolation mounts: `/dev/office-shell`, `/dev/office-conference`, `/dev/office-teams`, `/dev/office-glass`.
