@@ -1,5 +1,12 @@
 ﻿# Crew Activity â€” AgentVerse
 
+## 2026-07-13 — Q1 promote 0.2.4 (first-person walk) → PREPROD
+
+- Session: `agentverse-0.2.4-promote-2026-07-13`
+- Git: `a9693b0` pushed origin/main
+- Result: **Q1_PREPROD_OK_024** — staging health 0.2.4
+- Evidence: `H:\releases\agentverse-0.2.4\evidence\q1\`
+
 ## 2026-07-13 — Q1 promote 0.2.3 (Expanded HQ) → PREPROD
 
 - Session: `agentverse-0.2.3-promote-2026-07-13`
