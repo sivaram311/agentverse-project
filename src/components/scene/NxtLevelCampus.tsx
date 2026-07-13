@@ -49,25 +49,38 @@ function SecurityTurnstiles({
   );
 }
 
-/** Tall glazed atrium at Nxt Level entry. */
+/** Double-height reception / atrium — polished stone, branding, visitor lounge. */
 function AtriumLobby({ lod }: { lod: OfficeLod }) {
   const { halfW, openZ, ceilingY } = HQ_BOUNDS;
   const atrDepth = 7.2;
   const midZ = openZ + atrDepth / 2;
-  const atrH = ceilingY + 1.4;
+  const atrH = ceilingY + 2.4;
 
   return (
     <group>
-      {/* Polished atrium floor */}
+      {/* Polished stone / tile floor */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         position={[0, 0.012, midZ]}
         receiveShadow
       >
         <planeGeometry args={[halfW * 1.85, atrDepth]} />
-        <meshStandardMaterial color="#0c1016" metalness={0.7} roughness={0.2} />
+        <meshStandardMaterial color="#C8C4BC" metalness={0.35} roughness={0.18} />
       </mesh>
-      {/* Tall side glass */}
+      {lod === "full"
+        ? [-4, 0, 4].map((x) => (
+            <mesh
+              key={x}
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[x, 0.02, midZ]}
+            >
+              <planeGeometry args={[0.035, atrDepth * 0.9]} />
+              <meshStandardMaterial color="#A8A49C" transparent opacity={0.5} />
+            </mesh>
+          ))
+        : null}
+
+      {/* Extra-clear side glass */}
       {(
         [
           [-halfW * 0.92, Math.PI / 2],
@@ -78,60 +91,164 @@ function AtriumLobby({ lod }: { lod: OfficeLod }) {
           <mesh>
             <planeGeometry args={[atrDepth * 0.92, atrH]} />
             <meshPhysicalMaterial
-              color="#9ec8dc"
+              color="#A5C4D8"
               transparent
-              opacity={0.14}
-              transmission={lod === "full" ? 0.5 : 0}
-              roughness={0.08}
+              opacity={0.12}
+              transmission={lod === "full" ? 0.62 : 0}
+              roughness={0.05}
               metalness={0.05}
               side={THREE.DoubleSide}
             />
           </mesh>
         </group>
       ))}
-      {/* Outer facade glass */}
       <mesh position={[0, atrH / 2, openZ + atrDepth - 0.1]}>
         <planeGeometry args={[halfW * 1.7, atrH]} />
         <meshPhysicalMaterial
-          color="#9ec8dc"
+          color="#7BA9C9"
           transparent
-          opacity={0.16}
-          transmission={lod === "full" ? 0.45 : 0}
-          roughness={0.1}
-          metalness={0.05}
+          opacity={0.18}
+          transmission={lod === "full" ? 0.4 : 0}
+          roughness={0.08}
+          metalness={0.08}
           side={THREE.DoubleSide}
         />
       </mesh>
-      {/* Mullion grid */}
       {lod === "full"
         ? [-4, -1.3, 1.3, 4].map((x) => (
             <mesh key={x} position={[x, atrH / 2, openZ + atrDepth - 0.08]}>
-              <boxGeometry args={[0.08, atrH, 0.06]} />
-              <meshStandardMaterial color="#121820" metalness={0.5} />
+              <boxGeometry args={[0.1, atrH, 0.08]} />
+              <meshStandardMaterial color="#D0D4D8" metalness={0.55} roughness={0.3} />
             </mesh>
           ))
         : null}
-      {/* Atrium ceiling slab */}
+
       <mesh position={[0, atrH, midZ]}>
-        <boxGeometry args={[halfW * 1.8, 0.12, atrDepth]} />
-        <meshStandardMaterial color="#10141a" metalness={0.25} roughness={0.75} />
+        <boxGeometry args={[halfW * 1.8, 0.14, atrDepth]} />
+        <meshStandardMaterial color="#E8E4DC" roughness={0.65} metalness={0.08} />
       </mesh>
+
+      {/* Intellect wall brand */}
+      <mesh position={[0, 3.4, midZ - atrDepth * 0.35]} castShadow>
+        <boxGeometry args={[4.2, 1.1, 0.08]} />
+        <meshStandardMaterial color="#0c1830" metalness={0.2} />
+      </mesh>
+      <mesh position={[0, 3.4, midZ - atrDepth * 0.34]}>
+        <boxGeometry args={[3.6, 0.55, 0.04]} />
+        <meshStandardMaterial
+          color="#00AEEF"
+          emissive="#00AEEF"
+          emissiveIntensity={0.45}
+        />
+      </mesh>
+
+      {/* Digital directory displays */}
+      {([-5.5, 5.5] as const).map((x) => (
+        <group key={x} position={[x, 1.6, midZ - 1.2]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.9, 1.6, 0.12]} />
+            <meshStandardMaterial color="#1a222c" metalness={0.4} />
+          </mesh>
+          <mesh position={[0, 0.1, 0.07]}>
+            <planeGeometry args={[0.72, 1.25]} />
+            <meshStandardMaterial
+              color="#0a1520"
+              emissive="#4DA3FF"
+              emissiveIntensity={0.35}
+            />
+          </mesh>
+        </group>
+      ))}
+
+      {/* CCTV domes */}
+      {([-4, 0, 4] as const).map((x) => (
+        <mesh key={x} position={[x, atrH - 0.35, midZ]}>
+          <sphereGeometry args={[0.12, 10, 10]} />
+          <meshStandardMaterial color="#1a1c1e" metalness={0.6} roughness={0.3} />
+        </mesh>
+      ))}
+
+      {/* Visitor seating */}
+      {([-3.2, 3.2] as const).map((x) => (
+        <group key={x} position={[x, 0, midZ + 1.4]}>
+          <mesh position={[0, 0.28, 0]} castShadow>
+            <boxGeometry args={[1.6, 0.28, 0.55]} />
+            <meshStandardMaterial color="#2a3240" roughness={0.65} />
+          </mesh>
+          <mesh position={[0, 0.52, -0.2]} castShadow>
+            <boxGeometry args={[1.6, 0.4, 0.12]} />
+            <meshStandardMaterial color="#243040" roughness={0.6} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Lobby plants */}
+      {([-6.5, 6.5] as const).map((x) => (
+        <group key={x} position={[x, 0, midZ + 0.4]}>
+          <mesh position={[0, 0.25, 0]}>
+            <cylinderGeometry args={[0.28, 0.32, 0.5, 10]} />
+            <meshStandardMaterial color="#f0f0ee" roughness={0.7} />
+          </mesh>
+          <mesh position={[0, 0.9, 0]} castShadow>
+            <sphereGeometry args={[0.45, 8, 8]} />
+            <meshStandardMaterial color="#2A6A3A" roughness={0.85} />
+          </mesh>
+        </group>
+      ))}
+
       {lod === "full"
         ? [-3, 0, 3].map((x) => (
             <pointLight
               key={x}
-              position={[x, atrH - 0.4, midZ]}
-              intensity={0.22}
-              distance={8}
-              color="#ffe8c8"
+              position={[x, atrH - 0.5, midZ]}
+              intensity={0.28}
+              distance={9}
+              color="#fff4e0"
             />
           ))
         : null}
-      <Html position={[0, atrH - 0.7, openZ + atrDepth - 0.5]} center distanceFactor={20}>
+
+      <Html position={[0, atrH - 0.85, openZ + atrDepth - 0.55]} center distanceFactor={20}>
         <div className="plaza-brand">
-          <strong>Nxt Level</strong>
-          <span>Atrium lobby · Visitor management</span>
+          <strong>Intellect</strong>
+          <span>Double-height reception · Visitor lounge</span>
         </div>
+      </Html>
+    </group>
+  );
+}
+
+/** Glass corridor connector with clear partitions. */
+function GlassCorridor({
+  position,
+  length = 6,
+  yaw = 0,
+}: {
+  position: [number, number, number];
+  length?: number;
+  yaw?: number;
+}) {
+  return (
+    <group position={position} rotation={[0, yaw, 0]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]} receiveShadow>
+        <planeGeometry args={[2.4, length]} />
+        <meshStandardMaterial color="#3a3530" roughness={0.85} />
+      </mesh>
+      {([-1.15, 1.15] as const).map((x) => (
+        <mesh key={x} position={[x, 1.35, 0]}>
+          <boxGeometry args={[0.06, 2.6, length]} />
+          <meshPhysicalMaterial
+            color="#A5C4D8"
+            transparent
+            opacity={0.14}
+            transmission={0.55}
+            roughness={0.06}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      ))}
+      <Html position={[0, 2.8, 0]} center distanceFactor={14}>
+        <div className="zone-badge">Corridor · Clear glass</div>
       </Html>
     </group>
   );
@@ -344,6 +461,8 @@ export function NxtLevelCampus({ lod = "full" }: { lod?: OfficeLod }) {
     <group>
       <AtriumLobby lod={lod} />
       <SecurityTurnstiles position={[0, 0, openZ + 1.15]} />
+      <GlassCorridor position={[-5.5, 0, 2.2]} length={7.5} yaw={0.05} />
+      <GlassCorridor position={[5.5, 0, 0.8]} length={6.5} yaw={-0.08} />
       <CafeteriaWing position={[-halfW + 3.4, 0, openZ + 3.6]} lod={lod} />
       <CampusParking lod={lod} />
       <FocusGlassPod position={[halfW - 2.8, 0, openZ + 2.4]} yaw={-0.2} />

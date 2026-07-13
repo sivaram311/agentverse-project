@@ -2,7 +2,7 @@
 
 Next.js + React Three Fiber **Tamil Nadu digital office** (Intellect Design Arena / Siruseri vibe) — agents sit at bench desks, walk over when summoned, and talk via the Agent Portal API.
 
-**PREPROD:** **0.3.12** · https://agentverse-staging.delena.buzz · [docs/OPS.md](docs/OPS.md)  
+**PREPROD:** **0.3.13** · https://agentverse-staging.delena.buzz · [docs/OPS.md](docs/OPS.md)  
 **PROD:** **0.2.2** (unchanged until promote)
 
 ## Office crew
@@ -21,7 +21,7 @@ Greetings default to **Tamil** (`ta-IN`); switch Hindi / English in the top bar.
 Prompts & routing: `src/prompts/personas.json`  
 Crew / pre-work: `agents/`
 
-## What’s on the PREPROD floor (0.3.12)
+## What’s on the PREPROD floor (0.3.13)
 
 - Dark Siruseri shell (PROD-matched walls/pillars/lights) + pantry
 - Intellect-style **bench desks** (wood tops, black mesh chairs, monitors, phones)

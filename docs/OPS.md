@@ -8,11 +8,9 @@
 
 ## Current PREPROD (ready for next iteration)
 
-- **Version:** **0.3.12** · git `main` · evidence `H:\releases\agentverse-0.3.12\evidence\q1\Q1_PREPROD_OK_045`
+- **Version:** **0.3.13** · git `main` · evidence `H:\releases\agentverse-0.3.13\evidence\q1\Q1_PREPROD_OK_046`
 - **Smoke:** `https://agentverse-staging.delena.buzz/health` · bypass `http://103.118.183.185:4310/`
-- **Office contents:** SIPCOT Siruseri exterior — Nxt Level multi-floor glass/steel tower shell, gated compound, drop-off canopy, landscaping, lake buffer, OMR strip, distant TCS-style landmark + residential high-rises; plus prior campus amenities + Intellect interior benches
-- **Camera:** exterior-capable floor angles (zoom out to ~48); freestyle after snap
-- **Address cue:** Plot No. 3/G3, SIPCOT IT Park, Siruseri / Navalur · 600130
+- **Office contents:** Photo-matched Intellect exterior (beige panels, blue glass, rooftop Intellect logo); double-height reception (stone floor, visitor seats, CCTV, digital displays, biometric desk); clear-glass corridors; boom gates + EV; paver plaza + palms/planters; emergency stairs by lifts; prior benches + campus amenities
 - **PROD:** still **0.2.2** — do not promote without EM Q2 GO
 
 ## PREPROD runbook
@@ -27,6 +25,7 @@
 
 | Ver | What |
 |-----|------|
+| **0.3.13** | Photo-matched Intellect facade+logo; double-height lobby; glass corridors; plaza/boom/EV polish |
 | **0.3.12** | Exterior: Nxt Level tower shell, SIPCOT compound gate, lake, OMR, TCS landmark silhouettes |
 | **0.3.11** | Atrium lobby, turnstiles, cafeteria, focus pods, SIPCOT parking exterior |
 | **0.3.10** | Nxt Level infra: elevators, reception, glass huddles, boardroom, glass cube, breakout + benches |
