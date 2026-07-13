@@ -29,25 +29,25 @@ function buildWalkers(lod: Lod): WalkerDef[] {
     { color: "#4A6A8A", skin: "#C9956C", hair: "#241810", gender: "male" },
   ];
 
-  /** Perimeter loops on expanded HQ walkways — clear of central conference. */
+  /** Aisle loops inside Siruseri open plan — clear of benches. */
   const loops: [number, number][][] = [
     [
-      [-16, 10],
-      [-16, -14],
-      [16, -14],
-      [16, 10],
+      [-8.5, 5.5],
+      [-8.5, -6.5],
+      [8.5, -6.5],
+      [8.5, 5.5],
     ],
     [
-      [-14.5, 8],
-      [14.5, 8],
-      [14.5, -12],
-      [-14.5, -12],
+      [-6.5, 5.0],
+      [6.5, 5.0],
+      [6.5, -5.5],
+      [-6.5, -5.5],
     ],
     [
-      [-15, 4],
-      [-15, -8],
-      [15, -8],
-      [15, 4],
+      [-9.2, 0.5],
+      [-9.2, -4],
+      [9.2, -4],
+      [9.2, 0.5],
     ],
   ];
 

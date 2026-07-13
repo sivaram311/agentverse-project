@@ -23,19 +23,20 @@ type ControlsApi = {
   update: () => void;
 };
 
-/** Head-shoulders follow OR first-person walk. */
+/**
+ * Snap once to the chosen angle view, then freestyle orbit + zoom.
+ * Walk mode uses FirstPersonControls instead.
+ */
 export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
   const orbitLocked = useVerseStore((s) => s.orbitLocked);
   const cameraMode = useVerseStore((s) => s.cameraMode);
   const orbitShot = useVerseStore((s) => s.orbitShot);
   const authenticated = useVerseStore((s) => s.authenticated);
   const firstPerson = authenticated && cameraMode === "firstPerson";
-  const shot = ORBIT_SHOTS[orbitShot];
+  const shot = ORBIT_SHOTS[orbitShot] ?? ORBIT_SHOTS.floorS;
 
   const { camera } = useThree();
   const controls = useRef<ControlsApi | null>(null);
-  const follow = useRef(new THREE.Vector3());
-  const pos = useRef(new THREE.Vector3());
   const snap = useRef(true);
 
   useEffect(() => {
@@ -50,38 +51,37 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
     }
     const c = controls.current;
     if (c) {
-      c.minDistance = shot.minDistance;
-      c.maxDistance = shot.maxDistance;
-      c.minPolarAngle = shot.minPolarAngle;
-      c.maxPolarAngle = shot.maxPolarAngle;
+      // Freestyle after snap — wide zoom + full rotate
+      c.minDistance = 1.2;
+      c.maxDistance = 28;
+      c.minPolarAngle = 0.12;
+      c.maxPolarAngle = Math.PI / 2 - 0.04;
       c.minAzimuthAngle = -Infinity;
       c.maxAzimuthAngle = Infinity;
       c.update();
     }
   }, [camera, shot, firstPerson]);
 
-  useFrame((_, dt) => {
+  useFrame(() => {
     if (firstPerson) return;
     const c = controls.current;
-    if (!c) return;
-    const desiredTarget = follow.current;
-    const desiredPos = pos.current;
+    if (!c || !snap.current) return;
 
     if (shot.world) {
       const [wx, wy, wz] = shot.world.position;
       const [tx, ty, tz] = shot.world.target;
-      desiredTarget.set(tx, ty, tz);
-      desiredPos.set(wx, wy, wz);
+      c.target.set(tx, ty, tz);
+      camera.position.set(wx, wy, wz);
     } else {
       const [px, , pz] = useVerseStore.getState().playerPosition;
-      desiredTarget.set(px, shot.lookY, pz);
-      desiredPos.set(px + shot.offset[0], shot.offset[1], pz + shot.offset[2]);
+      c.target.set(px, shot.lookY, pz);
+      camera.position.set(
+        px + shot.offset[0],
+        shot.offset[1],
+        pz + shot.offset[2],
+      );
     }
-
-    const k = snap.current ? 1 : Math.min(1, dt * 4.5);
-    c.target.lerp(desiredTarget, k);
-    camera.position.lerp(desiredPos, k);
-    if (snap.current) snap.current = false;
+    snap.current = false;
     c.update();
   });
 
@@ -93,15 +93,18 @@ export function FramingControls({ viewMode }: { viewMode: ViewMode }) {
     <OrbitControls
       ref={controls as never}
       enabled={!orbitLocked}
-      enablePan={false}
-      minPolarAngle={shot.minPolarAngle}
-      maxPolarAngle={shot.maxPolarAngle}
-      minDistance={shot.minDistance}
-      maxDistance={shot.maxDistance}
+      enablePan
+      enableZoom
+      enableRotate
+      minPolarAngle={0.12}
+      maxPolarAngle={Math.PI / 2 - 0.04}
+      minDistance={1.2}
+      maxDistance={28}
       enableDamping
       dampingFactor={0.1}
-      rotateSpeed={isPortraitView(viewMode) ? 0.55 : 0.5}
-      zoomSpeed={0.7}
+      rotateSpeed={isPortraitView(viewMode) ? 0.7 : 0.62}
+      zoomSpeed={0.95}
+      panSpeed={0.65}
       makeDefault
     />
   );

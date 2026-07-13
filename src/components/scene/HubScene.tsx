@@ -15,6 +15,7 @@ import {
 import { personas } from "@/lib/orchestrator";
 import { AmbientWalkers } from "./AmbientWalkers";
 import { FramingControls } from "./FramingControls";
+import { IntellectBenches } from "./IntellectBenches";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
 import { PlayerAvatar } from "./PlayerAvatar";
@@ -46,7 +47,8 @@ function SceneInner({
       <OfficeBackdrop lod={lod} />
       <Environment preset="warehouse" />
       <SiruseriOffice lod={lod} reducedMotion={reducedMotion} />
-      {/* Empty floor: crew only — no desks / hex / team furniture */}
+      <IntellectBenches lod={lod} />
+      {/* Crew seated on Intellect benches */}
       {personas.map((p) => (
         <PersonaAvatar
           key={p.id}
@@ -112,7 +114,7 @@ export function HubScene() {
   const cam = presetForView(viewMode);
 
   return (
-    <div className="hub-canvas" data-office="empty-intellect">
+    <div className="hub-canvas" data-office="intellect-benches">
       <Canvas
         shadows={!narrow && viewMode === "portrait"}
         dpr={dpr}

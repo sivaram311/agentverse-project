@@ -3,12 +3,11 @@
 import { useFrame } from "@react-three/fiber";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, Suspense } from "react";
 import type { Group } from "three";
-import * as THREE from "three";
+import { personaHome } from "@/lib/intellect-benches";
 import { greetingFor, type PersonaDef } from "@/lib/orchestrator";
 import { speakPersona, stopSpeaking, type VoicePrefs } from "@/lib/speech";
 import { useVerseStore } from "@/lib/store";
 import type { AgentPose, PersonaId } from "@/lib/types";
-import { isHubSeat } from "@/lib/hex-office";
 import { AVATAR_SCALE } from "@/lib/avatar-catalog";
 import { DistanceLabel } from "./DistanceLabel";
 import { RpmAvatar } from "./RpmAvatar";
@@ -29,34 +28,10 @@ type Props = {
   lod: "full" | "simple";
 };
 
-/** Yaw-only so characters never pitch into the floor. */
-function setYawToward(
-  g: Group,
-  from: THREE.Vector3,
-  toX: number,
-  toZ: number,
-  blend = 1,
-) {
-  const dx = toX - from.x;
-  const dz = toZ - from.z;
-  if (dx * dx + dz * dz < 1e-8) return;
-  const target = Math.atan2(dx, dz);
-  if (blend >= 1) {
-    g.rotation.set(0, target, 0);
-    return;
-  }
-  let diff = target - g.rotation.y;
-  while (diff > Math.PI) diff -= Math.PI * 2;
-  while (diff < -Math.PI) diff += Math.PI * 2;
-  g.rotation.y += diff * blend;
-  g.rotation.x = 0;
-  g.rotation.z = 0;
-}
-
 export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props) {
   const group = useRef<Group>(null);
   const [wavePhase, setWavePhase] = useState(0);
-  const [localPose, setLocalPose] = useState<AgentPose>("standing");
+  const [localPose, setLocalPose] = useState<AgentPose>("sitting");
 
   const selected = useVerseStore((s) => s.selectedPersona);
   const focusId = useVerseStore((s) => s.interaction.focusId);
@@ -69,31 +44,27 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
 
   const isSelected = selected === persona.id;
   const isFocus = focusId === persona.id;
-  // Empty floor: stand at station (no chairs/desks)
-  const pose = isFocus ? localPose : agentState?.pose === "walking" ? "walking" : "standing";
+  const pose = isFocus ? localPose : agentState?.pose ?? "sitting";
   const walking = pose === "walking";
-  const sitting = false;
+  const sitting = pose === "sitting";
 
-  const deskPos = useMemo(
+  const fallback = useMemo(
     () => persona.position as [number, number, number],
     [persona.position],
   );
-  const home = useMemo(
-    () => [deskPos[0], 0, deskPos[2]] as [number, number, number],
-    [deskPos],
+  const { home, yaw: seatYaw } = useMemo(
+    () => personaHome(persona.id, fallback),
+    [persona.id, fallback],
   );
-  const hub = isHubSeat(deskPos);
 
   useLayoutEffect(() => {
     if (!group.current) return;
     group.current.position.set(home[0], 0, home[2]);
-    const faceX = hub ? 0 : deskPos[0] * 0.35;
-    const faceZ = hub ? -0.15 : deskPos[2] * 0.35;
-    setYawToward(group.current, group.current.position, faceX, faceZ, 1);
-  }, [home, deskPos, hub]);
+    group.current.rotation.set(0, seatYaw, 0);
+  }, [home, seatYaw]);
 
   const onPoseChange = useCallback((p: AgentPose) => {
-    setLocalPose(p === "sitting" ? "standing" : p);
+    setLocalPose(p);
   }, []);
 
   const onArrivedGreet = useCallback(() => {
@@ -154,17 +125,25 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
 
   useFrame((_, dt) => {
     if (!group.current || isFocus) return;
-    if (walking) return;
+    if (!sitting) return;
     group.current.position.y = 0;
-    const faceX = hub ? 0 : deskPos[0] * 0.35;
-    const faceZ = hub ? -0.15 : deskPos[2] * 0.35;
-    setYawToward(group.current, group.current.position, faceX, faceZ, Math.min(1, dt * 4));
+    // Ease back to bench facing
+    let diff = seatYaw - group.current.rotation.y;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    group.current.rotation.y += diff * Math.min(1, dt * 4);
+    group.current.rotation.x = 0;
+    group.current.rotation.z = 0;
   });
 
   const progress = agentState?.progress ?? (activeQuest ? 40 : 0);
-  const labelY = 1.55;
+  const labelY = sitting ? 1.15 : 1.55;
   const prominent = isSelected || isFocus;
   const showAgentLabel = showLabels || prominent;
+
+  // Lavanya — gold/yellow scarf accent cue in the photo
+  const accent =
+    persona.id === "lavanya" ? "#E8C838" : persona.color;
 
   function summon(e: { stopPropagation: () => void }) {
     e.stopPropagation();
@@ -202,7 +181,7 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
           fallback={
             <HumanoidFigure
               look={{
-                accent: persona.color,
+                accent,
                 skin: persona.skin || "#E0C4A8",
                 hair: persona.hair || "#2A1F14",
                 gender: persona.gender || "male",
@@ -232,8 +211,8 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
         <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[0.26, 0.36, 24]} />
           <meshStandardMaterial
-            color={persona.color}
-            emissive={persona.color}
+            color={accent}
+            emissive={accent}
             emissiveIntensity={prominent ? 0.55 : 0.22}
             transparent
             opacity={prominent ? 0.55 : 0.28}
@@ -255,12 +234,12 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
             {agentState?.working || activeQuest ? (
               <em>{agentState?.status || "Working"}</em>
             ) : null}
-            {progress > 0 ? (
+            {progress > 0 && sitting ? (
               <div className="persona-progress" aria-hidden>
                 <i
                   style={{
                     width: `${Math.min(100, progress)}%`,
-                    background: persona.color,
+                    background: accent,
                   }}
                 />
               </div>
