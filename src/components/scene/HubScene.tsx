@@ -14,6 +14,7 @@ import {
 } from "@/lib/camera-framing";
 import { personas } from "@/lib/orchestrator";
 import { AmbientWalkers } from "./AmbientWalkers";
+import { BuildingLife } from "./BuildingLife";
 import { FramingControls } from "./FramingControls";
 import { IntellectBenches } from "./IntellectBenches";
 import { NxtLevelCampus } from "./NxtLevelCampus";
@@ -57,6 +58,7 @@ function SceneInner({
       />
       <NxtLevelCampus lod={lod} />
       <NxtLevelExterior lod={lod} />
+      <BuildingLife lod={lod} reducedMotion={reducedMotion} />
       <IntellectBenches lod={lod} />
       {/* Crew seated on Intellect benches */}
       {personas.map((p) => (

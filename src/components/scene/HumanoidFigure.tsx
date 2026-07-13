@@ -21,6 +21,10 @@ type Props = {
   phase?: number;
   working?: boolean;
   walking?: boolean;
+  /** Raise hand to mouth — canteen drink/eat */
+  eating?: boolean;
+  /** Uniformed stance (security) — less casual sway */
+  uniform?: boolean;
   /** Uniform scale — calibrated so feet stay on the floor */
   scale?: number;
   showRing?: boolean;
@@ -39,6 +43,8 @@ export function HumanoidFigure({
   phase = 0,
   working = true,
   walking = false,
+  eating = false,
+  uniform = false,
   scale = 0.85,
   showRing = true,
 }: Props) {
@@ -53,11 +59,15 @@ export function HumanoidFigure({
   const glow = useRef<Mesh>(null);
 
   const segs = look.lod === "simple" ? 6 : 10;
-  const shirt = useMemo(
-    () => new THREE.Color(look.accent).lerp(new THREE.Color("#1a2433"), 0.55).getStyle(),
-    [look.accent],
-  );
-  const pants = look.gender === "female" ? "#2a2430" : "#1a2030";
+  const shirt = useMemo(() => {
+    if (uniform) return "#1a3050";
+    return new THREE.Color(look.accent).lerp(new THREE.Color("#1a2433"), 0.55).getStyle();
+  }, [look.accent, uniform]);
+  const pants = uniform
+    ? "#0e1520"
+    : look.gender === "female"
+      ? "#2a2430"
+      : "#1a2030";
 
   useFrame((state) => {
     const t = state.clock.elapsedTime + phase;
@@ -115,6 +125,10 @@ export function HumanoidFigure({
         armR.current.rotation.x = Math.sin(t * 6) * 0.55;
         armR.current.rotation.z = 0.08;
         armR.current.rotation.y = 0;
+      } else if (eating) {
+        armR.current.rotation.x = -2.05 + Math.sin(t * 2.4) * 0.2;
+        armR.current.rotation.z = 0.15;
+        armR.current.rotation.y = 0.35;
       } else if (typing) {
         armR.current.rotation.x = -1.05 + Math.sin(t * 9) * 0.22;
         armR.current.rotation.z = 0.18;
@@ -127,6 +141,10 @@ export function HumanoidFigure({
         armR.current.rotation.x = -0.65 + Math.sin(t * 0.7) * 0.04;
         armR.current.rotation.z = 0.1;
         armR.current.rotation.y = 0.12;
+      } else if (uniform) {
+        armR.current.rotation.x = -0.25;
+        armR.current.rotation.z = 0.12;
+        armR.current.rotation.y = 0;
       } else {
         armR.current.rotation.x = THREE.MathUtils.lerp(armR.current.rotation.x, -0.15, 0.1);
         armR.current.rotation.z = THREE.MathUtils.lerp(armR.current.rotation.z, 0.1, 0.1);
@@ -139,6 +157,10 @@ export function HumanoidFigure({
         armL.current.rotation.x = Math.sin(t * 6 + Math.PI) * 0.55;
         armL.current.rotation.z = -0.08;
         armL.current.rotation.y = 0;
+      } else if (eating) {
+        armL.current.rotation.x = -0.55 + Math.sin(t * 1.8) * 0.08;
+        armL.current.rotation.z = -0.2;
+        armL.current.rotation.y = -0.15;
       } else if (typing) {
         armL.current.rotation.x = -0.95 + Math.sin(t * 8.2 + 1.1) * 0.2;
         armL.current.rotation.z = -0.16;
@@ -273,6 +295,12 @@ export function HumanoidFigure({
               <sphereGeometry args={[0.15, segs + 2, segs + 2]} />
               <meshStandardMaterial color={look.skin} roughness={0.52} />
             </mesh>
+            {uniform ? (
+              <mesh position={[0, 0.12, 0]} castShadow>
+                <cylinderGeometry args={[0.16, 0.17, 0.08, 10]} />
+                <meshStandardMaterial color="#0c1420" roughness={0.55} />
+              </mesh>
+            ) : null}
             <mesh position={[-0.135, 0, 0]} castShadow>
               <sphereGeometry args={[0.032, 6, 6]} />
               <meshStandardMaterial color={look.skin} roughness={0.55} />

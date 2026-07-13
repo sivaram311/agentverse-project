@@ -8,9 +8,9 @@
 
 ## Current PREPROD (ready for next iteration)
 
-- **Version:** **0.3.13** · git `main` · evidence `H:\releases\agentverse-0.3.13\evidence\q1\Q1_PREPROD_OK_046`
+- **Version:** **0.3.14** · git `main` · evidence `H:\releases\agentverse-0.3.14\evidence\q1\Q1_PREPROD_OK_047`
 - **Smoke:** `https://agentverse-staging.delena.buzz/health` · bypass `http://103.118.183.185:4310/`
-- **Office contents:** Photo-matched Intellect exterior (beige panels, blue glass, rooftop Intellect logo); double-height reception (stone floor, visitor seats, CCTV, digital displays, biometric desk); clear-glass corridors; boom gates + EV; paver plaza + palms/planters; emergency stairs by lifts; prior benches + campus amenities
+- **Office contents:** 7 tower floors populated (per-floor vibe: delivery → labs); canteen patrons eating/drinking/chatting + queue; uniformed security at gate + roaming patrol; prior Intellect exterior/lobby/benches
 - **PROD:** still **0.2.2** — do not promote without EM Q2 GO
 
 ## PREPROD runbook
@@ -25,6 +25,7 @@
 
 | Ver | What |
 |-----|------|
+| **0.3.14** | 7-floor workers; canteen eat/drink; gate + roaming security uniforms |
 | **0.3.13** | Photo-matched Intellect facade+logo; double-height lobby; glass corridors; plaza/boom/EV polish |
 | **0.3.12** | Exterior: Nxt Level tower shell, SIPCOT compound gate, lake, OMR, TCS landmark silhouettes |
 | **0.3.11** | Atrium lobby, turnstiles, cafeteria, focus pods, SIPCOT parking exterior |
