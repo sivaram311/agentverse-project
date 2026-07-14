@@ -1,33 +1,25 @@
-# Promote playbook — Upgradation 0.3.0
+# Promote — agentverse-upgrade 0.3.0 (side fleet)
 
-## Gate
+## Rule
 
-| Gate | Action | Blocker |
-|------|--------|---------|
-| DEV | `npm run typecheck` + smoke `:3310` | none |
-| **Q1** | User GO → F:`apps\agentverse` `:4310` | Evidence `H:\releases\agentverse-0.3.0\evidence\q1\` |
-| **Q2** | User GO → G:`apps\agentverse` `:5310` | Evidence `...\evidence\q2\` |
+Deploy only to `F:\apps\agentverse-upgrade` / `G:\apps\agentverse-upgrade` on **4312 / 5312**.  
+Never stop or overwrite `F:\apps\agentverse`, `G:\apps\agentverse`, `*-v2`, ProdDeck, portal, CSS.
 
-## Mandatory crew
+## Hosts
 
-`promote-em` · `promote-qa` · `promote-security` · `promote-review` · `promote-ops` · **`promote-field-ops`**
+| Env | Host | Upstream |
+|-----|------|----------|
+| PREPROD | https://agentverse-upgrade-staging.delena.buzz | :4312 |
+| PROD | https://agentverse-upgrade.delena.buzz | :5312 |
 
-## Non-negotiables
+## Crew
 
-- Do **not** touch AgentVerse-v2 `:4311/:5311`, ProdDeck, portal, CSS.
-- Bake `NEXT_PUBLIC_CSS_ISSUER=https://css.delena.buzz` on PREPROD/PROD builds.
-- Cloudflare hosts unchanged: `agentverse-staging` / `agentverse`.
-- Other apps health OK after cutover.
+promote-em + qa + security + review + ops + **field-ops**
 
-## Smoke checklist
+## Bake
 
-1. `/health`
-2. CSS login (staging/prod password)
-3. Session Desk search + cancel (if busy session)
-4. Deep-link: `/desk?intent=hire&crew=rajesh&brief=test&return=https://home-staging.delena.buzz`
-5. Quest appears with session id after prompt
-6. JWT catalog / portal chat poll
+`NEXT_PUBLIC_CSS_ISSUER=https://css.delena.buzz` · `NEXT_PUBLIC_AV_ENV=PREPROD|PROD`
 
-## Status
+## Evidence
 
-**Awaiting explicit user Q1 / Q2 GO.** Pack scaffolding under `H:\releases\agentverse-0.3.0\` when promote starts.
+`H:\releases\agentverse-upgrade-0.3.0\evidence\q1|q2\`

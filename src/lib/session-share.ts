@@ -20,6 +20,10 @@ const RETURN_HOST_ALLOWLIST = new Set([
   "home-staging.delena.buzz",
   "agentverse.delena.buzz",
   "agentverse-staging.delena.buzz",
+  "agentverse-v2.delena.buzz",
+  "agentverse-v2-staging.delena.buzz",
+  "agentverse-upgrade.delena.buzz",
+  "agentverse-upgrade-staging.delena.buzz",
 ]);
 
 export function readSessionIdFromUrl(): string | null {
@@ -183,6 +187,8 @@ export function detectDeployEnv(): "DEV" | "PREPROD" | "PROD" | "UNKNOWN" {
   if (baked === "DEV" || baked === "PREPROD" || baked === "PROD") return baked;
   if (typeof window === "undefined") return "UNKNOWN";
   const host = window.location.hostname.toLowerCase();
+  if (host === "agentverse-upgrade.delena.buzz") return "PROD";
+  if (host === "agentverse-upgrade-staging.delena.buzz") return "PREPROD";
   if (host === "agentverse.delena.buzz") return "PROD";
   if (host === "agentverse-staging.delena.buzz") return "PREPROD";
   if (host === "localhost" || host === "127.0.0.1") return "DEV";

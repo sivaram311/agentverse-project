@@ -3,12 +3,12 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 0.0.0.0 -p 3310",
+    "dev": "next dev -H 0.0.0.0 -p 3312",
     "dev:stack": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/start-stack.ps1",
     "dev:public": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/start-stack.ps1",
     "avatars:generate": "node scripts/generate-avatars.mjs",
     "build": "next build",
-    "start": "next start -H 0.0.0.0 -p 3310",
+    "start": "next start -H 0.0.0.0 -p 3312",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
