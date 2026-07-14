@@ -22,6 +22,7 @@ export function TopBar({
   const cameraMode = useVerseStore((s) => s.cameraMode);
   const toggleCameraMode = useVerseStore((s) => s.toggleCameraMode);
   const session = useVerseStore((s) => s.session);
+  const returnUrl = useVerseStore((s) => s.returnUrl);
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -82,6 +83,11 @@ export function TopBar({
             >
               Sessions
             </button>
+          ) : null}
+          {returnUrl ? (
+            <a className="ghost keep-mobile" href={returnUrl}>
+              Home
+            </a>
           ) : null}
           {authenticated && session ? (
             <button

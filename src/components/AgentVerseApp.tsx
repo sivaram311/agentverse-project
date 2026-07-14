@@ -14,12 +14,50 @@ import { TeamMemberBar } from "@/components/hud/TeamMemberBar";
 import { TopBar } from "@/components/hud/TopBar";
 import { TouchJoystick } from "@/components/hud/TouchJoystick";
 import { ViewAngles } from "@/components/hud/ViewAngles";
+import {
+  parseDeepLinkParams,
+  resolveCrewPersona,
+  sanitizeReturnUrl,
+} from "@/lib/session-share";
 import { useVerseStore } from "@/lib/store";
 
 const HubScene = dynamic(
   () => import("@/components/scene/HubScene").then((m) => m.HubScene),
   { ssr: false, loading: () => <div className="hub-canvas placeholder" /> },
 );
+
+function applyDeepLinkAfterAuth() {
+  const deep = parseDeepLinkParams();
+  const store = useVerseStore.getState();
+  const safeReturn = sanitizeReturnUrl(deep.returnUrl);
+  if (safeReturn) store.setReturnUrl(safeReturn);
+
+  const isProdDeck = (deep.src || "").toLowerCase() === "proddeck";
+  const crew = resolveCrewPersona(deep.crew);
+  if (crew && deep.intent === "hire") {
+    store.selectPersona(crew);
+  }
+
+  if (deep.brief || isProdDeck) {
+    store.setIncidentBrief(deep.brief, deep.evidence, isProdDeck);
+  }
+
+  if (deep.brief) {
+    const seed = deep.brief.startsWith("Investigate:")
+      ? deep.brief
+      : `Investigate: ${deep.brief}`;
+    store.setComposeDraft(seed);
+    store.openChat();
+    store.bumpChatFocus();
+  } else if (deep.intent === "hire" || isProdDeck) {
+    store.openChat();
+    store.bumpChatFocus();
+  }
+
+  if (deep.intent === "session-desk" || deep.intent === "hire") {
+    store.requestSessionDesk();
+  }
+}
 
 export function AgentVerseApp() {
   const authConfig = useVerseStore((s) => s.authConfig);
@@ -31,7 +69,9 @@ export function AgentVerseApp() {
   const busy = useVerseStore((s) => s.busy);
   const officeChromeOpen = useVerseStore((s) => s.officeChromeOpen);
   const chatOpen = useVerseStore((s) => s.chatOpen);
+  const sessionDeskRequestNonce = useVerseStore((s) => s.sessionDeskRequestNonce);
   const [sessionDeskOpen, setSessionDeskOpen] = useState(false);
+  const [deepLinkApplied, setDeepLinkApplied] = useState(false);
 
   useEffect(() => {
     document.body.dataset.avFocus = focusId ?? "";
@@ -89,6 +129,18 @@ export function AgentVerseApp() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!authenticated || deepLinkApplied) return;
+    applyDeepLinkAfterAuth();
+    setDeepLinkApplied(true);
+  }, [authenticated, deepLinkApplied]);
+
+  useEffect(() => {
+    if (sessionDeskRequestNonce > 0) {
+      setSessionDeskOpen(true);
+    }
+  }, [sessionDeskRequestNonce]);
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {

@@ -2,8 +2,9 @@
 
 Next.js + React Three Fiber **Tamil Nadu digital office** (Intellect Design Arena / Siruseri vibe) — agents sit at bench desks, walk over when summoned, and talk via the Agent Portal API.
 
-**PREPROD:** **0.3.15** · https://agentverse-staging.delena.buzz · [docs/OPS.md](docs/OPS.md)  
-**PROD:** **0.2.2** (unchanged until promote)
+**PREPROD:** **0.3.16** · https://agentverse-staging.delena.buzz · [docs/OPS.md](docs/OPS.md)  
+**Next pack:** **0.3.17** Desk upgradation (`feature/desk-0.3.17`) — bake `NEXT_PUBLIC_CSS_ISSUER=https://css.delena.buzz` on promote  
+**PROD:** **0.3.16** (unchanged until promote)
 
 ## Office crew
 

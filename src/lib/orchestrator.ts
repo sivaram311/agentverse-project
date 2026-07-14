@@ -117,6 +117,7 @@ export function makeQuest(
   title: string,
   description: string,
   projectId?: string | null,
+  sessionId?: string | null,
 ): Quest {
   return {
     id: `q-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -125,8 +126,9 @@ export function makeQuest(
     assignee,
     status: "active",
     createdAt: Date.now(),
-    progress: 8,
+    progress: undefined,
     projectId: projectId ?? null,
+    sessionId: sessionId ?? null,
   };
 }
 

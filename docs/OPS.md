@@ -8,10 +8,12 @@
 
 ## Current PREPROD (ready for next iteration)
 
-- **Version:** **0.3.15** · git `main` · evidence `H:\releases\agentverse-0.3.15\evidence\q1\Q1_PREPROD_OK_048`
+- **Live F:** **0.3.16** densify+deep-link · evidence `H:\releases\agentverse-0.3.16\evidence\q1\`
+- **Packaged next:** **0.3.17** Desk upgradation · `H:\releases\agentverse-0.3.17\` (await EM Q1 GO — Lead cutover)
 - **Smoke:** `https://agentverse-staging.delena.buzz/health` · bypass `http://103.118.183.185:4310/`
-- **Office contents:** Micro entrance — interlocking paver plaza, glass sliding doors + canopy, Intellect totem, white planters, staked trees/palms, scooters, manhole/drain, CCTV/downlights; plus 7-floor life, canteen, security, prior campus
-- **PROD:** still **0.2.2** — do not promote without EM Q2 GO
+- **Office contents:** unchanged densify plaza (0.3.15–0.3.16); Desk HUD only in 0.3.17
+- **PROD:** **0.3.16** — do not promote 0.3.17 without EM Q2 GO
+- **Deep-link:** `/desk?...` — [DEEP-LINK-CONTRACT.md](./DEEP-LINK-CONTRACT.md). Bake `NEXT_PUBLIC_CSS_ISSUER=https://css.delena.buzz` on F/G builds.
 
 ## PREPROD runbook
 
@@ -19,12 +21,16 @@
 - Auth: CSS clientId `agent-portal` (shared)
 - DNS: Cloudflare A `agentverse-staging.delena.buzz` → `103.118.183.185` (proxied)
 - **Login:** staging/prod CSS admin password (`G:\apps\css\.env` → `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` → **401** on staging.
-- Hotfix: build on E: → robocopy to `F:\apps\agentverse\app` (skip `node_modules` if junction) → restart :4310
+- Hotfix: build on E:/worktree → robocopy to `F:\apps\agentverse\app` (skip `node_modules` if junction) → restart :4310
+- **Bake on build:** `NEXT_PUBLIC_CSS_ISSUER=https://css.delena.buzz` (PREPROD/PROD). DEV may use `http://localhost:9000`.
+- **Do not** overwrite F with upgradation `0.3.0` / `feature/upgradation-functionality` — use densify+deep-link+desk packs only.
 
 ### Version trail (recent)
 
 | Ver | What |
 |-----|------|
+| **0.3.17** | Desk search/status/cancel + quest↔session sync + permission poll (from upgradation `@f5249ed`) on densify chrome |
+| **0.3.16** | ProdDeck deep-link on densify: `/desk`, dual brief decode, IncidentStrip, return allowlist (home / home-staging) |
 | **0.3.15** | Entrance micro: pavers, auto doors, canopy, planters, scooters, plaza props |
 | **0.3.14** | 7-floor workers; canteen eat/drink; gate + roaming security uniforms |
 | **0.3.13** | Photo-matched Intellect facade+logo; double-height lobby; glass corridors; plaza/boom/EV polish |
