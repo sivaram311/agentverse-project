@@ -1,21 +1,16 @@
 # HANDOFF — Upgradation side fleet
 
 **When:** 2026-07-15  
-**Branch:** `feature/upgradation-functionality` · **Version:** **0.3.1**  
+**Branch:** `feature/upgradation-functionality` · **Version:** **0.3.1 LIVE**  
 **Side ports:** **3312 / 4312 / 5312**  
-**Hosts:** `agentverse-upgrade-staging.delena.buzz` · `agentverse-upgrade.delena.buzz`
+**Hosts:** https://agentverse-upgrade-staging.delena.buzz · https://agentverse-upgrade.delena.buzz
 
-## 0.3.1 leftovers (parallel train)
+## Live
 
-| Lane | Delivered |
-|------|-----------|
-| A Durable | `project-workspace.ts` · project.workspacePath · `docs/PROJECT-WORKSPACE.md` |
-| B WebGL | FlatRoster fallback in HubScene |
-| C Plan/PWA | planMarkdown in permission banner · last-desk localStorage restore |
-| D ProdDeck | Dispatch → upgrade hosts (`E:\wt\proddeck-integrate`) |
+- Q1+Q2 side fleet **0.3.1** SMOKE_PASS (parallel subagent promote)
+- Evidence: `H:\releases\agentverse-upgrade-0.3.1\`
+- Classic / v2 not overwritten
 
-Classic / v2 untouched. Promote of **0.3.1** to F/G upgrade fleet: ask user Q1/Q2.
+## 0.3.1 leftovers (shipped)
 
-## Docs
-
-OPS · DEEP-LINK-CONTRACT · PROJECT-WORKSPACE · PROMOTE-UPGRADATION · LEFTOVER-0.3.1
+Durable projects · WebGL FlatRoster · planMarkdown/PWA · ProdDeck Dispatch → upgrade hosts
