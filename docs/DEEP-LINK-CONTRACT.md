@@ -1,13 +1,13 @@
 # AgentVerse ↔ ProdDeck Deep-Link Contract
 
-**Status:** Frozen for Upgradation 0.2.4+  
-**Hosts:** classic `agentverse.delena.buzz` / `agentverse-staging.delena.buzz` / DEV `:3310`  
-**Keep compatible:** `/?session=<id>`
+**Status:** Frozen for Upgradation 0.2.4+ · **SoT fleet = upgrade** (2026-07-15)  
+**Primary hosts:** `agentverse-upgrade.delena.buzz` · `agentverse-upgrade-staging.delena.buzz` · DEV `:3312`  
+**Legacy (still accepted):** classic `agentverse.delena.buzz` / staging / DEV `:3310` · `/?session=<id>`
 
 ## Canonical URL
 
 ```
-/desk?src=&crew=&session=&intent=&brief=&skills=&return=&env=&evidence=
+https://agentverse-upgrade[-staging].delena.buzz/desk?src=&crew=&session=&intent=&brief=&skills=&return=&env=&evidence=
 ```
 
 | Param | Meaning |
@@ -26,7 +26,15 @@
 
 ## Security
 
-`return` must resolve to host in: `localhost`, `127.0.0.1`, `home.delena.buzz`, `home-staging.delena.buzz`, `agentverse.delena.buzz`, `agentverse-staging.delena.buzz`. Others → ignored.
+`return` must resolve to host in:
+
+- `localhost`, `127.0.0.1`
+- `home.delena.buzz`, `home-staging.delena.buzz`
+- `agentverse-upgrade.delena.buzz`, `agentverse-upgrade-staging.delena.buzz`
+- `agentverse.delena.buzz`, `agentverse-staging.delena.buzz` (legacy)
+- `agentverse-v2.delena.buzz`, `agentverse-v2-staging.delena.buzz` (legacy side)
+
+Others → ignored.
 
 ## Behavior
 
@@ -37,4 +45,4 @@
 5. `src=proddeck` → Incident strip banner **“ProdDeck dispatch params received”** even if `brief` empty (chat opens so strip is visible).
 6. Safe `return` → “Back to Home” in chat/TopBar/IncidentStrip.
 
-ProdDeck Dispatch must match this schema.
+**ProdDeck Dispatch SoT:** upgrade hosts (not classic). See ProdDeck `docs/SUPPORTED-VERSIONS.md`.
