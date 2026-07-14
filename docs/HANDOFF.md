@@ -14,3 +14,7 @@
 ## 0.3.1 leftovers (shipped)
 
 Durable projects · WebGL FlatRoster · planMarkdown/PWA · ProdDeck Dispatch → upgrade hosts
+
+## Next
+
+[ROADMAP-UPGRADE.md](./ROADMAP-UPGRADE.md) — Grok post–0.3.1 priorities + how to confirm you are on the new fleet.
