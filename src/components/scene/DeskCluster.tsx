@@ -11,6 +11,22 @@ import { DeskClutter, OfficePlant } from "./OfficeDetails";
 /** Match persona scale (~0.82). */
 export const MINI_FURNITURE = 0.8;
 
+export type DeskVariant = "teal" | "whiteEdge" | "curved";
+
+const DESK_VARIANTS: DeskVariant[] = ["teal", "whiteEdge", "curved"];
+
+/** Stable cycle of desk finishes from world position (or explicit seed). */
+export function deskVariantFromHash(
+  position: [number, number, number],
+  seed = 0,
+): DeskVariant {
+  const h =
+    Math.abs(
+      Math.round(position[0] * 17.3 + position[2] * 31.7 + seed * 7.1) | 0,
+    ) % DESK_VARIANTS.length;
+  return DESK_VARIANTS[h]!;
+}
+
 type DeskProps = {
   position: [number, number, number];
   color: string;
@@ -20,6 +36,8 @@ type DeskProps = {
   status?: string;
   lod?: "full" | "simple";
   faceCenter?: boolean;
+  /** Desktop finish — defaults to a cycle hashed from position. */
+  variant?: DeskVariant;
 };
 
 type OfficeChairProps = {
@@ -162,12 +180,15 @@ export function AgentDesk({
   status,
   lod = "full",
   faceCenter = true,
+  variant: variantProp,
 }: DeskProps) {
   const screenL = useRef<Mesh>(null);
   const screenR = useRef<Mesh>(null);
   const edge = useRef<Mesh>(null);
   const lamp = useRef<Mesh>(null);
   const column = useRef<Mesh>(null);
+
+  const variant = variantProp ?? deskVariantFromHash(position);
 
   const yaw = useMemo(() => {
     if (!faceCenter) return 0;
@@ -203,7 +224,20 @@ export function AgentDesk({
   /** Desk surface height — matches seated hand reach */
   const topY = 0.58;
   const legH = topY - 0.04;
-  const topColor = lod === "full" ? PALETTE.deskTop : PALETTE.deskTopAlt;
+  const isCurved = variant === "curved";
+  const isWhiteEdge = variant === "whiteEdge";
+  const slabColor = isWhiteEdge
+    ? PALETTE.wallPure
+    : isCurved
+      ? PALETTE.deskTopAlt
+      : lod === "full"
+        ? PALETTE.deskTop
+        : PALETTE.deskTopAlt;
+  const insetColor = isWhiteEdge
+    ? PALETTE.floorTint
+    : isCurved
+      ? PALETTE.deskTop
+      : PALETTE.deskTopAlt;
 
   return (
     <group position={position} rotation={[0, yaw, 0]}>
@@ -285,24 +319,98 @@ export function AgentDesk({
         />
       </mesh>
 
-      {/* Teal desktop (prototype fidelity — ignore persona color) */}
-      <mesh position={[0, topY, 0]} castShadow receiveShadow>
-        <boxGeometry args={[deskW, 0.035, deskD]} />
-        <meshStandardMaterial
-          color={topColor}
-          metalness={0.25}
-          roughness={0.35}
-        />
-      </mesh>
-      {/* Slightly lighter teal inset surface */}
-      <mesh position={[0, topY + 0.018, 0]}>
-        <boxGeometry args={[deskW * 0.96, 0.006, deskD * 0.94]} />
-        <meshStandardMaterial
-          color={PALETTE.deskTopAlt}
-          metalness={0.2}
-          roughness={0.28}
-        />
-      </mesh>
+      {/* Desktop — teal | whiteEdge | curved */}
+      {isCurved ? (
+        <>
+          {/* Wider rounded slab */}
+          <mesh position={[0, topY, 0]} castShadow receiveShadow>
+            <boxGeometry args={[deskW * 1.02, 0.032, deskD * 0.92]} />
+            <meshStandardMaterial
+              color={slabColor}
+              metalness={0.22}
+              roughness={0.32}
+            />
+          </mesh>
+          {/* Cylinder segment front bumper for soft curve */}
+          <mesh
+            position={[0, topY, -deskD * 0.42]}
+            rotation={[0, 0, Math.PI / 2]}
+            castShadow
+            receiveShadow
+          >
+            <cylinderGeometry args={[deskD * 0.22, deskD * 0.22, deskW * 0.98, 16, 1, false, 0, Math.PI]} />
+            <meshStandardMaterial
+              color={slabColor}
+              metalness={0.22}
+              roughness={0.32}
+            />
+          </mesh>
+          <mesh position={[0, topY + 0.016, 0.02]}>
+            <boxGeometry args={[deskW * 0.94, 0.006, deskD * 0.78]} />
+            <meshStandardMaterial
+              color={insetColor}
+              metalness={0.18}
+              roughness={0.28}
+            />
+          </mesh>
+        </>
+      ) : (
+        <>
+          <mesh position={[0, topY, 0]} castShadow receiveShadow>
+            <boxGeometry args={[deskW, 0.035, deskD]} />
+            <meshStandardMaterial
+              color={slabColor}
+              metalness={isWhiteEdge ? 0.08 : 0.25}
+              roughness={isWhiteEdge ? 0.42 : 0.35}
+            />
+          </mesh>
+          <mesh position={[0, topY + 0.018, 0]}>
+            <boxGeometry args={[deskW * 0.96, 0.006, deskD * 0.94]} />
+            <meshStandardMaterial
+              color={insetColor}
+              metalness={0.2}
+              roughness={0.28}
+            />
+          </mesh>
+          {isWhiteEdge ? (
+            /* Teal edge strip around white top */
+            <>
+              <mesh position={[0, topY - 0.002, deskD / 2 - 0.01]}>
+                <boxGeometry args={[deskW, 0.028, 0.02]} />
+                <meshStandardMaterial
+                  color={PALETTE.deskTop}
+                  metalness={0.28}
+                  roughness={0.32}
+                />
+              </mesh>
+              <mesh position={[0, topY - 0.002, -deskD / 2 + 0.01]}>
+                <boxGeometry args={[deskW, 0.028, 0.02]} />
+                <meshStandardMaterial
+                  color={PALETTE.deskTop}
+                  metalness={0.28}
+                  roughness={0.32}
+                />
+              </mesh>
+              <mesh position={[-deskW / 2 + 0.01, topY - 0.002, 0]}>
+                <boxGeometry args={[0.02, 0.028, deskD]} />
+                <meshStandardMaterial
+                  color={PALETTE.deskTop}
+                  metalness={0.28}
+                  roughness={0.32}
+                />
+              </mesh>
+              <mesh position={[deskW / 2 - 0.01, topY - 0.002, 0]}>
+                <boxGeometry args={[0.02, 0.028, deskD]} />
+                <meshStandardMaterial
+                  color={PALETTE.deskTop}
+                  metalness={0.28}
+                  roughness={0.32}
+                />
+              </mesh>
+            </>
+          ) : null}
+        </>
+      )}
       {/* Thin white front lip */}
       <mesh position={[0, topY - 0.01, -deskD / 2 + 0.012]}>
         <boxGeometry args={[deskW * 0.98, 0.02, 0.016]} />
@@ -384,6 +492,38 @@ export function AgentDesk({
               roughness={0.5}
             />
           </mesh>
+          {/* Extra charger brick on floor / cable run */}
+          <mesh position={[-0.22, 0.04, deskD / 2 - 0.14]} castShadow>
+            <boxGeometry args={[0.07, 0.045, 0.1]} />
+            <meshStandardMaterial
+              color="#1a1a1a"
+              metalness={0.35}
+              roughness={0.45}
+            />
+          </mesh>
+          <mesh position={[-0.22, 0.055, deskD / 2 - 0.08]}>
+            <boxGeometry args={[0.035, 0.018, 0.028]} />
+            <meshStandardMaterial
+              color={PALETTE.laptopSilver}
+              metalness={0.5}
+              roughness={0.35}
+            />
+          </mesh>
+          {/* USB cable coil on desktop */}
+          <mesh
+            position={[-deskW * 0.32, topY + 0.028, -deskD * 0.05]}
+            rotation={[Math.PI / 2, 0, 0.35]}
+          >
+            <torusGeometry args={[0.04, 0.007, 6, 14]} />
+            <meshStandardMaterial color={PALETTE.cable} roughness={0.75} />
+          </mesh>
+          <mesh
+            position={[-deskW * 0.32, topY + 0.028, -deskD * 0.02]}
+            rotation={[Math.PI / 2, 0.2, -0.4]}
+          >
+            <torusGeometry args={[0.028, 0.006, 6, 12]} />
+            <meshStandardMaterial color="#222222" roughness={0.8} />
+          </mesh>
           {/* Thin black cables */}
           <mesh
             position={[-0.18, topY - 0.08, deskD / 2 - 0.12]}
@@ -405,6 +545,14 @@ export function AgentDesk({
           >
             <cylinderGeometry args={[0.005, 0.005, 0.36, 5]} />
             <meshStandardMaterial color={PALETTE.cable} roughness={0.8} />
+          </mesh>
+          {/* Charger lead into power strip */}
+          <mesh
+            position={[-0.16, 0.08, deskD / 2 - 0.11]}
+            rotation={[0.9, 0, 0.35]}
+          >
+            <cylinderGeometry args={[0.004, 0.004, 0.22, 5]} />
+            <meshStandardMaterial color={PALETTE.cable} roughness={0.85} />
           </mesh>
           <DeskClutter topY={topY} deskW={deskW} color={PALETTE.tealAccent} />
           <OfficePlant
@@ -607,6 +755,155 @@ export function ProjectCluster({ project, showLabels, lod, satellite }: ClusterP
           faceCenter={false}
         />
       ))}
+    </group>
+  );
+}
+
+type DeskPodProps = {
+  origin: [number, number, number];
+  yaw?: number;
+  seats?: 4 | 5 | 6;
+  lod?: "full" | "simple";
+  /** Offsets variant hash so nearby pods don't all match. */
+  variantSeed?: number;
+};
+
+type PodSeat = {
+  position: [number, number, number];
+  /** World yaw for the desk group (AgentDesk faceCenter=false). */
+  yaw: number;
+};
+
+/**
+ * Ambient open-plan filler: 4–6 desks + chairs around a shared white side table.
+ * Does not replace PersonaAvatar desks — density only.
+ */
+function podLayout(seats: 4 | 5 | 6): PodSeat[] {
+  const R = 1.55;
+
+  if (seats === 4) {
+    // L-cluster: three along back, one on the wing — open walkway to +X
+    const pts: [number, number][] = [
+      [-0.9, -1.15],
+      [0.35, -1.25],
+      [-1.35, 0.15],
+      [-0.55, 1.2],
+    ];
+    return pts.map(([x, z]) => ({
+      position: [x, 0, z] as [number, number, number],
+      yaw: Math.atan2(-x, -z),
+    }));
+  }
+
+  if (seats === 5) {
+    const out: PodSeat[] = [];
+    for (let i = 0; i < 5; i++) {
+      const t = i / 5;
+      // Arc with gap toward +X for walkway
+      const a = -Math.PI * 0.65 + t * Math.PI * 1.3;
+      const x = Math.cos(a) * R;
+      const z = Math.sin(a) * R;
+      out.push({
+        position: [x, 0, z],
+        yaw: Math.atan2(-x, -z),
+      });
+    }
+    return out;
+  }
+
+  // seats === 6 — ring with open walkway toward +X
+  const out: PodSeat[] = [];
+  for (let i = 0; i < 6; i++) {
+    const t = i / 6;
+    const a = -Math.PI * 0.72 + t * Math.PI * 1.44;
+    const x = Math.cos(a) * R * 1.05;
+    const z = Math.sin(a) * R * 1.05;
+    out.push({
+      position: [x, 0, z],
+      yaw: Math.atan2(-x, -z),
+    });
+  }
+  return out;
+}
+
+function SharedSideTable({ lod }: { lod: "full" | "simple" }) {
+  const topY = 0.52;
+  return (
+    <group>
+      <mesh position={[0, topY, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.42, 0.44, 0.04, 20]} />
+        <meshStandardMaterial
+          color={PALETTE.wallPure}
+          metalness={0.08}
+          roughness={0.4}
+        />
+      </mesh>
+      <mesh position={[0, topY / 2, 0]} castShadow>
+        <cylinderGeometry args={[0.04, 0.055, topY - 0.04, 10]} />
+        <meshStandardMaterial
+          color={PALETTE.deskFrame}
+          metalness={0.12}
+          roughness={0.38}
+        />
+      </mesh>
+      <mesh position={[0, 0.03, 0]} castShadow>
+        <cylinderGeometry args={[0.2, 0.22, 0.035, 14]} />
+        <meshStandardMaterial
+          color={PALETTE.deskFrame}
+          metalness={0.1}
+          roughness={0.42}
+        />
+      </mesh>
+      {lod === "full" ? (
+        <>
+          <mesh position={[0.08, topY + 0.025, -0.05]} castShadow>
+            <boxGeometry args={[0.16, 0.02, 0.12]} />
+            <meshStandardMaterial color={PALETTE.laptopSilver} metalness={0.4} roughness={0.35} />
+          </mesh>
+          <OfficePlant position={[-0.12, topY, 0.1]} scale={0.4} variant={2} />
+        </>
+      ) : null}
+    </group>
+  );
+}
+
+/** Ambient desk pod for open-plan density (not persona seats). */
+export function DeskPod({
+  origin,
+  yaw = 0,
+  seats = 4,
+  lod = "full",
+  variantSeed = 0,
+}: DeskPodProps) {
+  const layout = useMemo(() => podLayout(seats), [seats]);
+  const ambientColor = PALETTE.tealAccent;
+
+  return (
+    <group position={origin} rotation={[0, yaw, 0]}>
+      <SharedSideTable lod={lod} />
+      {layout.map((seat, i) => {
+        const localPos = seat.position;
+        const worldApprox: [number, number, number] = [
+          origin[0] + localPos[0],
+          origin[1],
+          origin[2] + localPos[2],
+        ];
+        return (
+          <group
+            key={`pod-desk-${i}`}
+            position={localPos}
+            rotation={[0, seat.yaw, 0]}
+          >
+            <AgentDesk
+              position={[0, 0, 0]}
+              color={ambientColor}
+              lod={lod}
+              faceCenter={false}
+              variant={deskVariantFromHash(worldApprox, variantSeed + i)}
+            />
+          </group>
+        );
+      })}
     </group>
   );
 }

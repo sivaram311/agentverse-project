@@ -11,7 +11,7 @@ import { personas } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
 import { AmbientWalkers } from "./AmbientWalkers";
 import { DataOrbs } from "./DataOrbs";
-import { ProjectCluster } from "./DeskCluster";
+import { DeskPod, ProjectCluster } from "./DeskCluster";
 import { FramingControls } from "./FramingControls";
 import { HexCollabOffice } from "./HexCollabOffice";
 import { IndustrialCeiling } from "./IndustrialCeiling";
@@ -52,6 +52,15 @@ function SceneInner({
       <IndustrialCeiling lod={lod} />
       <OfficeStorage lod={lod} />
       <HexCollabOffice lod={lod} />
+      {/* Ambient L / ring desk pods — open-plan density (not crew seats) */}
+      <DeskPod origin={[-7.4, 0, 3.8]} yaw={0.15} seats={4} lod={lod} variantSeed={1} />
+      <DeskPod origin={[7.4, 0, 3.6]} yaw={-0.2} seats={5} lod={lod} variantSeed={2} />
+      {lod === "full" ? (
+        <>
+          <DeskPod origin={[-7.2, 0, -5.2]} yaw={0.4} seats={6} lod={lod} variantSeed={3} />
+          <DeskPod origin={[7.2, 0, -5.0]} yaw={-0.35} seats={4} lod={lod} variantSeed={4} />
+        </>
+      ) : null}
       {/* Soft project orbs above collab */}
       <group position={[0, 3.6, 0]}>
         <DataOrbs showLabels={showLabels && viewMode !== "portrait-compact"} />

@@ -1,4 +1,4 @@
-# AgentVerse â€” Ops
+# AgentVerse Ã¢â‚¬â€ Ops
 
 Two **parallel fleets** share CSS/portal but never share ports or app paths. Deploying stable-v2 must **not** recycle classic `:4310` / `:5310`.
 
@@ -23,7 +23,7 @@ Two **parallel fleets** share CSS/portal but never share ports or app paths. Dep
 
 Leave this fleet running when promoting or smoking **agentverse-v2**.
 
-### AgentVerse stable-v2 (this branch — 0.4.2)
+### AgentVerse stable-v2 (this branch — 0.4.3)
 
 | Env | Drive / path | Port | URL | Portal API | CSS |
 |-----|--------------|------|-----|------------|-----|
@@ -33,7 +33,7 @@ Leave this fleet running when promoting or smoking **agentverse-v2**.
 
 | Piece | Value |
 |-------|--------|
-| Version | **0.4.2** |
+| Version | **0.4.3** |
 | Branch | `feature/stable-v2` (based on `v0.2.2-stable`) |
 | Package / ship name | `agentverse-v2` |
 | CSS clientId | `agent-portal` (same as classic) |
@@ -42,7 +42,7 @@ Leave this fleet running when promoting or smoking **agentverse-v2**.
 | Start PROD | `G:\apps\agentverse-v2\start.ps1 -EnvName prod` |
 | Launcher source | `scripts/start-release.ps1` → copied as `start.ps1` on F:/G: (`PORT` 3311 / 4311 / 5311) |
 
-**Features (v2):** bright industrial open-plan office — white/blue industrial floor, exposed ceiling (`IndustrialCeiling`), teal desks / black chairs, perimeter `OfficeStorage`. Still bright day lighting (`toneMappingExposure` ≈ 1.32) + PREPROD-style camera angles / first-person + TopBar **Joystick** / **Views** toggles. Chat does **not** auto-open on select/summon (Talk / command strip / Comms only — PREPROD-matched). Persist key `agentverse-office-v2-stable`.
+**Features (v2):** bright industrial open-plan — white walls/floor, exposed ceiling with braces/LED panels, teal + white-edge + curved desk variants, ambient **DeskPods** (4–6), blinds + glass partitions + floor scuffs, lockers/whiteboards. Camera Walk/Views/Joystick toggles; chat tap-only. Persist `agentverse-office-v2-stable`.
 
 > **Never** stop, recycle, or bind classic **:4310** / **:5310** when deploying or restarting agentverse-v2. Use **:4311** / **:5311** and paths `F:\apps\agentverse-v2` / `G:\apps\agentverse-v2` only.
 
@@ -51,18 +51,18 @@ Leave this fleet running when promoting or smoking **agentverse-v2**.
 ## PREPROD (stable-v2)
 
 - Path: `F:\apps\agentverse-v2`
-- Start: `F:\apps\agentverse-v2\start.ps1 -EnvName preprod` â†’ listens **4311**
+- Start: `F:\apps\agentverse-v2\start.ps1 -EnvName preprod` Ã¢â€ â€™ listens **4311**
 - Public: https://agentverse-v2-staging.delena.buzz
 - Bypass: http://103.118.183.185:4311
 - Portal / CSS: `:4080` / `:5900` (`https://css.delena.buzz`)
 - Auth: CSS clientId `agent-portal` (shared with classic)
 - Health: `GET /health` on :4311 or via public host
-- **Login:** staging CSS admin password (`G:\apps\css\.env` â†’ `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` returns **401** on staging.
+- **Login:** staging CSS admin password (`G:\apps\css\.env` Ã¢â€ â€™ `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` returns **401** on staging.
 
 ## PROD (stable-v2)
 
 - Path: `G:\apps\agentverse-v2`
-- Start: `G:\apps\agentverse-v2\start.ps1 -EnvName prod` â†’ listens **5311**
+- Start: `G:\apps\agentverse-v2\start.ps1 -EnvName prod` Ã¢â€ â€™ listens **5311**
 - Public: https://agentverse-v2.delena.buzz
 - Bypass: http://103.118.183.185:5311
 - Portal / CSS: `:5080` / `:5900`
@@ -70,21 +70,21 @@ Leave this fleet running when promoting or smoking **agentverse-v2**.
 
 ## Classic PREPROD / PROD (reference only)
 
-- `F:\apps\agentverse` :4310 Â· https://agentverse-staging.delena.buzz Â· tag `v0.3.15-unstable`
-- `G:\apps\agentverse` :5310 Â· https://agentverse.delena.buzz Â· tag `v0.2.2-stable`
+- `F:\apps\agentverse` :4310 Ã‚Â· https://agentverse-staging.delena.buzz Ã‚Â· tag `v0.3.15-unstable`
+- `G:\apps\agentverse` :5310 Ã‚Â· https://agentverse.delena.buzz Ã‚Â· tag `v0.2.2-stable`
 - Do not use these paths/ports for 0.4.0 side deploy.
 
 ## Health
 
-`GET /health` â€” process up. Authenticated smoke uses `/api/css` + `/api/portal` proxies against the envâ€™s portal/CSS ports above.
+`GET /health` Ã¢â‚¬â€ process up. Authenticated smoke uses `/api/css` + `/api/portal` proxies against the envÃ¢â‚¬â„¢s portal/CSS ports above.
 
 ## Camera + HUD toggles (0.4.0 stable-v2)
 
-- Default mood: **day**; canvas `toneMappingExposure` â‰ˆ **1.32** (bright office).
-- Open top chrome â†’ **Joystick** / **Views** toggle on-screen stick and angle picker (persisted).
+- Default mood: **day**; canvas `toneMappingExposure` Ã¢â€°Ë† **1.32** (bright office).
+- Open top chrome Ã¢â€ â€™ **Joystick** / **Views** toggle on-screen stick and angle picker (persisted).
 - Angle bar (when Views on): Front/Back/East/West + diagonals + body shots + **Walk**.
 - Authenticated: **Walk** / **Overview** (TopBar) or **FP** / **Orbit** (command strip) flips first-person vs orbit.
-- Persist key: `agentverse-office-v2-stable` (cameraMode, orbitShot, joystickVisible, cameraViewsVisible, officeMood, â€¦).
+- Persist key: `agentverse-office-v2-stable` (cameraMode, orbitShot, joystickVisible, cameraViewsVisible, officeMood, Ã¢â‚¬Â¦).
 - Chat panel does **not** open on persona select/summon (PREPROD-matched); open only via **Talk**, command strip, CommsDock, or explicit `openChat`.
 
 ## Sessions (Session Desk)
@@ -92,14 +92,14 @@ Leave this fleet running when promoting or smoking **agentverse-v2**.
 In-app **Sessions** (command strip / top chrome) lists portal sessions:
 
 - **Active / Archived** filters
-- **New** â€” create session on a workspace path
-- **Open** â€” load into tabs + chat
-- **Archive / Restore** â€” `POST /api/portal/sessions/{id}/archive|unarchive`
+- **New** Ã¢â‚¬â€ create session on a workspace path
+- **Open** Ã¢â‚¬â€ load into tabs + chat
+- **Archive / Restore** Ã¢â‚¬â€ `POST /api/portal/sessions/{id}/archive|unarchive`
 
 Config:
 
-- `NEXT_PUBLIC_DEFAULT_WORKSPACE` â€” default path/name (e.g. `demo`)
-- `NEXT_PUBLIC_WORKSPACE_ALLOWLIST` â€” optional comma-separated paths for quick-picks; empty = unrestricted (portal root still applies)
+- `NEXT_PUBLIC_DEFAULT_WORKSPACE` Ã¢â‚¬â€ default path/name (e.g. `demo`)
+- `NEXT_PUBLIC_WORKSPACE_ALLOWLIST` Ã¢â‚¬â€ optional comma-separated paths for quick-picks; empty = unrestricted (portal root still applies)
 
 ## DEV env discipline (do not mix)
 
@@ -111,9 +111,9 @@ Config:
 | UI port (stable-v2) | **3311** | **4311** / **5311** |
 | UI port (classic) | **3310** | **4310** / **5310** |
 
-Never load a mixed `.env` that sets `CSS_AUTH_URL=https://delena.buzz` (or css.delena.buzz) into DEV portal â€” AgentVerse will reject tokens as incompatible JWT (`iss` vs `authUrl`).
+Never load a mixed `.env` that sets `CSS_AUTH_URL=https://delena.buzz` (or css.delena.buzz) into DEV portal Ã¢â‚¬â€ AgentVerse will reject tokens as incompatible JWT (`iss` vs `authUrl`).
 
-## Cloudflare (Ops) â€” stable-v2 DNS
+## Cloudflare (Ops) Ã¢â‚¬â€ stable-v2 DNS
 
 ```powershell
 cd E:\MyWorkspace\agent-portal
@@ -134,6 +134,7 @@ Token: Account API token in `.env` / `E:\MyAgent\workflow\secrets\cloudflare.tok
 
 | Version | Notes |
 |---------|--------|
+| **0.4.3** | Fidelity: DeskPods 4–6, blinds, glass partitions, floor scuffs, ceiling braces/LED panels/detectors, desk variants |
 | **0.4.2** | Bright industrial office prototype: white/blue industrial floor, exposed ceiling, teal desks, black chairs, `OfficeStorage`; palette SoT `office-palette.ts` |
 | **0.4.1** | Chat does not auto-open on select/summon (Talk/Comms only; PREPROD-matched) |
 | **0.4.0** | `feature/stable-v2` side deploy. Siruseri 0.2.2-stable base + bright day office + OrbitShot / FP / ViewAngles + TopBar Joystick/Views. Ports **3311/4311/5311**, paths `agentverse-v2`. Persist `agentverse-office-v2-stable`. |

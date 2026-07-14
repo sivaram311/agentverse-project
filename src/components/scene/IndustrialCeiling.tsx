@@ -46,8 +46,9 @@ function IBeam({
 }
 
 /**
- * Exposed industrial ceiling: I-beams/trusses, HVAC pipes/ducts,
- * sprinklers, linear LED tubes + a few pendant point lights.
+ * Exposed industrial ceiling: I-beams/trusses + diagonal bracing,
+ * HVAC pipes/ducts, sprinklers/smoke detectors, surface LED panels,
+ * linear LED tubes + a few pendant point lights.
  */
 export function IndustrialCeiling({ lod = "full" }: { lod?: "full" | "simple" }) {
   const { halfW, backZ, openZ, ceilingY } = INDUSTRIAL_BOUNDS;
@@ -106,6 +107,67 @@ export function IndustrialCeiling({ lod = "full" }: { lod?: "full" | "simple" })
     return pts;
   }, [backZ, halfW, openZ, simple]);
 
+  /** Diagonal cross-bracing in I-beam bays (X pattern); sparser when lod=simple */
+  const braces = useMemo(() => {
+    type Brace = {
+      key: string;
+      position: [number, number, number];
+      length: number;
+      rotationY: number;
+    };
+    const items: Brace[] = [];
+    const skip = simple ? 2 : 1;
+    for (let i = 0; i < mainBeamsX.length - 1; i += skip) {
+      for (let j = 0; j < crossBeamsZ.length - 1; j += skip) {
+        if (simple && (i + j) % 2 !== 0) continue;
+        const x0 = mainBeamsX[i];
+        const x1 = mainBeamsX[i + 1];
+        const z0 = crossBeamsZ[j];
+        const z1 = crossBeamsZ[j + 1];
+        const cx = (x0 + x1) / 2;
+        const cz = (z0 + z1) / 2;
+        const dx = x1 - x0;
+        const dz = z1 - z0;
+        const len = Math.hypot(dx, dz) - 0.12;
+        const by = y - 0.2;
+        items.push({
+          key: `br-a-${i}-${j}`,
+          position: [cx, by, cz],
+          length: len,
+          rotationY: Math.atan2(dz, dx),
+        });
+        items.push({
+          key: `br-b-${i}-${j}`,
+          position: [cx, by, cz],
+          length: len,
+          rotationY: Math.atan2(-dz, dx),
+        });
+      }
+    }
+    return items;
+  }, [crossBeamsZ, mainBeamsX, simple, y]);
+
+  /** Sparse surface-mounted circular LED panels on/near ceiling plane */
+  const ledPanels = useMemo(() => {
+    const pts: [number, number][] = [];
+    const xStep = simple ? 6.5 : 4.8;
+    const zStep = simple ? 6.2 : 4.5;
+    for (let x = -halfW + 2.8; x <= halfW - 2.8; x += xStep) {
+      for (let z = backZ + 2.5; z <= openZ - 2.2; z += zStep) {
+        pts.push([x, z]);
+      }
+    }
+    return pts;
+  }, [backZ, halfW, openZ, simple]);
+
+  /** Smoke detectors next to a subset of sprinklers */
+  const smokeDetectors = useMemo(() => {
+    const stride = simple ? 4 : 3;
+    return sprinklers
+      .filter((_, i) => i % stride === 0)
+      .map(([x, z]) => [x + 0.22, z + 0.18] as const);
+  }, [simple, sprinklers]);
+
   const tubeLen = halfW * 1.55;
 
   return (
@@ -127,6 +189,23 @@ export function IndustrialCeiling({ lod = "full" }: { lod?: "full" | "simple" })
           length={halfW * 2 - 1.2}
           position={[0, y - 0.18, z]}
         />
+      ))}
+
+      {/* Diagonal cross-bracing between I-beams */}
+      {braces.map((b) => (
+        <mesh
+          key={b.key}
+          position={b.position}
+          rotation={[0, b.rotationY, 0]}
+          castShadow
+        >
+          <boxGeometry args={[b.length, 0.025, 0.04]} />
+          <meshStandardMaterial
+            color={PALETTE.ceilingBeamDark}
+            metalness={0.7}
+            roughness={0.4}
+          />
+        </mesh>
       ))}
 
       {/* Black main HVAC run + red fire pipe (along depth / Z) */}
@@ -171,6 +250,34 @@ export function IndustrialCeiling({ lod = "full" }: { lod?: "full" | "simple" })
         <mesh key={`sp-${i}`} position={[x, y - 0.28, z]}>
           <sphereGeometry args={[0.045, 6, 6]} />
           <meshStandardMaterial color={PALETTE.ductRed} metalness={0.5} roughness={0.4} />
+        </mesh>
+      ))}
+
+      {/* Smoke detectors (white disc + dark center) next to some sprinklers */}
+      {smokeDetectors.map(([x, z], i) => (
+        <group key={`sd-${i}`} position={[x, y - 0.02, z]}>
+          <mesh>
+            <cylinderGeometry args={[0.07, 0.07, 0.02, 12]} />
+            <meshStandardMaterial color="#F1F5F9" metalness={0.15} roughness={0.55} />
+          </mesh>
+          <mesh position={[0, -0.012, 0]}>
+            <cylinderGeometry args={[0.025, 0.025, 0.012, 10]} />
+            <meshStandardMaterial color={PALETTE.ceilingBeamDark} metalness={0.4} roughness={0.5} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Surface-mounted circular LED panels (flat emissive discs) */}
+      {ledPanels.map(([x, z], i) => (
+        <mesh key={`led-panel-${i}`} position={[x, y - 0.04, z]}>
+          <cylinderGeometry args={[0.38, 0.38, 0.018, 20]} />
+          <meshStandardMaterial
+            color="#FFFFFF"
+            emissive="#FFFFFF"
+            emissiveIntensity={0.9}
+            roughness={0.3}
+            metalness={0.05}
+          />
         </mesh>
       ))}
 
