@@ -10,7 +10,13 @@ import {
   routeQuest,
 } from "@/lib/orchestrator";
 import { connectSessionEvents } from "@/lib/realtime";
-import { parseDeepLinkParams, readSessionIdFromUrl } from "@/lib/session-share";
+import {
+  buildSessionShareUrl,
+  parseDeepLinkParams,
+  readSessionIdFromUrl,
+  restoreLastDeskUrlIfNeeded,
+  saveLastDeskUrl,
+} from "@/lib/session-share";
 import { useVerseStore } from "@/lib/store";
 import type { PermissionDto, Session } from "@/lib/types";
 import { IncidentStrip } from "./IncidentStrip";
@@ -22,6 +28,14 @@ const BUSY_STATUSES = new Set([
   "WAITING_PERMISSION",
   "WAITING_PLAN",
 ]);
+
+const PLAN_MARKDOWN_PREVIEW_CHARS = 1200;
+
+function truncatePlanMarkdown(markdown: string, max = PLAN_MARKDOWN_PREVIEW_CHARS): string {
+  const trimmed = markdown.trim();
+  if (trimmed.length <= max) return trimmed;
+  return `${trimmed.slice(0, max).trimEnd()}\n…`;
+}
 
 function forceSignOut(message: string) {
   clearTokens();
@@ -134,6 +148,11 @@ export function ChatPanel() {
     }
   }, [chatFocusNonce]);
 
+  useEffect(() => {
+    if (!session?.id) return;
+    saveLastDeskUrl(buildSessionShareUrl(session.id));
+  }, [session?.id]);
+
   function initials(name: string): string {
     return name
       .split(/\s+/)
@@ -205,9 +224,11 @@ export function ChatPanel() {
             store.session.workspacePath || store.workspacePath,
             store.session.id,
           );
+          saveLastDeskUrl(buildSessionShareUrl(store.session.id));
           return;
         }
 
+        restoreLastDeskUrlIfNeeded();
         const deep = parseDeepLinkParams();
         const urlSessionId = deep.session || readSessionIdFromUrl();
         const pathKey = store.workspacePath;
@@ -517,6 +538,24 @@ export function ChatPanel() {
               <span className="muted">
                 {p.kind || "permission"} · {(p.detailsJson || "").slice(0, 80)}
               </span>
+              {p.planMarkdown?.trim() ? (
+                <pre
+                  className="permission-plan muted"
+                  title={p.planMarkdown}
+                  style={{
+                    margin: 0,
+                    maxHeight: "10rem",
+                    overflow: "auto",
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                    fontSize: "0.78rem",
+                    fontFamily: "inherit",
+                    lineHeight: 1.35,
+                  }}
+                >
+                  {truncatePlanMarkdown(p.planMarkdown)}
+                </pre>
+              ) : null}
               <div className="permission-actions">
                 <button
                   type="button"

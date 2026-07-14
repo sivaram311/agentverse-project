@@ -2,6 +2,11 @@
 
 import type { DeepLinkIntent, DeepLinkParams, PersonaId } from "./types";
 
+/** PWA / cold-start: last desk share URL (same-origin `?session=`). */
+export const LAST_DESK_URL_KEY = "agentverse-last-desk-url";
+
+let lastDeskRestoreAttempted = false;
+
 const PERSONA_IDS = new Set<PersonaId>([
   "rajesh",
   "karthik",
@@ -134,6 +139,59 @@ export function buildSessionShareUrl(sessionId: string): string {
   url.search = "";
   url.searchParams.set("session", sessionId);
   return url.toString();
+}
+
+export function saveLastDeskUrl(url: string): void {
+  if (typeof window === "undefined") return;
+  const trimmed = url.trim();
+  if (!trimmed) return;
+  try {
+    localStorage.setItem(LAST_DESK_URL_KEY, trimmed);
+  } catch {
+    /* quota / private mode */
+  }
+}
+
+export function readLastDeskUrl(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(LAST_DESK_URL_KEY)?.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Once per page load: if the URL has no `session=`, restore the last saved
+ * same-origin desk/share URL via `history.replaceState` (PWA start_url `/`).
+ * Returns the restored session id, or null.
+ */
+export function restoreLastDeskUrlIfNeeded(): string | null {
+  if (typeof window === "undefined") return null;
+  if (lastDeskRestoreAttempted) return null;
+  lastDeskRestoreAttempted = true;
+
+  if (readSessionIdFromUrl() || parseDeepLinkParams().session) return null;
+
+  const last = readLastDeskUrl();
+  if (!last) return null;
+
+  try {
+    const target = new URL(last, window.location.origin);
+    if (target.origin !== window.location.origin) return null;
+    const path = target.pathname || "/";
+    if (path !== "/" && path !== "/desk") return null;
+    const sessionId = target.searchParams.get("session")?.trim() || null;
+    if (!sessionId) return null;
+    window.history.replaceState(
+      null,
+      "",
+      `${path}${target.search}${target.hash}`,
+    );
+    return sessionId;
+  } catch {
+    return null;
+  }
 }
 
 export function buildDeskDeepLink(partial: Partial<DeepLinkParams>): string {

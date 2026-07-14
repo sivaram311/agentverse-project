@@ -9,3 +9,11 @@ self.addEventListener("activate", (event) => {
     ).then(() => self.clients.claim()),
   );
 });
+
+/**
+ * Network-only fetch: never cache HTML/RSC so Next.js navigations stay fresh.
+ * Last-session restore is handled in-app via localStorage (not clients.openWindow).
+ */
+self.addEventListener("fetch", (event) => {
+  event.respondWith(fetch(event.request));
+});

@@ -92,6 +92,12 @@ export type OfficeProject = {
   managerId: PersonaId;
   crewIds: PersonaId[];
   createdAt: number;
+  /**
+   * Bound filesystem / portal workspace for this office project.
+   * Local durable binding — portal sessions remain SoT for session records.
+   * See `docs/PROJECT-WORKSPACE.md`.
+   */
+  workspacePath?: string | null;
 };
 
 export type SessionTab = {

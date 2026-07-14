@@ -8,6 +8,7 @@ import {
   orchestratorId,
   projectColor,
 } from "./orchestrator";
+import { resolveProjectWorkspacePath } from "./project-workspace";
 import type {
   AgentRuntimeState,
   AuthConfig,
@@ -59,6 +60,7 @@ const HUB_PROJECT: OfficeProject = {
     "kabilan",
   ],
   createdAt: 0,
+  workspacePath: DEFAULT_WORKSPACE,
 };
 
 function defaultAgentStates(): Record<PersonaId, AgentRuntimeState> {
@@ -344,24 +346,41 @@ export const useVerseStore = create<VerseState>()(
             : get().activeTabSessionId;
         set({ sessionTabs: tabs, activeTabSessionId: active });
       },
-      setActiveProject: (id) => set({ activeProjectId: id }),
+      setActiveProject: (id) => {
+        const project = get().projects.find((p) => p.id === id);
+        if (project?.workspacePath) {
+          const path = project.workspacePath;
+          set({ activeProjectId: id, workspacePath: path });
+          get().rememberWorkspace(path);
+          return;
+        }
+        set({ activeProjectId: id });
+      },
       deployProject: (name, idea) => {
         const existing = get().projects.filter((p) => p.id !== "hub");
         const id = `proj-${Date.now().toString(36)}`;
+        const projectName = name.slice(0, 48) || "New Project";
+        const workspacePath = resolveProjectWorkspacePath({
+          id,
+          name: projectName,
+        });
         const project: OfficeProject = {
           id,
-          name: name.slice(0, 48) || "New Project",
+          name: projectName,
           idea: idea.slice(0, 200),
           color: projectColor(existing.length),
           clusterOffset: nextClusterOffset(existing.length),
           managerId: "muthu",
           crewIds: ["muthu", "aravind", "karthik", "kabilan"],
           createdAt: Date.now(),
+          workspacePath,
         };
         set({
           projects: [...get().projects, project],
           activeProjectId: id,
+          workspacePath,
         });
+        get().rememberWorkspace(workspacePath);
         // Light up crew as working on the new project
         for (const pid of project.crewIds) {
           get().setAgentState(pid, {

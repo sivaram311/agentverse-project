@@ -5,10 +5,19 @@ import {
   Environment,
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useState } from "react";
+import {
+  Component,
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+  type ErrorInfo,
+  type ReactNode,
+} from "react";
 import { isPortraitView, presetForView, resolveViewMode, type ViewMode } from "@/lib/camera-framing";
 import { personas } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
+import { FlatRoster } from "@/components/hud/FlatRoster";
 import { AmbientWalkers } from "./AmbientWalkers";
 import { DataOrbs } from "./DataOrbs";
 import { ProjectCluster } from "./DeskCluster";
@@ -18,6 +27,51 @@ import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
 import { PersonaAvatar } from "./PersonaAvatar";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { SiruseriOffice } from "./SiruseriOffice";
+
+function canCreateWebGL(): boolean {
+  if (typeof document === "undefined") return true;
+  try {
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl2") ||
+      canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl");
+    return !!gl;
+  } catch {
+    return false;
+  }
+}
+
+type WebGLBoundaryProps = {
+  onFail: () => void;
+  children: ReactNode;
+};
+
+type WebGLBoundaryState = { hasError: boolean };
+
+/** Catches Canvas / R3F render crashes and promotes the 2D roster. */
+class WebGLErrorBoundary extends Component<WebGLBoundaryProps, WebGLBoundaryState> {
+  state: WebGLBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(): WebGLBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(_error: Error, _info: ErrorInfo) {
+    this.props.onFail();
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="hub-canvas webgl-fallback" data-webgl-fallback="1">
+          <FlatRoster />
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function SceneInner({
   reducedMotion,
@@ -87,7 +141,7 @@ function SceneInner({
   );
 }
 
-export function HubScene() {
+function HubCanvas({ onWebGLFail }: { onWebGLFail: () => void }) {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [narrow, setNarrow] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("portrait");
@@ -141,6 +195,23 @@ export function HubScene() {
           powerPreference: "high-performance",
           toneMappingExposure: 1.28,
         }}
+        onCreated={({ gl }) => {
+          try {
+            const ctx = gl.getContext();
+            if (!ctx) {
+              onWebGLFail();
+              return;
+            }
+            const el = gl.domElement;
+            const onLost = (event: Event) => {
+              event.preventDefault();
+              onWebGLFail();
+            };
+            el.addEventListener("webglcontextlost", onLost, false);
+          } catch {
+            onWebGLFail();
+          }
+        }}
       >
         <Suspense fallback={null}>
           <SceneInner
@@ -153,5 +224,33 @@ export function HubScene() {
         </Suspense>
       </Canvas>
     </div>
+  );
+}
+
+export function HubScene() {
+  const [webglFailed, setWebglFailed] = useState(false);
+
+  useEffect(() => {
+    if (!canCreateWebGL()) {
+      setWebglFailed(true);
+    }
+  }, []);
+
+  const onFail = useCallback(() => {
+    setWebglFailed(true);
+  }, []);
+
+  if (webglFailed) {
+    return (
+      <div className="hub-canvas webgl-fallback" data-webgl-fallback="1">
+        <FlatRoster />
+      </div>
+    );
+  }
+
+  return (
+    <WebGLErrorBoundary onFail={onFail}>
+      <HubCanvas onWebGLFail={onFail} />
+    </WebGLErrorBoundary>
   );
 }
