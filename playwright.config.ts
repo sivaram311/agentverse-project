@@ -4,6 +4,10 @@ const baseURL =
   process.env.AV_E2E_BASE_URL?.trim() ||
   "https://agentverse-upgrade-staging.delena.buzz";
 
+const prodBaseURL =
+  process.env.AV_E2E_PROD_BASE_URL?.trim() ||
+  "https://agentverse-upgrade.delena.buzz";
+
 /** CI or common CI-ish envs → one retry. */
 const ciIsh = !!(
   process.env.CI ||
@@ -28,7 +32,16 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { browserName: "chromium" },
+      use: { browserName: "chromium", baseURL },
+    },
+    {
+      // Upgrade PROD smoke only — full suite stays on staging (default project).
+      name: "upgrade-prod",
+      use: {
+        browserName: "chromium",
+        baseURL: prodBaseURL,
+      },
+      testMatch: /(?:health|shell)\.spec\.ts$/,
     },
   ],
 });
