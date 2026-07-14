@@ -8,6 +8,7 @@
 
 - Based on **`v0.2.2-stable`** Siruseri office.
 - Adds PREPROD-style camera framing / first-person + TopBar **Joystick** / **Views** toggles, bright day office.
+- Chat panel stays closed on persona select/summon; open only via Talk / command strip / CommsDock / `openChat` (PREPROD-matched).
 - Ships as **agentverse-v2** on ports **3311 / 4311 / 5311**.
 
 ## What’s live (classic — DO NOT DISTURB)

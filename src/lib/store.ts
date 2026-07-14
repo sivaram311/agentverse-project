@@ -242,11 +242,10 @@ export const useVerseStore = create<VerseState>()(
       setApiOnline: (v) => set({ apiOnline: v }),
       setLanguage: (language) => set({ language }),
       setVoiceGender: (voiceGender) => set({ voiceGender }),
-      selectPersona: (id) => set({ selectedPersona: id, chatOpen: true }),
+      selectPersona: (id) => set({ selectedPersona: id }),
       summonPersona: (id) => {
         set({
           selectedPersona: id,
-          chatOpen: true,
           interaction: { mode: "approaching", focusId: id },
           // Keep orbit free so the player can watch / keep walking nearby
           orbitLocked: false,

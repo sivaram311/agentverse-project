@@ -23,7 +23,7 @@ Crew / pre-work: `agents/`
 ## Features
 
 - Mandala office floor, holographic desks, work-loop animations
-- Click agent → stand → walk → greet → chat → return to desk
+- Click agent → stand → walk → greet → return to desk (chat opens only via Talk / command strip / CommsDock / `openChat`)
 - Multi-project desk clusters (ask Rajesh: `new project: …`)
 - Per-directory portal sessions (workspace picker + session tabs)
 - **Session Desk** — list / create / archive / restore portal sessions (Active & Archived)

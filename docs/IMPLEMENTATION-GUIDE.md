@@ -43,9 +43,10 @@ Public URLs and classic fleet: [OPS.md](./OPS.md)
 ## Office behavior
 
 1. Agents sit at desks with work-loop animations and progress bars.
-2. Click → stand → walk → greet (ta/hi/en) → chat focus → return → sit.
-3. `new project: …` via Rajesh → satellite desk cluster + crew assignment.
-4. Each directory can own a portal session (WorkspacePicker + SessionTabs).
+2. Click → stand → walk → greet (ta/hi/en) → return → sit. Chat does **not** auto-open; use Talk / command strip / CommsDock / `openChat`.
+3. `selectPersona` / `summonPersona` in `store.ts` must **not** set `chatOpen: true` (PREPROD-matched).
+4. `new project: …` via Rajesh → satellite desk cluster + crew assignment.
+5. Each directory can own a portal session (WorkspacePicker + SessionTabs).
 
 ## Session Desk (from 0.2.2 lineage)
 
