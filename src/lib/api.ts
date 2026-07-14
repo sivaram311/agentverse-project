@@ -11,6 +11,7 @@ import type {
   CreateSessionRequest,
   Health,
   Message,
+  PermissionDto,
   Session,
 } from "./types";
 
@@ -158,6 +159,23 @@ export const portalApi = {
     apiFetch<Message>(
       `/sessions/${id}/prompt`,
       { method: "POST", body: JSON.stringify({ prompt }) },
+      authConfig,
+    ),
+  listPermissions: (id: string, authConfig?: AuthConfig | null) =>
+    apiFetch<PermissionDto[]>(`/sessions/${id}/permissions`, {}, authConfig),
+  resolvePermission: (
+    sessionId: string,
+    permissionId: string,
+    decision: "allow" | "deny" | "allow_always",
+    reason?: string,
+    authConfig?: AuthConfig | null,
+  ) =>
+    apiFetch<{ status: string }>(
+      `/sessions/${sessionId}/permissions/${permissionId}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ decision, reason: reason ?? null }),
+      },
       authConfig,
     ),
 };

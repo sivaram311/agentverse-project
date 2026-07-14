@@ -154,6 +154,7 @@ type VerseState = {
   ) => void;
   dismissIncident: () => void;
   requestSessionDesk: () => void;
+  syncQuestFromSessionStatus: (sessionId: string, status: string) => void;
   selectPersona: (id: PersonaId) => void;
   summonPersona: (id: PersonaId) => void;
   setSession: (s: Session | null) => void;
@@ -266,6 +267,31 @@ export const useVerseStore = create<VerseState>()(
       dismissIncident: () => set({ incidentDismissed: true }),
       requestSessionDesk: () =>
         set((s) => ({ sessionDeskRequestNonce: s.sessionDeskRequestNonce + 1 })),
+      syncQuestFromSessionStatus: (sessionId, status) => {
+        const upper = status.toUpperCase();
+        set((s) => ({
+          quests: s.quests.map((q) => {
+            if (q.sessionId !== sessionId) return q;
+            if (
+              upper === "STREAMING" ||
+              upper === "WAITING_PERMISSION" ||
+              upper === "WAITING_PLAN"
+            ) {
+              return { ...q, status: "active" as const, progress: undefined };
+            }
+            if (upper === "FAILED") {
+              return { ...q, status: "failed" as const, progress: 100 };
+            }
+            if (upper === "CANCELLED") {
+              return { ...q, status: "cancelled" as const, progress: 100 };
+            }
+            if (upper === "COMPLETED" || upper === "IDLE") {
+              return { ...q, status: "done" as const, progress: 100 };
+            }
+            return q;
+          }),
+        }));
+      },
       // Selection / summon never auto-opens chat — Talk / CommsDock only
       selectPersona: (id) => set({ selectedPersona: id }),
       summonPersona: (id) => {
@@ -412,7 +438,7 @@ export const useVerseStore = create<VerseState>()(
             };
             return { quests, agentStates };
           }
-          if (q && patch.status === "done") {
+          if (q && (patch.status === "done" || patch.status === "failed" || patch.status === "cancelled")) {
             return {
               quests,
               agentStates: {
@@ -421,7 +447,12 @@ export const useVerseStore = create<VerseState>()(
                   ...s.agentStates[q.assignee],
                   progress: 100,
                   working: false,
-                  status: "At desk",
+                  status:
+                    patch.status === "failed"
+                      ? "Failed"
+                      : patch.status === "cancelled"
+                        ? "Cancelled"
+                        : "At desk",
                   pose: "sitting",
                 },
               },

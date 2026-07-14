@@ -636,6 +636,30 @@ body {
   background: color-mix(in srgb, var(--av-accent) 14%, transparent);
 }
 
+.chip.streaming {
+  border-color: #4da3ff;
+  color: #9fd0ff;
+  cursor: default;
+}
+
+.chip.waiting {
+  border-color: #e8a838;
+  color: #ffd27a;
+  cursor: default;
+}
+
+.chip.failed {
+  border-color: #ff6b6b;
+  color: #ffb0b0;
+  cursor: default;
+}
+
+.chip.idle {
+  border-color: #3ddc97;
+  color: #9cf0c8;
+  cursor: default;
+}
+
 .desk-tag {
   display: grid;
   gap: 0.1rem;
@@ -969,6 +993,27 @@ body {
   flex-wrap: wrap;
 }
 
+.permission-banner {
+  margin: 0.45rem 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--av-line);
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.permission-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.permission-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
 .return-link {
   white-space: nowrap;
 }
@@ -1053,6 +1098,14 @@ body {
 
 .quest-card.status-done em {
   color: var(--av-mint);
+}
+
+.quest-card.status-failed em {
+  color: #ff8d8d;
+}
+
+.quest-card.status-cancelled em {
+  color: var(--av-muted);
 }
 
 .chat-log {
@@ -1860,8 +1913,8 @@ body {
 
 .session-desk {
   pointer-events: auto;
-  width: min(92vw, 28rem);
-  max-height: min(78dvh, 34rem);
+  width: min(92vw, 30rem);
+  max-height: min(82dvh, 40rem);
   overflow: hidden;
   display: grid;
   gap: 0.55rem;
@@ -1893,6 +1946,7 @@ body {
 .session-desk-head,
 .session-desk-actions,
 .session-desk-filters,
+.session-desk-status-filters,
 .session-desk-form-actions,
 .session-desk-row-actions {
   display: flex;
@@ -1925,6 +1979,7 @@ body {
 
 .session-desk button.ghost,
 .session-desk-filters button,
+.session-desk-status-filters button,
 .session-desk-quick button {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--av-line);
@@ -1943,7 +1998,8 @@ body {
   transform: none;
 }
 
-.session-desk-filters button.on {
+.session-desk-filters button.on,
+.session-desk-status-filters button.on {
   color: var(--av-ink);
   border-color: color-mix(in srgb, var(--av-accent) 65%, transparent);
   background: color-mix(in srgb, var(--av-accent) 18%, transparent);
@@ -2052,6 +2108,48 @@ body {
   letter-spacing: 0.04em;
 }
 
+.session-desk-search {
+  padding: 0 0.15rem 0.15rem;
+}
+
+.session-desk-search input {
+  width: 100%;
+  min-height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--av-line);
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.78rem;
+}
+
+.session-desk-search input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--av-accent) 60%, transparent);
+  box-shadow: 0 0 0 2px rgba(255, 98, 0, 0.16);
+}
+
+.session-desk-hint {
+  margin: 0.2rem 0 0;
+  font-size: 0.68rem;
+}
+
+.session-desk-status-filters {
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0 0.15rem 0.15rem;
+}
+
+.session-desk-status-filters button {
+  min-height: 32px;
+  font-size: 0.62rem;
+}
+
+.session-desk button.danger,
+.ghost.danger {
+  color: #ff8d8d;
+}
+
 .session-desk-row-actions {
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -2069,6 +2167,23 @@ body {
   text-align: center;
   border: 1px dashed var(--av-line);
   border-radius: var(--radius-md);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.quest-session {
+  display: block;
+  font-size: 0.62rem;
 }
 
 .session-meta {
