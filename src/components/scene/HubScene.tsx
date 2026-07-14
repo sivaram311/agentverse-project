@@ -139,7 +139,7 @@ export function HubScene() {
         gl={{
           antialias: !narrow && !compact,
           powerPreference: "high-performance",
-          toneMappingExposure: 1.28,
+          toneMappingExposure: 1.32,
         }}
       >
         <Suspense fallback={null}>

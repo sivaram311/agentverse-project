@@ -20,6 +20,7 @@ import type {
   UiLanguage,
 } from "./types";
 import type { VoiceGenderPref } from "./speech";
+import type { OrbitShot } from "./camera-framing";
 
 export type InteractionMode =
   | "idle"
@@ -27,6 +28,8 @@ export type InteractionMode =
   | "greeting"
   | "talking"
   | "returning";
+
+export type CameraMode = "firstPerson" | "overview";
 
 export type InteractionState = {
   mode: InteractionMode;
@@ -114,6 +117,10 @@ type VerseState = {
   greetOnce: Partial<Record<PersonaId, boolean>>;
   subtitle: string | null;
   orbitLocked: boolean;
+  /** Orbit overview vs first-person walk */
+  cameraMode: CameraMode;
+  /** Framed orbit angle when overview */
+  orbitShot: OrbitShot;
   chatFocusNonce: number;
   composeDraft: string;
   /** Full top chrome (lang, API, share, projects) — off by default for immersion */
@@ -122,6 +129,10 @@ type VerseState = {
   chatOpen: boolean;
   /** Tunable office lighting mood */
   officeMood: OfficeMood;
+  /** On-screen walk stick */
+  joystickVisible: boolean;
+  /** Bottom angle picker (ViewAngles) */
+  cameraViewsVisible: boolean;
   /** Logged-in visitor on the floor */
   playerPosition: [number, number, number];
   /** WASD / joystick stick (−1..1) */
@@ -155,6 +166,11 @@ type VerseState = {
   markGreeted: (id: PersonaId) => void;
   setSubtitle: (text: string | null) => void;
   setOrbitLocked: (v: boolean) => void;
+  setCameraMode: (m: CameraMode) => void;
+  setOrbitShot: (shot: OrbitShot) => void;
+  /** Menu picker: framed shots or walk */
+  pickCameraView: (view: OrbitShot | "walk") => void;
+  toggleCameraMode: () => void;
   bumpChatFocus: () => void;
   setComposeDraft: (text: string) => void;
   consumeComposeDraft: () => string;
@@ -165,6 +181,10 @@ type VerseState = {
   closeChat: () => void;
   setOfficeMood: (m: OfficeMood) => void;
   cycleOfficeMood: () => void;
+  setJoystickVisible: (v: boolean) => void;
+  toggleJoystickVisible: () => void;
+  setCameraViewsVisible: (v: boolean) => void;
+  toggleCameraViewsVisible: () => void;
   setPlayerPosition: (p: [number, number, number]) => void;
   setPlayerMoveInput: (v: { x: number; z: number }) => void;
 };
@@ -199,15 +219,25 @@ export const useVerseStore = create<VerseState>()(
       greetOnce: {},
       subtitle: null,
       orbitLocked: false,
+      cameraMode: "overview",
+      orbitShot: "floorS",
       chatFocusNonce: 0,
       composeDraft: "",
       officeChromeOpen: false,
       chatOpen: false,
       officeMood: "day",
+      joystickVisible: true,
+      cameraViewsVisible: true,
       playerPosition: [0, 0, 5.2],
       playerMoveInput: { x: 0, z: 0 },
       setAuthConfig: (c) => set({ authConfig: c }),
-      setAuthenticated: (v, username = null) => set({ authenticated: v, username }),
+      setAuthenticated: (v, username = null) =>
+        set({
+          authenticated: v,
+          username,
+          // Default orbit overview on auth change (FP via toggle / Walk)
+          cameraMode: "overview",
+        }),
       setAccessToken: (accessToken) => set({ accessToken }),
       setApiOnline: (v) => set({ apiOnline: v }),
       setLanguage: (language) => set({ language }),
@@ -384,6 +414,20 @@ export const useVerseStore = create<VerseState>()(
         set((s) => ({ greetOnce: { ...s.greetOnce, [id]: true } })),
       setSubtitle: (text) => set({ subtitle: text }),
       setOrbitLocked: (v) => set({ orbitLocked: v }),
+      setCameraMode: (m) => set({ cameraMode: m }),
+      setOrbitShot: (orbitShot) => set({ orbitShot, cameraMode: "overview" }),
+      pickCameraView: (view) => {
+        if (view === "walk") {
+          set({ cameraMode: "firstPerson" });
+          return;
+        }
+        set({ cameraMode: "overview", orbitShot: view });
+      },
+      toggleCameraMode: () =>
+        set((s) => ({
+          cameraMode:
+            s.cameraMode === "firstPerson" ? "overview" : "firstPerson",
+        })),
       bumpChatFocus: () =>
         set((s) => ({ chatFocusNonce: s.chatFocusNonce + 1, chatOpen: true })),
       setComposeDraft: (composeDraft) => set({ composeDraft }),
@@ -404,11 +448,17 @@ export const useVerseStore = create<VerseState>()(
           const i = OFFICE_MOODS.indexOf(s.officeMood);
           return { officeMood: OFFICE_MOODS[(i + 1) % OFFICE_MOODS.length] };
         }),
+      setJoystickVisible: (joystickVisible) => set({ joystickVisible }),
+      toggleJoystickVisible: () =>
+        set((s) => ({ joystickVisible: !s.joystickVisible })),
+      setCameraViewsVisible: (cameraViewsVisible) => set({ cameraViewsVisible }),
+      toggleCameraViewsVisible: () =>
+        set((s) => ({ cameraViewsVisible: !s.cameraViewsVisible })),
       setPlayerPosition: (playerPosition) => set({ playerPosition }),
       setPlayerMoveInput: (playerMoveInput) => set({ playerMoveInput }),
     }),
     {
-      name: "agentverse-office-v2",
+      name: "agentverse-office-v2-stable",
       partialize: (s) => ({
         language: s.language,
         voiceGender: s.voiceGender,
@@ -424,6 +474,10 @@ export const useVerseStore = create<VerseState>()(
         quests: s.quests,
         greetOnce: s.greetOnce,
         officeMood: s.officeMood,
+        cameraMode: s.cameraMode,
+        orbitShot: s.orbitShot,
+        joystickVisible: s.joystickVisible,
+        cameraViewsVisible: s.cameraViewsVisible,
       }),
     },
   ),

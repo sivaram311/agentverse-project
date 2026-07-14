@@ -19,6 +19,14 @@ export function TopBar({
   const username = useVerseStore((s) => s.username);
   const authConfig = useVerseStore((s) => s.authConfig);
   const setAuthenticated = useVerseStore((s) => s.setAuthenticated);
+  const cameraMode = useVerseStore((s) => s.cameraMode);
+  const toggleCameraMode = useVerseStore((s) => s.toggleCameraMode);
+  const joystickVisible = useVerseStore((s) => s.joystickVisible);
+  const toggleJoystickVisible = useVerseStore((s) => s.toggleJoystickVisible);
+  const cameraViewsVisible = useVerseStore((s) => s.cameraViewsVisible);
+  const toggleCameraViewsVisible = useVerseStore(
+    (s) => s.toggleCameraViewsVisible,
+  );
   const session = useVerseStore((s) => s.session);
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -53,6 +61,47 @@ export function TopBar({
           )}
           <VoicePicker />
           <MoodPicker />
+          <button
+            type="button"
+            className={`ghost keep-mobile${joystickVisible ? " is-on" : ""}`}
+            onClick={toggleJoystickVisible}
+            aria-pressed={joystickVisible}
+            title={joystickVisible ? "Hide on-screen joystick" : "Show on-screen joystick"}
+          >
+            Joystick
+          </button>
+          <button
+            type="button"
+            className={`ghost keep-mobile${cameraViewsVisible ? " is-on" : ""}`}
+            onClick={toggleCameraViewsVisible}
+            aria-pressed={cameraViewsVisible}
+            title={
+              cameraViewsVisible
+                ? "Hide camera angle picker"
+                : "Show camera angle picker"
+            }
+          >
+            Views
+          </button>
+          {authenticated ? (
+            <button
+              type="button"
+              className="ghost keep-mobile"
+              onClick={toggleCameraMode}
+              title={
+                cameraMode === "firstPerson"
+                  ? "Switch to orbit overview"
+                  : "Switch to first-person walk"
+              }
+              aria-label={
+                cameraMode === "firstPerson"
+                  ? "Camera: first person. Switch to orbit."
+                  : "Camera: orbit. Switch to first person."
+              }
+            >
+              {cameraMode === "firstPerson" ? "Walk" : "Overview"}
+            </button>
+          ) : null}
           {authenticated && onOpenSessions ? (
             <button
               type="button"

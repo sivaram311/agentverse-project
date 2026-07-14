@@ -1,6 +1,8 @@
 # AgentVerse - 3D Multi-Agent Office Workplace
 
-Next.js + React Three Fiber **Tamil Nadu digital office** — agents sit at desks, walk over when summoned, and talk via the Agent Portal API at `:8080`.
+Next.js + React Three Fiber **Tamil Nadu digital office** — agents sit at desks, walk over when summoned, and talk via the Agent Portal API.
+
+**Current branch:** `feature/stable-v2` · **0.4.0** (ships as **agentverse-v2** alongside classic AgentVerse). Ops detail: [`docs/OPS.md`](docs/OPS.md).
 
 ## Office crew
 
@@ -25,15 +27,28 @@ Crew / pre-work: `agents/`
 - Multi-project desk clusters (ask Rajesh: `new project: …`)
 - Per-directory portal sessions (workspace picker + session tabs)
 - **Session Desk** — list / create / archive / restore portal sessions (Active & Archived)
+- **Camera angles + chrome toggles** (0.4.0) — OrbitShot / first-person Views bar; TopBar **Joystick** / **Views** show-hide; bright day office
+
+## Parallel fleets (ports / URLs)
+
+Two fleets share CSS (`agent-portal` clientId) and portal APIs but use **different ports and app paths**. Do not recycle classic ports when deploying v2.
+
+| Fleet | DEV | PREPROD | PROD |
+|-------|-----|---------|------|
+| **Classic** (do not disturb) | **3310** | **4310** · https://agentverse-staging.delena.buzz · `F:\apps\agentverse` · `v0.3.15-unstable` | **5310** · https://agentverse.delena.buzz · `G:\apps\agentverse` · `v0.2.2-stable` |
+| **stable-v2** (this branch, 0.4.0) | **3311** | **4311** · https://agentverse-v2-staging.delena.buzz · `F:\apps\agentverse-v2` | **5311** · https://agentverse-v2.delena.buzz · `G:\apps\agentverse-v2` |
+
+Bypass (v2): http://103.118.183.185:4311 · http://103.118.183.185:5311  
+Staging/prod portal `:4080`/`:5080`, CSS `:5900`. Full tables + DNS: [`docs/OPS.md`](docs/OPS.md).
 
 ## Prerequisites
 
 - Node.js 22+ (host has 24.x)
-- Agent Portal backend running on `http://127.0.0.1:8080`
+- Agent Portal backend running on `http://127.0.0.1:8080` (DEV) or `:4080`/`:5080` (staging/prod)
 - CSS on `:9000` when `cssEnabled` (DEV login: `admin` / `admin123`)
 - **PREPROD/PROD login:** CSS admin password from `G:\apps\css\.env` (`CSS_ADMIN_PASSWORD`) — not `admin123` (staging returns 401)
 
-## Dev (port **3310** reserved)
+## Dev (stable-v2 port **3311**)
 
 ```powershell
 cd E:\MyWorkspace\agentverse-project
@@ -47,10 +62,10 @@ npm run dev
 
 Bundled backends (junctions): `services/agent-portal`, `services/centralized-security-system`.
 
-Open `http://127.0.0.1:3310` (phone/tablet / public IP: `http://<host>:3310`).
+Open `http://127.0.0.1:3311` (phone/tablet / public IP: `http://<host>:3311`).
 
-PREPROD: https://agentverse-staging.delena.buzz (`F:\apps\agentverse` :4310).  
-PROD: https://agentverse.delena.buzz (`G:\apps\agentverse` :5310).
+PREPROD (v2): https://agentverse-v2-staging.delena.buzz (`F:\apps\agentverse-v2` :4311).  
+PROD (v2): https://agentverse-v2.delena.buzz (`G:\apps\agentverse-v2` :5311).
 
 CORS is open (`Access-Control-Allow-Origin: *`) on the UI and `/api/*` proxies for LAN/public-IP access. Portal/CSS use `APP_CORS_ORIGINS=*` / `CSS_CORS_ORIGINS=*`.
 
@@ -60,13 +75,16 @@ Realtime uses same-origin message polling (no SockJS → no CORS / unload consol
 
 ```powershell
 npm run build
-# Pack to H:\releases\agentverse-<ver>\ then start via start.ps1 -EnvName preprod|prod
+# Pack to H:\releases\ then deploy to F:\apps\agentverse-v2 or G:\apps\agentverse-v2
+# Start: .\start.ps1 -EnvName preprod|prod  (ports 4311 / 5311 from scripts/start-release.ps1)
+# Never recycle classic :4310 / :5310
 # Promote playbook: .cursor/skills/agentverse-promote + docs/OPS.md
 ```
 
 ## Docs
 
+- `docs/OPS.md` — both fleets, DNS, camera, Session Desk
+- `docs/HANDOFF.md` — continue-from for next session
 - `docs/IMPLEMENTATION-GUIDE.md`
-- `docs/OPS.md`
 - `agents/roles/office-crew.md`
 - Migration source: `https://github.com/sivaram311/agent-portal.git` → `E:\MyWorkspace\agent-portal`

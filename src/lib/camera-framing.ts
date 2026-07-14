@@ -6,6 +6,31 @@ export type ViewMode =
   | "landscape"
   | "landscape-compact";
 
+/**
+ * User-selectable framing (menu).
+ * Floor_* = elevated whole-floor angles (all sides).
+ * Others = character follow shots.
+ */
+export type OrbitShot =
+  | "floorS"
+  | "floorN"
+  | "floorE"
+  | "floorW"
+  | "floorSE"
+  | "floorSW"
+  | "floorNE"
+  | "floorNW"
+  | "shoulders"
+  | "close"
+  | "face"
+  | "over"
+  | "desk"
+  | "sideL"
+  | "sideR"
+  | "rear"
+  | "high"
+  | "wide";
+
 export type CameraPreset = {
   position: [number, number, number];
   fov: number;
@@ -18,7 +43,7 @@ export type CameraPreset = {
   maxAzimuthAngle?: number;
 };
 
-/** Sync with SiruseriOffice SIRUSERI */
+/** Sync with SiruseriOffice SIRUSERI (0.2.2 stable size — not HQ ±18) */
 export const OFFICE_BOUNDS = {
   halfW: 10.5,
   backZ: -9.2,
@@ -29,6 +54,182 @@ export const OFFICE_BOUNDS = {
     return this.floorH;
   },
 } as const;
+
+const FLOOR_LOOK: [number, number, number] = [0, 1.35, -0.6];
+
+export type ShotFollow = {
+  label: string;
+  /** Camera offset from player feet (ignored when world is set) */
+  offset: [number, number, number];
+  lookY: number;
+  fov: number;
+  minDistance: number;
+  maxDistance: number;
+  minPolarAngle: number;
+  maxPolarAngle: number;
+  /** Fixed floor view — world camera + look-at */
+  world?: {
+    position: [number, number, number];
+    target: [number, number, number];
+  };
+};
+
+function floorShot(
+  label: string,
+  position: [number, number, number],
+  target: [number, number, number] = FLOOR_LOOK,
+): ShotFollow {
+  return {
+    label,
+    offset: [0, position[1], 8],
+    lookY: target[1],
+    fov: 42,
+    minDistance: 6,
+    maxDistance: 22,
+    minPolarAngle: 0.35,
+    maxPolarAngle: Math.PI / 2.05,
+    world: { position, target },
+  };
+}
+
+/**
+ * Floor shots adapted from PREPROD HQ (±18–22) into Siruseri 0.2.2 bounds
+ * (halfW 10.5, openZ 7.4, backZ −9.2). Cameras sit just outside the slab
+ * (same envelope as PORTRAIT_PRESET ≈ [0, 6.8, 12.5]).
+ */
+export const ORBIT_SHOTS: Record<OrbitShot, ShotFollow> = {
+  floorS: floorShot("Front", [0, 7.2, 12.8], [0, 1.55, 2.0]),
+  floorN: floorShot("Back", [0, 6.8, -11.2], [0, 1.45, -0.4]),
+  floorE: floorShot("East", [13.5, 7.0, 0.8], [0, 1.45, 0.8]),
+  floorW: floorShot("West", [-13.5, 7.0, 0.8], [0, 1.45, 0.8]),
+  floorSE: floorShot("SE", [10.2, 6.8, 10.5], [0, 1.45, 1.0]),
+  floorSW: floorShot("SW", [-10.2, 6.8, 10.5], [0, 1.45, 1.0]),
+  floorNE: floorShot("NE", [10.2, 6.8, -9.0], [0, 1.4, -0.3]),
+  floorNW: floorShot("NW", [-10.2, 6.8, -9.0], [0, 1.4, -0.3]),
+
+  shoulders: {
+    label: "Shoulders",
+    offset: [0.35, 1.48, 2.15],
+    lookY: 1.42,
+    fov: 48,
+    minDistance: 1.6,
+    maxDistance: 3.4,
+    minPolarAngle: 0.95,
+    maxPolarAngle: 1.45,
+  },
+  close: {
+    label: "Close",
+    offset: [0.2, 1.5, 1.35],
+    lookY: 1.48,
+    fov: 42,
+    minDistance: 1.1,
+    maxDistance: 2.2,
+    minPolarAngle: 1.05,
+    maxPolarAngle: 1.5,
+  },
+  face: {
+    label: "Face",
+    offset: [0.05, 1.55, 0.95],
+    lookY: 1.52,
+    fov: 38,
+    minDistance: 0.75,
+    maxDistance: 1.5,
+    minPolarAngle: 1.1,
+    maxPolarAngle: 1.55,
+  },
+  over: {
+    label: "Over",
+    offset: [-0.45, 1.62, 1.55],
+    lookY: 1.4,
+    fov: 46,
+    minDistance: 1.2,
+    maxDistance: 2.8,
+    minPolarAngle: 1.0,
+    maxPolarAngle: 1.48,
+  },
+  desk: {
+    label: "Desk",
+    offset: [1.2, 1.65, 2.6],
+    lookY: 1.15,
+    fov: 50,
+    minDistance: 2.2,
+    maxDistance: 5.5,
+    minPolarAngle: 0.7,
+    maxPolarAngle: 1.4,
+  },
+  sideL: {
+    label: "Left",
+    offset: [-2.4, 1.5, 0.6],
+    lookY: 1.4,
+    fov: 48,
+    minDistance: 1.8,
+    maxDistance: 4.2,
+    minPolarAngle: 0.9,
+    maxPolarAngle: 1.45,
+  },
+  sideR: {
+    label: "Right",
+    offset: [2.4, 1.5, 0.6],
+    lookY: 1.4,
+    fov: 48,
+    minDistance: 1.8,
+    maxDistance: 4.2,
+    minPolarAngle: 0.9,
+    maxPolarAngle: 1.45,
+  },
+  rear: {
+    label: "Rear",
+    offset: [0.15, 1.55, -2.3],
+    lookY: 1.4,
+    fov: 50,
+    minDistance: 1.7,
+    maxDistance: 3.8,
+    minPolarAngle: 0.95,
+    maxPolarAngle: 1.45,
+  },
+  high: {
+    label: "High",
+    offset: [0.2, 3.4, 3.2],
+    lookY: 1.2,
+    fov: 46,
+    minDistance: 3.2,
+    maxDistance: 7.5,
+    minPolarAngle: 0.55,
+    maxPolarAngle: 1.25,
+  },
+  wide: {
+    label: "Wide",
+    offset: [0, 5.8, 11.2],
+    lookY: 1.3,
+    fov: 42,
+    minDistance: 7,
+    maxDistance: 18,
+    minPolarAngle: 0.5,
+    maxPolarAngle: Math.PI / 2.12,
+  },
+};
+
+/** Menu order — floor sides first, then body shots */
+export const ORBIT_SHOT_ORDER: OrbitShot[] = [
+  "floorS",
+  "floorN",
+  "floorE",
+  "floorW",
+  "floorSE",
+  "floorSW",
+  "floorNE",
+  "floorNW",
+  "shoulders",
+  "close",
+  "face",
+  "over",
+  "desk",
+  "sideL",
+  "sideR",
+  "rear",
+  "high",
+  "wide",
+];
 
 /** Portrait — elevated view of open floor + hex desks. */
 export const PORTRAIT_PRESET: CameraPreset = {

@@ -13,6 +13,7 @@ import { SessionDesk } from "@/components/hud/SessionDesk";
 import { TeamMemberBar } from "@/components/hud/TeamMemberBar";
 import { TopBar } from "@/components/hud/TopBar";
 import { TouchJoystick } from "@/components/hud/TouchJoystick";
+import { ViewAngles } from "@/components/hud/ViewAngles";
 import { useVerseStore } from "@/lib/store";
 
 const HubScene = dynamic(
@@ -30,6 +31,8 @@ export function AgentVerseApp() {
   const busy = useVerseStore((s) => s.busy);
   const officeChromeOpen = useVerseStore((s) => s.officeChromeOpen);
   const chatOpen = useVerseStore((s) => s.chatOpen);
+  const joystickVisible = useVerseStore((s) => s.joystickVisible);
+  const cameraViewsVisible = useVerseStore((s) => s.cameraViewsVisible);
   const [sessionDeskOpen, setSessionDeskOpen] = useState(false);
 
   useEffect(() => {
@@ -144,6 +147,7 @@ export function AgentVerseApp() {
             </div>
             {!chatOpen ? (
               <div className="command-layer">
+                {cameraViewsVisible ? <ViewAngles /> : null}
                 <CommandStrip
                   onOpenSessions={() => setSessionDeskOpen(true)}
                 />
@@ -158,13 +162,13 @@ export function AgentVerseApp() {
                 />
               </div>
             ) : null}
-            <TouchJoystick />
+            {joystickVisible ? <TouchJoystick /> : null}
           </>
         )}
         <div className="hero-copy" aria-hidden="true">
           <p className="brand-kicker">Siruseri floor</p>
           <h1>Digital office</h1>
-          <p>WASD / joystick to walk · approach an agent to talk</p>
+          <p>WASD / joystick to walk · tap an agent · Talk to open chat</p>
         </div>
         {subtitle && focusId ? (
           <div className="verse-subtitle persona-subtitle" role="status">
