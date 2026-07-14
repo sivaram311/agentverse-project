@@ -13,6 +13,7 @@ import { connectSessionEvents } from "@/lib/realtime";
 import { readSessionIdFromUrl } from "@/lib/session-share";
 import { useVerseStore } from "@/lib/store";
 import type { Session } from "@/lib/types";
+import { IncidentStrip } from "./IncidentStrip";
 import { SessionTabs } from "./SessionTabs";
 import { WorkspacePicker } from "./WorkspacePicker";
 
@@ -105,6 +106,7 @@ export function ChatPanel() {
   const workspacePath = useVerseStore((s) => s.workspacePath);
   const chatFocusNonce = useVerseStore((s) => s.chatFocusNonce);
   const activeProjectId = useVerseStore((s) => s.activeProjectId);
+  const returnUrl = useVerseStore((s) => s.returnUrl);
   const [text, setText] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -368,6 +370,11 @@ export function ChatPanel() {
           </h2>
           <div className="chat-head-actions">
             <span className="demo-badge">demo</span>
+            {returnUrl ? (
+              <a className="ghost keep-mobile return-link" href={returnUrl}>
+                Back to Home
+              </a>
+            ) : null}
             <button
               type="button"
               className="chat-close"
@@ -381,6 +388,7 @@ export function ChatPanel() {
         <SessionTabs />
         <WorkspacePicker />
       </header>
+      <IncidentStrip />
       <div className="chat-log" role="log" aria-live="polite">
         {messages.length === 0 ? (
           <div className="chat-empty">

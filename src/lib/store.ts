@@ -124,6 +124,16 @@ type VerseState = {
   officeChromeOpen: boolean;
   /** Talk-to panel — opens on persona/desk tap or comms dock */
   chatOpen: boolean;
+  /** Safe `return` from deep-link (allowlisted host). */
+  returnUrl: string | null;
+  /** Incident / hire brief from ProdDeck deep-link. */
+  incidentBrief: string | null;
+  incidentEvidence: string | null;
+  incidentDismissed: boolean;
+  /** True when `src=proddeck` even if brief empty. */
+  incidentFromProdDeck: boolean;
+  /** Bump to open Session Desk from deep-link. */
+  sessionDeskRequestNonce: number;
   /** Tunable office lighting mood */
   officeMood: OfficeMood;
   /** Logged-in visitor on the floor */
@@ -136,6 +146,14 @@ type VerseState = {
   setApiOnline: (v: boolean) => void;
   setLanguage: (lang: UiLanguage) => void;
   setVoiceGender: (g: VoiceGenderPref) => void;
+  setReturnUrl: (url: string | null) => void;
+  setIncidentBrief: (
+    brief: string | null,
+    evidence?: string | null,
+    fromProdDeck?: boolean,
+  ) => void;
+  dismissIncident: () => void;
+  requestSessionDesk: () => void;
   selectPersona: (id: PersonaId) => void;
   summonPersona: (id: PersonaId) => void;
   setSession: (s: Session | null) => void;
@@ -216,6 +234,12 @@ export const useVerseStore = create<VerseState>()(
       composeDraft: "",
       officeChromeOpen: false,
       chatOpen: false,
+      returnUrl: null,
+      incidentBrief: null,
+      incidentEvidence: null,
+      incidentDismissed: false,
+      incidentFromProdDeck: false,
+      sessionDeskRequestNonce: 0,
       officeMood: "day",
       playerPosition: [0, 0, 5.2],
       playerMoveInput: { x: 0, z: 0 },
@@ -231,6 +255,17 @@ export const useVerseStore = create<VerseState>()(
       setApiOnline: (v) => set({ apiOnline: v }),
       setLanguage: (language) => set({ language }),
       setVoiceGender: (voiceGender) => set({ voiceGender }),
+      setReturnUrl: (url) => set({ returnUrl: url }),
+      setIncidentBrief: (brief, evidence = null, fromProdDeck = false) =>
+        set({
+          incidentBrief: brief,
+          incidentEvidence: evidence,
+          incidentFromProdDeck: fromProdDeck,
+          incidentDismissed: false,
+        }),
+      dismissIncident: () => set({ incidentDismissed: true }),
+      requestSessionDesk: () =>
+        set((s) => ({ sessionDeskRequestNonce: s.sessionDeskRequestNonce + 1 })),
       // Selection / summon never auto-opens chat — Talk / CommsDock only
       selectPersona: (id) => set({ selectedPersona: id }),
       summonPersona: (id) => {

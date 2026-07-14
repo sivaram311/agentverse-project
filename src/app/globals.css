@@ -946,6 +946,33 @@ body {
   flex-shrink: 0;
 }
 
+.incident-strip {
+  margin: 0.45rem 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--av-line);
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.28);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.incident-strip-body p {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+}
+
+.incident-strip-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.return-link {
+  white-space: nowrap;
+}
+
 .chat-close {
   width: 1.7rem;
   height: 1.7rem;

@@ -128,3 +128,18 @@ export type OfficeZoneId =
   | "side-conference"
   | "elevator-l"
   | "elevator-r";
+
+/** ProdDeck / Cloud OS deep-link intent (`/desk?...`). */
+export type DeepLinkIntent = "session-desk" | "hire" | "";
+
+export type DeepLinkParams = {
+  src: string | null;
+  crew: string | null;
+  session: string | null;
+  intent: DeepLinkIntent;
+  brief: string | null;
+  skills: string | null;
+  returnUrl: string | null;
+  env: string | null;
+  evidence: string | null;
+};
