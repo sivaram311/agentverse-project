@@ -1,5 +1,7 @@
 # AgentVerse — Ops
 
+**Branch (DEV):** `feature/upgradation-functionality` · **Version:** **0.3.0** (upgradation train on `v0.2.2-stable`)
+
 | Env | Drive | Port | URL | Portal API | CSS |
 |-----|-------|------|-----|------------|-----|
 | DEV | E:\MyWorkspace\agentverse-project | 3310 | http://127.0.0.1:3310 | :8080 | :9000 |
@@ -8,38 +10,38 @@
 
 ## PREPROD
 
-- Release: `H:\releases\agentverse-0.2.1\`
+- Live classic currently: `H:\releases\agentverse-0.2.1\` until Q1 of 0.3.0
+- Target release: `H:\releases\agentverse-0.3.0\` (await user GO)
 - Start: `F:\apps\agentverse\start.ps1 -EnvName preprod`
-- Evidence: `H:\releases\agentverse-0.2.1\evidence\q1\`
 - Auth: CSS clientId `agent-portal` (shared)
 - DNS: Cloudflare A `agentverse-staging.delena.buzz` → `103.118.183.185` (proxied)
-- Public smoke: `https://agentverse-staging.delena.buzz/health` (0.2.1)
 - **Login:** staging/prod CSS admin password (`G:\apps\css\.env` → `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` will return **401** on staging.
+- Bake on build: `NEXT_PUBLIC_CSS_ISSUER=https://css.delena.buzz`
 
 ## PROD
 
-- Release: `H:\releases\agentverse-0.2.1\`
+- Live classic currently: `H:\releases\agentverse-0.2.1\` until Q2 of 0.3.0
+- Target: `H:\releases\agentverse-0.3.0\`
 - Start: `G:\apps\agentverse\start.ps1 -EnvName prod`
-- Evidence: `H:\releases\agentverse-0.2.1\evidence\q2\`
 - DNS: Cloudflare A `agentverse.delena.buzz` → `103.118.183.185` (proxied)
-- Public smoke: `https://agentverse.delena.buzz/health` (0.2.1)
-- **Login:** CSS admin password (`G:\apps\css\.env` → `CSS_ADMIN_PASSWORD`). DEV `admin`/`admin123` returns **401**.
 
 ## Health
 
-`GET /health` — process up. Authenticated smoke uses `/api/css` + `/api/portal` proxies.
+`GET /health` — process up. TopBar shows Portal + CSS reachability + env badge (DEV/PREPROD/PROD).
 
 ## Sessions (Session Desk)
 
-In-app **Sessions** (command strip / top chrome) lists portal sessions:
-- **Active / Archived** filters
-- **New** — create session on a workspace path
-- **Open** — load into tabs + chat
-- **Archive / Restore** — `POST /api/portal/sessions/{id}/archive|unarchive`
+- Active / Archived + **status filters** + **search**
+- **Cancel run** on busy sessions
+- Title set at create (portal has no rename API)
+- Deep-link: `/desk?...` — see [DEEP-LINK-CONTRACT.md](./DEEP-LINK-CONTRACT.md)
+- Promote gate: [PROMOTE-UPGRADATION.md](./PROMOTE-UPGRADATION.md)
 
 Config:
 - `NEXT_PUBLIC_DEFAULT_WORKSPACE` — default path/name (e.g. `demo`)
-- `NEXT_PUBLIC_WORKSPACE_ALLOWLIST` — optional comma-separated paths for quick-picks; empty = unrestricted (portal root still applies)
+- `NEXT_PUBLIC_WORKSPACE_ALLOWLIST` — optional comma-separated paths
+- `NEXT_PUBLIC_AV_ENV` — optional `DEV`|`PREPROD`|`PROD` override for badge
+- `NEXT_PUBLIC_PORTAL_UI_URL` — optional “Open Portal” link base
 
 ## DEV env discipline (do not mix)
 
@@ -48,9 +50,8 @@ Config:
 | CSS | `:9000`, issuer `http://localhost:9000` | `:5900` / `https://css.delena.buzz` |
 | Portal | `:8080` | `:4080` / `:5080` |
 | AgentVerse `.env.local` | `CSS_AUTH_URL=http://127.0.0.1:9000`, `NEXT_PUBLIC_CSS_ISSUER=http://localhost:9000` | set by `start.ps1` |
-| Portal start | `CSS_AUTH_URL` / `CSS_ISSUER` / `CSS_JWKS_URI` all localhost:9000; `CURSOR_AGENT_CMD` absolute; `AGENT_WORKSPACE_ROOT` under E: | F:/G: scripts |
 
-Never load a mixed `.env` that sets `CSS_AUTH_URL=https://delena.buzz` (or css.delena.buzz) into DEV portal — AgentVerse will reject tokens as incompatible JWT (`iss` vs `authUrl`).
+Never load a mixed `.env` that sets CSS issuer to production into DEV portal.
 
 ## Cloudflare (Ops)
 
@@ -59,5 +60,3 @@ cd E:\MyWorkspace\agent-portal
 .\scripts\cloudflare-dns.ps1 -Upsert -Name agentverse-staging -Type A -Content 103.118.183.185 -Proxied
 .\scripts\cloudflare-dns.ps1 -Upsert -Name agentverse -Type A -Content 103.118.183.185 -Proxied
 ```
-
-Token: Account API token in `.env` / `E:\MyAgent\workflow\secrets\cloudflare.token` (gitignored). See `.cursor/rules/promote-dns-cloudflare.mdc`.

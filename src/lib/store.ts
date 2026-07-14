@@ -91,6 +91,8 @@ type VerseState = {
   username: string | null;
   accessToken: string | null;
   apiOnline: boolean;
+  /** CSS reachability probe */
+  cssOnline: boolean | null;
   language: UiLanguage;
   voiceGender: VoiceGenderPref;
   selectedPersona: PersonaId;
@@ -120,6 +122,16 @@ type VerseState = {
   officeChromeOpen: boolean;
   /** Talk-to panel — opens on persona/desk tap or comms dock */
   chatOpen: boolean;
+  /** Sanitized deep-link return URL */
+  returnUrl: string | null;
+  /** Incident / hire brief from deep-link */
+  incidentBrief: string | null;
+  incidentEvidence: string | null;
+  incidentDismissed: boolean;
+  /** `src=proddeck` deep-link — show strip even when brief empty */
+  incidentFromProdDeck: boolean;
+  /** Bumped when deep-link asks to open Session Desk */
+  sessionDeskRequestNonce: number;
   /** Tunable office lighting mood */
   officeMood: OfficeMood;
   /** Logged-in visitor on the floor */
@@ -130,8 +142,18 @@ type VerseState = {
   setAuthenticated: (v: boolean, username?: string | null) => void;
   setAccessToken: (token: string | null) => void;
   setApiOnline: (v: boolean) => void;
+  setCssOnline: (v: boolean | null) => void;
   setLanguage: (lang: UiLanguage) => void;
   setVoiceGender: (g: VoiceGenderPref) => void;
+  setReturnUrl: (url: string | null) => void;
+  setIncidentBrief: (
+    brief: string | null,
+    evidence?: string | null,
+    fromProdDeck?: boolean,
+  ) => void;
+  dismissIncident: () => void;
+  requestSessionDesk: () => void;
+  syncQuestFromSessionStatus: (sessionId: string, status: string) => void;
   selectPersona: (id: PersonaId) => void;
   summonPersona: (id: PersonaId) => void;
   setSession: (s: Session | null) => void;
@@ -177,8 +199,15 @@ export const useVerseStore = create<VerseState>()(
       username: null,
       accessToken: null,
       apiOnline: false,
+      cssOnline: null,
       language: "ta",
       voiceGender: "auto",
+      returnUrl: null,
+      incidentBrief: null,
+      incidentEvidence: null,
+      incidentDismissed: false,
+      incidentFromProdDeck: false,
+      sessionDeskRequestNonce: 0,
       selectedPersona: orchestratorId,
       session: null,
       persistedSessionId: null,
@@ -210,8 +239,45 @@ export const useVerseStore = create<VerseState>()(
       setAuthenticated: (v, username = null) => set({ authenticated: v, username }),
       setAccessToken: (accessToken) => set({ accessToken }),
       setApiOnline: (v) => set({ apiOnline: v }),
+      setCssOnline: (v) => set({ cssOnline: v }),
       setLanguage: (language) => set({ language }),
       setVoiceGender: (voiceGender) => set({ voiceGender }),
+      setReturnUrl: (url) => set({ returnUrl: url }),
+      setIncidentBrief: (brief, evidence = null, fromProdDeck = false) =>
+        set({
+          incidentBrief: brief,
+          incidentEvidence: evidence,
+          incidentFromProdDeck: fromProdDeck,
+          incidentDismissed: false,
+        }),
+      dismissIncident: () => set({ incidentDismissed: true }),
+      requestSessionDesk: () =>
+        set((s) => ({ sessionDeskRequestNonce: s.sessionDeskRequestNonce + 1 })),
+      syncQuestFromSessionStatus: (sessionId, status) => {
+        const upper = status.toUpperCase();
+        set((s) => ({
+          quests: s.quests.map((q) => {
+            if (q.sessionId !== sessionId) return q;
+            if (
+              upper === "STREAMING" ||
+              upper === "WAITING_PERMISSION" ||
+              upper === "WAITING_PLAN"
+            ) {
+              return { ...q, status: "active" as const, progress: undefined };
+            }
+            if (upper === "FAILED") {
+              return { ...q, status: "failed" as const, progress: 100 };
+            }
+            if (upper === "CANCELLED") {
+              return { ...q, status: "cancelled" as const, progress: 100 };
+            }
+            if (upper === "COMPLETED" || upper === "IDLE") {
+              return { ...q, status: "done" as const, progress: 100 };
+            }
+            return q;
+          }),
+        }));
+      },
       selectPersona: (id) => set({ selectedPersona: id, chatOpen: true }),
       summonPersona: (id) => {
         set({
@@ -358,7 +424,12 @@ export const useVerseStore = create<VerseState>()(
             };
             return { quests, agentStates };
           }
-          if (q && patch.status === "done") {
+          if (
+            q &&
+            (patch.status === "done" ||
+              patch.status === "failed" ||
+              patch.status === "cancelled")
+          ) {
             return {
               quests,
               agentStates: {

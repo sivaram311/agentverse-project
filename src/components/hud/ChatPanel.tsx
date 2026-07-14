@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError, portalApi } from "@/lib/api";
-import { clearTokens, getAccessToken, getStoredUser } from "@/lib/auth";
+import { clearTokens, getAccessToken } from "@/lib/auth";
 import {
   getPersona,
   makeQuest,
@@ -10,9 +10,10 @@ import {
   routeQuest,
 } from "@/lib/orchestrator";
 import { connectSessionEvents } from "@/lib/realtime";
-import { readSessionIdFromUrl } from "@/lib/session-share";
+import { parseDeepLinkParams, readSessionIdFromUrl } from "@/lib/session-share";
 import { useVerseStore } from "@/lib/store";
-import type { Session } from "@/lib/types";
+import type { PermissionDto, Session } from "@/lib/types";
+import { IncidentStrip } from "./IncidentStrip";
 import { SessionTabs } from "./SessionTabs";
 import { WorkspacePicker } from "./WorkspacePicker";
 
@@ -53,6 +54,7 @@ function isAuthRejection(error: unknown): error is ApiError {
   }
 }
 
+/** Prefer cancel+reuse over spawning a new session when busy. */
 async function ensureIdleSession(
   session: Session,
   authConfig: Parameters<typeof portalApi.cancelRun>[1],
@@ -65,33 +67,40 @@ async function ensureIdleSession(
     /* fall through with local copy */
   }
   useVerseStore.getState().setSession(latest);
+  useVerseStore.getState().syncQuestFromSessionStatus(latest.id, latest.status);
 
-  if (BUSY_STATUSES.has(latest.status)) {
-    return portalApi.createSession(
-      {
-        workspacePath,
-        title: `AgentVerse · ${workspacePath.replace(/\\/g, "/").split("/").pop() || "Hub"}`,
-        provider: "cursor",
-      },
-      authConfig,
-    );
+  if (!BUSY_STATUSES.has(latest.status)) return latest;
+
+  try {
+    await portalApi.cancelRun(latest.id, authConfig);
+    for (let i = 0; i < 6; i++) {
+      await new Promise((r) => setTimeout(r, 400));
+      latest = await portalApi.getSession(session.id, authConfig);
+      useVerseStore.getState().setSession(latest);
+      useVerseStore.getState().syncQuestFromSessionStatus(latest.id, latest.status);
+      if (!BUSY_STATUSES.has(latest.status)) return latest;
+    }
+  } catch {
+    /* fall through to fork */
   }
-  return latest;
+
+  return portalApi.createSession(
+    {
+      workspacePath,
+      title: `AgentVerse · ${workspacePath.replace(/\\/g, "/").split("/").pop() || "Hub"}`,
+      provider: "cursor",
+    },
+    authConfig,
+  );
 }
 
-function tickQuestProgress(questId: string) {
-  let n = 12;
-  const id = window.setInterval(() => {
-    n = Math.min(92, n + 8 + Math.floor(Math.random() * 10));
-    const store = useVerseStore.getState();
-    const q = store.quests.find((x) => x.id === questId);
-    if (!q || q.status === "done") {
-      window.clearInterval(id);
-      return;
-    }
-    store.updateQuest(questId, { progress: n });
-  }, 900);
-  return () => window.clearInterval(id);
+function statusChipClass(status: string): string {
+  const u = status.toUpperCase();
+  if (u === "STREAMING") return "chip streaming";
+  if (u === "WAITING_PERMISSION" || u === "WAITING_PLAN") return "chip waiting";
+  if (u === "FAILED") return "chip failed";
+  if (u === "IDLE" || u === "COMPLETED") return "chip idle";
+  return "chip";
 }
 
 export function ChatPanel() {
@@ -105,7 +114,10 @@ export function ChatPanel() {
   const workspacePath = useVerseStore((s) => s.workspacePath);
   const chatFocusNonce = useVerseStore((s) => s.chatFocusNonce);
   const activeProjectId = useVerseStore((s) => s.activeProjectId);
+  const returnUrl = useVerseStore((s) => s.returnUrl);
   const [text, setText] = useState("");
+  const [pendingPerms, setPendingPerms] = useState<PermissionDto[]>([]);
+  const [permBusy, setPermBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const persona = useMemo(() => getPersona(selectedPersona), [selectedPersona]);
@@ -142,10 +154,41 @@ export function ChatPanel() {
       onError: () => undefined,
     });
 
+    let cancelled = false;
+    const pollStatus = async () => {
+      try {
+        const latest = await portalApi.getSession(session.id, authConfig);
+        if (cancelled) return;
+        useVerseStore.getState().setSession(latest);
+        useVerseStore.getState().syncQuestFromSessionStatus(latest.id, latest.status);
+        if (
+          latest.status === "WAITING_PERMISSION" ||
+          latest.status === "WAITING_PLAN"
+        ) {
+          try {
+            const perms = await portalApi.listPermissions(latest.id, authConfig);
+            if (!cancelled) {
+              setPendingPerms(perms.filter((p) => p.status === "PENDING"));
+            }
+          } catch {
+            if (!cancelled) setPendingPerms([]);
+          }
+        } else if (!cancelled) {
+          setPendingPerms([]);
+        }
+      } catch {
+        /* keep prior */
+      }
+    };
+    void pollStatus();
+    const timer = window.setInterval(() => void pollStatus(), 4000);
+
     return () => {
+      cancelled = true;
+      window.clearInterval(timer);
       void connection.disconnect();
     };
-  }, [session?.id, authConfig?.cssEnabled]);
+  }, [session?.id, authConfig]);
 
   useEffect(() => {
     if (!authenticated) return;
@@ -165,7 +208,8 @@ export function ChatPanel() {
           return;
         }
 
-        const urlSessionId = readSessionIdFromUrl();
+        const deep = parseDeepLinkParams();
+        const urlSessionId = deep.session || readSessionIdFromUrl();
         const pathKey = store.workspacePath;
         const mappedId = store.sessionsByPath[pathKey];
         const preferredId = urlSessionId || mappedId || store.persistedSessionId;
@@ -180,6 +224,7 @@ export function ChatPanel() {
                 existing.workspacePath || pathKey,
                 existing.id,
               );
+              store.syncQuestFromSessionStatus(existing.id, existing.status);
               const msgs = await portalApi.getMessages(existing.id, authConfig);
               if (!cancelled) store.setMessages(msgs);
               return;
@@ -234,6 +279,50 @@ export function ChatPanel() {
     };
   }, [authenticated, authConfig]);
 
+  async function onCancelRun() {
+    if (!session) return;
+    const store = useVerseStore.getState();
+    store.setBusy(true);
+    try {
+      await portalApi.cancelRun(session.id, authConfig);
+      const latest = await portalApi.getSession(session.id, authConfig);
+      store.setSession(latest);
+      store.syncQuestFromSessionStatus(latest.id, latest.status);
+    } catch (err) {
+      store.setError(err instanceof Error ? err.message : "Cancel failed");
+    } finally {
+      store.setBusy(false);
+    }
+  }
+
+  async function onResolvePermission(
+    permissionId: string,
+    decision: "allow" | "deny",
+  ) {
+    if (!session) return;
+    setPermBusy(true);
+    try {
+      await portalApi.resolvePermission(
+        session.id,
+        permissionId,
+        decision,
+        undefined,
+        authConfig,
+      );
+      const latest = await portalApi.getSession(session.id, authConfig);
+      useVerseStore.getState().setSession(latest);
+      useVerseStore.getState().syncQuestFromSessionStatus(latest.id, latest.status);
+      const perms = await portalApi.listPermissions(session.id, authConfig);
+      setPendingPerms(perms.filter((p) => p.status === "PENDING"));
+    } catch (err) {
+      useVerseStore
+        .getState()
+        .setError(err instanceof Error ? err.message : "Permission resolve failed");
+    } finally {
+      setPermBusy(false);
+    }
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const prompt = text.trim();
@@ -276,23 +365,24 @@ export function ChatPanel() {
       store.summonPersona("muthu");
     }
 
-    const quest = makeQuest(
-      routed.assignee,
-      routed.title,
-      routed.description,
-      projectId,
-    );
-    store.addQuest(quest);
-    store.selectPersona(routed.assignee);
-    if (!routed.projectIdea) {
-      store.setStreamingHint(`${getPersona(routed.assignee).name} is on it…`);
-    }
-    const stopProgress = tickQuestProgress(quest.id);
-
     try {
       let active = await ensureIdleSession(session, authConfig, store.workspacePath);
       store.setSession(active);
       store.registerSessionForPath(active.workspacePath || store.workspacePath, active.id);
+
+      const quest = makeQuest(
+        routed.assignee,
+        routed.title,
+        routed.description,
+        projectId,
+        active.id,
+      );
+      store.addQuest(quest);
+      store.selectPersona(routed.assignee);
+      if (!routed.projectIdea) {
+        store.setStreamingHint(`${getPersona(routed.assignee).name} is on it…`);
+      }
+
       try {
         await portalApi.sendPrompt(active.id, routed.composedPrompt, authConfig);
       } catch (err) {
@@ -313,31 +403,36 @@ export function ChatPanel() {
             active.workspacePath || store.workspacePath,
             active.id,
           );
+          store.updateQuest(quest.id, { sessionId: active.id });
           await portalApi.sendPrompt(active.id, routed.composedPrompt, authConfig);
         } else {
           throw err;
         }
       }
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 12; i++) {
         await new Promise((resolve) => setTimeout(resolve, 800));
         try {
+          const latest = await portalApi.getSession(active.id, authConfig);
+          store.setSession(latest);
+          store.syncQuestFromSessionStatus(latest.id, latest.status);
           const msgs = await portalApi.getMessages(active.id, authConfig);
           store.setMessages(msgs);
-          if (msgs.some((m) => m.role === "ASSISTANT")) break;
+          if (
+            !BUSY_STATUSES.has(latest.status) &&
+            msgs.some((m) => m.role === "ASSISTANT")
+          ) {
+            break;
+          }
         } catch {
           /* keep waiting */
         }
       }
-      stopProgress();
-      store.updateQuest(quest.id, { status: "done", progress: 100 });
     } catch (err) {
-      stopProgress();
       if (isAuthRejection(err)) {
         forceSignOut("Auth rejected — please sign in again.");
       } else {
         store.setError(err instanceof Error ? err.message : "Prompt failed");
       }
-      store.updateQuest(quest.id, { status: "open" });
     } finally {
       store.setBusy(false);
       store.setStreamingHint(null);
@@ -355,6 +450,11 @@ export function ChatPanel() {
     );
   }
 
+  const portalUiBase =
+    typeof window !== "undefined"
+      ? process.env.NEXT_PUBLIC_PORTAL_UI_URL || ""
+      : "";
+
   return (
     <aside className="chat-panel glass-panel">
       <header className="chat-head">
@@ -367,7 +467,27 @@ export function ChatPanel() {
             </span>
           </h2>
           <div className="chat-head-actions">
-            <span className="demo-badge">demo</span>
+            {session ? (
+              <span className={statusChipClass(session.status)} title={session.status}>
+                {session.status.replace(/_/g, " ").toLowerCase()}
+              </span>
+            ) : null}
+            {session && BUSY_STATUSES.has(session.status) ? (
+              <button
+                type="button"
+                className="ghost danger"
+                onClick={() => void onCancelRun()}
+                disabled={busy}
+                aria-label="Cancel run"
+              >
+                Cancel run
+              </button>
+            ) : null}
+            {returnUrl ? (
+              <a className="ghost keep-mobile return-link" href={returnUrl}>
+                Back to Home
+              </a>
+            ) : null}
             <button
               type="button"
               className="chat-close"
@@ -381,6 +501,53 @@ export function ChatPanel() {
         <SessionTabs />
         <WorkspacePicker />
       </header>
+      <IncidentStrip />
+      {(session?.status === "WAITING_PERMISSION" ||
+        session?.status === "WAITING_PLAN") && (
+        <div className="permission-banner" role="status">
+          <p>
+            Session is{" "}
+            <strong>{session.status.replace(/_/g, " ").toLowerCase()}</strong>
+            {pendingPerms.length === 0
+              ? " — resolve in Agent Portal if controls do not appear."
+              : ` — ${pendingPerms.length} pending.`}
+          </p>
+          {pendingPerms.map((p) => (
+            <div key={p.id} className="permission-row">
+              <span className="muted">
+                {p.kind || "permission"} · {(p.detailsJson || "").slice(0, 80)}
+              </span>
+              <div className="permission-actions">
+                <button
+                  type="button"
+                  disabled={permBusy}
+                  onClick={() => void onResolvePermission(p.id, "allow")}
+                >
+                  Allow
+                </button>
+                <button
+                  type="button"
+                  className="ghost danger"
+                  disabled={permBusy}
+                  onClick={() => void onResolvePermission(p.id, "deny")}
+                >
+                  Deny
+                </button>
+              </div>
+            </div>
+          ))}
+          {portalUiBase ? (
+            <a
+              className="muted"
+              href={`${portalUiBase.replace(/\/$/, "")}/sessions/${session.id}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open Portal
+            </a>
+          ) : null}
+        </div>
+      )}
       <div className="chat-log" role="log" aria-live="polite">
         {messages.length === 0 ? (
           <div className="chat-empty">

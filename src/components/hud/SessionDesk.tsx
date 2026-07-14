@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { portalApi } from "@/lib/api";
 import { useVerseStore } from "@/lib/store";
-import type { Session } from "@/lib/types";
+import type { Session, SessionStatus } from "@/lib/types";
 import {
   getWorkspaceAllowlist,
   isWorkspaceAllowed,
@@ -17,6 +17,20 @@ type SessionDeskProps = {
 };
 
 type FilterMode = "active" | "archived";
+
+const STATUS_FILTERS: Array<"all" | SessionStatus | "BUSY"> = [
+  "all",
+  "BUSY",
+  "IDLE",
+  "STREAMING",
+  "WAITING_PERMISSION",
+  "WAITING_PLAN",
+  "FAILED",
+  "COMPLETED",
+  "CANCELLED",
+];
+
+const BUSY = new Set(["STREAMING", "WAITING_PERMISSION", "WAITING_PLAN"]);
 
 function sessionLabel(session: Session): string {
   return session.title?.trim() || pathLabel(session.workspacePath);
@@ -48,11 +62,15 @@ export function SessionDesk({
   const authConfig = useVerseStore((s) => s.authConfig);
   const workspacePath = useVerseStore((s) => s.workspacePath);
   const activeSessionId = useVerseStore((s) => s.activeTabSessionId);
+  const apiOnline = useVerseStore((s) => s.apiOnline);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [filter, setFilter] = useState<FilterMode>("active");
+  const [statusFilter, setStatusFilter] = useState<(typeof STATUS_FILTERS)[number]>("all");
+  const [query, setQuery] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [draftPath, setDraftPath] = useState(workspacePath);
+  const [draftTitle, setDraftTitle] = useState("");
 
   const allowlist = useMemo(() => getWorkspaceAllowlist(), []);
 
@@ -76,15 +94,29 @@ export function SessionDesk({
     }
   }, [open, refresh, workspacePath]);
 
-  const visibleSessions = useMemo(
-    () =>
-      sessions.filter((session) =>
+  const visibleSessions = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return sessions.filter((session) => {
+      const archivedOk =
         filter === "archived"
           ? session.status === "ARCHIVED"
-          : session.status !== "ARCHIVED",
-      ),
-    [filter, sessions],
-  );
+          : session.status !== "ARCHIVED";
+      if (!archivedOk) return false;
+      if (statusFilter === "BUSY") {
+        if (!BUSY.has(session.status)) return false;
+      } else if (statusFilter !== "all" && session.status !== statusFilter) {
+        return false;
+      }
+      if (!q) return true;
+      return (
+        sessionLabel(session).toLowerCase().includes(q) ||
+        session.workspacePath.toLowerCase().includes(q) ||
+        session.id.toLowerCase().includes(q) ||
+        (session.ownerUsername || "").toLowerCase().includes(q) ||
+        (session.provider || "").toLowerCase().includes(q)
+      );
+    });
+  }, [filter, query, sessions, statusFilter]);
 
   function validatePath(path: string): string | null {
     const trimmed = path.trim();
@@ -117,10 +149,29 @@ export function SessionDesk({
       store.registerSessionForPath(resolvedPath, latest.id, sessionLabel(latest));
       store.setWorkspacePath(resolvedPath);
       store.rememberWorkspace(resolvedPath);
+      store.syncQuestFromSessionStatus(latest.id, latest.status);
       store.openChat();
       onClose?.();
     } catch (error) {
       reportError(error, "Failed to open session");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function cancelRun(session: Session) {
+    setBusy(`cancel:${session.id}`);
+    try {
+      await portalApi.cancelRun(session.id, authConfig);
+      const latest = await portalApi.getSession(session.id, authConfig);
+      setSessions((prev) =>
+        [...prev.filter((s) => s.id !== latest.id), latest].sort(sortSessions),
+      );
+      const store = useVerseStore.getState();
+      if (store.session?.id === latest.id) store.setSession(latest);
+      store.syncQuestFromSessionStatus(latest.id, latest.status);
+    } catch (error) {
+      reportError(error, "Failed to cancel run");
     } finally {
       setBusy(null);
     }
@@ -163,11 +214,11 @@ export function SessionDesk({
 
     setBusy("create");
     try {
-      const label = pathLabel(trimmed);
+      const label = draftTitle.trim() || pathLabel(trimmed);
       const created = await portalApi.createSession(
         {
           workspacePath: trimmed,
-          title: `AgentVerse · ${label}`,
+          title: draftTitle.trim() || `AgentVerse · ${label}`,
           provider: "cursor",
         },
         authConfig,
@@ -180,6 +231,7 @@ export function SessionDesk({
       store.rememberWorkspace(trimmed);
       store.openChat();
       setCreateOpen(false);
+      setDraftTitle("");
       onClose?.();
       await refresh();
     } catch (error) {
@@ -202,6 +254,11 @@ export function SessionDesk({
         <div>
           <p className="brand-kicker">Session Desk</p>
           <h2>Portal sessions</h2>
+          <p className="session-desk-hint muted">
+            {apiOnline
+              ? "Search, filter, cancel runs. Title is set at create (portal has no rename API)."
+              : "Portal API offline — showing last loaded list if any."}
+          </p>
         </div>
         <div className="session-desk-actions">
           <button
@@ -238,6 +295,19 @@ export function SessionDesk({
         </div>
       </header>
 
+      <div className="session-desk-search">
+        <label htmlFor="session-desk-query" className="sr-only">
+          Search sessions
+        </label>
+        <input
+          id="session-desk-query"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search title, path, id, owner…"
+          autoComplete="off"
+        />
+      </div>
+
       <div className="session-desk-filters" aria-label="Session filters">
         <button
           type="button"
@@ -257,8 +327,33 @@ export function SessionDesk({
         </button>
       </div>
 
+      <div className="session-desk-status-filters" aria-label="Status filters">
+        {STATUS_FILTERS.map((s) => (
+          <button
+            key={s}
+            type="button"
+            className={statusFilter === s ? "on" : undefined}
+            onClick={() => setStatusFilter(s)}
+            aria-pressed={statusFilter === s}
+          >
+            {s === "all" ? "All status" : s.replace(/_/g, " ").toLowerCase()}
+          </button>
+        ))}
+      </div>
+
       {createOpen ? (
         <form className="session-desk-create" onSubmit={createSession}>
+          <label htmlFor="session-desk-title">
+            Title (set at create)
+            <input
+              id="session-desk-title"
+              value={draftTitle}
+              onChange={(event) => setDraftTitle(event.target.value)}
+              placeholder="Optional session title"
+              autoComplete="off"
+              disabled={busy === "create"}
+            />
+          </label>
           <label htmlFor="session-desk-path">
             Workspace path
             <input
@@ -311,13 +406,17 @@ export function SessionDesk({
             const rowBusy =
               busy === `open:${session.id}` ||
               busy === `archive:${session.id}` ||
-              busy === `restore:${session.id}`;
+              busy === `restore:${session.id}` ||
+              busy === `cancel:${session.id}`;
+            const canCancel = BUSY.has(session.status);
             return (
               <article className="session-desk-row" key={session.id}>
                 <div className="session-desk-main">
                   <div className="session-desk-title">
                     <strong title={sessionLabel(session)}>{sessionLabel(session)}</strong>
-                    <span className="session-desk-status">
+                    <span
+                      className={`session-desk-status status-${session.status.toLowerCase()}`}
+                    >
                       {statusLabel(session.status)}
                     </span>
                   </div>
@@ -334,6 +433,17 @@ export function SessionDesk({
                       >
                         {busy === `open:${session.id}` ? "Opening" : "Open"}
                       </button>
+                      {canCancel ? (
+                        <button
+                          type="button"
+                          className="ghost danger"
+                          onClick={() => void cancelRun(session)}
+                          disabled={busy !== null}
+                          aria-label={`Cancel run ${sessionLabel(session)}`}
+                        >
+                          {busy === `cancel:${session.id}` ? "Cancelling" : "Cancel run"}
+                        </button>
+                      ) : null}
                       <button
                         type="button"
                         className="ghost"

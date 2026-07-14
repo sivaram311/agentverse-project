@@ -2,6 +2,8 @@
 
 Next.js + React Three Fiber **Tamil Nadu digital office** — agents sit at desks, walk over when summoned, and talk via the Agent Portal API at `:8080`.
 
+**DEV train:** `feature/upgradation-functionality` · **0.3.0** (from `v0.2.2-stable`). Classic PREPROD/PROD stay on prior ship until Q1/Q2.
+
 ## Office crew
 
 | Name | Role |
@@ -24,7 +26,9 @@ Crew / pre-work: `agents/`
 - Click agent → stand → walk → greet → chat → return to desk
 - Multi-project desk clusters (ask Rajesh: `new project: …`)
 - Per-directory portal sessions (workspace picker + session tabs)
-- **Session Desk** — list / create / archive / restore portal sessions (Active & Archived)
+- **Session Desk** — search / filter / create / archive / restore / **cancel run**
+- **Deep-links** — `/desk?intent=&crew=&brief=&return=` ([docs/DEEP-LINK-CONTRACT.md](docs/DEEP-LINK-CONTRACT.md))
+- Quests bound to portal session status; incident brief strip on hire
 
 ## Prerequisites
 
@@ -38,35 +42,20 @@ Crew / pre-work: `agents/`
 ```powershell
 cd E:\MyWorkspace\agentverse-project
 copy .env.example .env.local
-# Full stack (CSS + agent-portal API + UI) — preferred
 npm run dev:stack
-
-# Or UI only if :8080 / :9000 already running
-npm run dev
+# Or UI only: npm run dev
 ```
 
-Bundled backends (junctions): `services/agent-portal`, `services/centralized-security-system`.
-
-Open `http://127.0.0.1:3310` (phone/tablet / public IP: `http://<host>:3310`).
+Open `http://127.0.0.1:3310`.
 
 PREPROD: https://agentverse-staging.delena.buzz (`F:\apps\agentverse` :4310).  
 PROD: https://agentverse.delena.buzz (`G:\apps\agentverse` :5310).
-
-CORS is open (`Access-Control-Allow-Origin: *`) on the UI and `/api/*` proxies for LAN/public-IP access. Portal/CSS use `APP_CORS_ORIGINS=*` / `CSS_CORS_ORIGINS=*`.
-
-Realtime uses same-origin message polling (no SockJS → no CORS / unload console noise).
-
-## Production build / release
-
-```powershell
-npm run build
-# Pack to H:\releases\agentverse-<ver>\ then start via start.ps1 -EnvName preprod|prod
-# Promote playbook: .cursor/skills/agentverse-promote + docs/OPS.md
-```
 
 ## Docs
 
 - `docs/IMPLEMENTATION-GUIDE.md`
 - `docs/OPS.md`
+- `docs/DEEP-LINK-CONTRACT.md`
+- `docs/PROMOTE-UPGRADATION.md`
+- `docs/HANDOFF.md`
 - `agents/roles/office-crew.md`
-- Migration source: `https://github.com/sivaram311/agent-portal.git` → `E:\MyWorkspace\agent-portal`

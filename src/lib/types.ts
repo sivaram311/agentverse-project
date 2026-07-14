@@ -105,10 +105,38 @@ export type Quest = {
   title: string;
   description: string;
   assignee: PersonaId;
-  status: "open" | "active" | "done";
+  status: "open" | "active" | "done" | "failed" | "cancelled";
   createdAt: number;
+  /** Cosmetics only — portal session status is source of truth when sessionId set */
   progress?: number;
   projectId?: string | null;
+  /** Portal session this quest is bound to */
+  sessionId?: string | null;
+};
+
+export type PermissionDto = {
+  id: string;
+  sessionId: string;
+  toolCallId: string | null;
+  detailsJson: string | null;
+  status: string;
+  kind: string | null;
+  planMarkdown: string | null;
+  createdAt: string;
+};
+
+export type DeepLinkIntent = "session-desk" | "hire" | "";
+
+export type DeepLinkParams = {
+  src: string | null;
+  crew: string | null;
+  session: string | null;
+  intent: DeepLinkIntent;
+  brief: string | null;
+  skills: string | null;
+  returnUrl: string | null;
+  env: string | null;
+  evidence: string | null;
 };
 
 export type AgentEvent = {

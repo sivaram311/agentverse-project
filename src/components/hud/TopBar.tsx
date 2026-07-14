@@ -1,9 +1,9 @@
 "use client";
 
 import { clearTokens } from "@/lib/auth";
-import { copySessionShareUrl } from "@/lib/session-share";
+import { copySessionShareUrl, detectDeployEnv } from "@/lib/session-share";
 import { useVerseStore } from "@/lib/store";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { LanguagePicker } from "./LanguagePicker";
 import { MoodPicker } from "./MoodPicker";
 import { ProjectSwitcher } from "./ProjectSwitcher";
@@ -15,13 +15,16 @@ export function TopBar({
   onOpenSessions?: () => void;
 } = {}) {
   const apiOnline = useVerseStore((s) => s.apiOnline);
+  const cssOnline = useVerseStore((s) => s.cssOnline);
   const authenticated = useVerseStore((s) => s.authenticated);
   const username = useVerseStore((s) => s.username);
   const authConfig = useVerseStore((s) => s.authConfig);
   const setAuthenticated = useVerseStore((s) => s.setAuthenticated);
   const session = useVerseStore((s) => s.session);
+  const returnUrl = useVerseStore((s) => s.returnUrl);
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const env = useMemo(() => detectDeployEnv(), []);
 
   const userLabel = authenticated ? username || "admin" : "guest";
   const userInitial = (userLabel[0] || "A").toUpperCase();
@@ -40,10 +43,23 @@ export function TopBar({
         <LanguagePicker />
 
         <div className="status-cluster">
+          <span className={`pill env-pill env-${env.toLowerCase()}`} title="Deploy env">
+            {env}
+          </span>
           <span className={`pill ${apiOnline ? "ok pulse-soft" : "bad"}`}>
             <i className={`conn-dot ${apiOnline ? "on" : "off"}`} aria-hidden />
-            API {apiOnline ? "online" : "offline"}
+            Portal {apiOnline ? "up" : "down"}
           </span>
+          {authConfig?.cssEnabled ? (
+            <span
+              className={`pill ${
+                cssOnline === true ? "ok" : cssOnline === false ? "bad" : "warn"
+              }`}
+              title="CSS reachability"
+            >
+              CSS {cssOnline === true ? "up" : cssOnline === false ? "down" : "…"}
+            </span>
+          ) : null}
           {authConfig?.cssEnabled ? (
             <span className={`pill ${authenticated ? "ok" : "warn"}`}>
               {authenticated ? userLabel : "auth required"}
@@ -61,6 +77,11 @@ export function TopBar({
             >
               Sessions
             </button>
+          ) : null}
+          {returnUrl ? (
+            <a className="ghost keep-mobile" href={returnUrl}>
+              Home
+            </a>
           ) : null}
           {authenticated && session ? (
             <button

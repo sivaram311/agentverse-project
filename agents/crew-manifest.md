@@ -1,47 +1,41 @@
 # Crew Manifest — AgentVerse
 
 **Project:** AgentVerse (Tamil Nadu 3D digital office)  
-**Status:** Active — **0.2.1 LIVE** on PREPROD + PROD (2026-07-13)  
-**Crew Lead:** Cursor CLI (Rajesh routing in-app)  
+**Status:** Active — Upgradation train on `feature/upgradation-functionality` (base `v0.2.2-stable`)  
+**Crew Lead:** Cursor (Integrate Lead)  
 **Workspace:** `E:\MyWorkspace\agentverse-project`  
-**Session start:** 2026-07-12
+**Session:** `agentverse-feature-branch-2026-07-15`
 
 ## Members
 
 | Role | Status | Notes |
 |------|--------|-------|
-| Crew Lead (Rajesh — Orchestrator) | Active | Routes office crew; project deploy |
-| Research (Karthik) | Active | `personas.json` |
-| Creative (Lavanya) | Active | `personas.json` |
-| Coder (Aravind) | Active | Implementation |
-| Companion (Meenakshi) | Active | Onboarding / morale |
-| Project Manager (Muthu) | Active | Desk clusters + milestones — `agents/roles/muthu-project-manager.md` |
-| Device Lab QA (Kabilan) | Active | Realme P2 Pro; `agents/roles/kabilan-device-lab-qa.md` |
-| Docs-Keeper | Active | README / OPS / IMPLEMENTATION-GUIDE |
-| Promote-EM / Promote-Ops / QA / Sec / Review | Active | MyAgent `promote-*` + `.cursor/skills/agentverse-promote` |
-| Security-Auditor | Standby | CSS auth mandatory |
+| Crew Lead / Integrate Lead | Active | Pre-work gate, merge, SemVer, ACTIVITY-LOG |
+| Vision SME | Active | Upgradation vision SoT |
+| Tech Architect / API Specialist | Active | Contracts + portal spike |
+| Validation Gatekeeper | Active | waves/upgradation/validation-log |
+| Research (Karthik) | Active | personas |
+| Creative (Lavanya) | Active | personas |
+| Coder (Aravind) | Active | Session / deep-link / chat / quests |
+| Companion (Meenakshi) | Active | Incident strip UX |
+| Project Manager (Muthu) | Active | Session Desk |
+| Device Lab QA (Kabilan) | Active | Realme P2 Pro |
+| Docs-Keeper | Active | OPS / DEEP-LINK / IMPLEMENTATION |
+| Security-Auditor | Active | Deep-link return allowlist |
+| Promote-EM / QA / Sec / Review / Ops / Field-Ops | Standby | Await user Q1/Q2 GO |
 
-## Skills hired
+## Skills
 
 | Skill | Location |
 |-------|----------|
 | `agentverse-office` | `.cursor/skills/agentverse-office/` |
 | `agentverse-promote` | `.cursor/skills/agentverse-promote/` |
-| `promote-em` / `qa` / `security` / `review` / `ops` | `E:\MyAgent\.cursor\skills\` |
+| `promote-*` + `promote-field-ops` | `E:\MyAgent\.cursor\skills\` |
 
-## Responsibilities
+## Hire
 
-- Pre-work: Crew Lead (`agents/pre-work/`)
-- Promote: MyAgent evidence packs under `H:\releases\`
-- DNS: Cloudflare upsert required (`.cursor/rules/promote-dns-cloudflare.mdc`)
+See `agents/hires/2026-07-15-upgradation-functionality.md`.
 
 ## Blockers
 
-_None for 0.2.0 ship._
-
-## Session History
-
-- 2026-07-12: Crew init; living hub; TN office workplace; Q1+Q2 promote 0.2.0.
-- 2026-07-13: Q1+Q2 promote 0.2.1 (player avatar + office polish) → PREPROD + PROD.
-
-**Last ship:** agentverse **0.2.1** → https://agentverse-staging.delena.buzz + https://agentverse.delena.buzz
+- Q1/Q2 promote: waiting explicit user GO.
