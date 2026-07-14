@@ -26,13 +26,13 @@ Evidence: `H:\releases\agentverse-upgrade-0.3.1\`
 
 | Pri | Item | Owner | Exit |
 |-----|------|-------|------|
-| **P0** | Truth check: live Home Dispatch preview URL host | QA / field-ops | Host is `agentverse-upgrade*.delena.buzz` or still classic |
-| **P0** | Confirm edge pack is **0.3.1** (not 0.3.0) | Ops | `/health` JSON `version":"0.3.1"` on upgrade hosts + origin |
-| **P1** | Realme E2E: Home → Dispatch → upgrade Desk → strip → return | QA | Evidence notes under H: release folder |
-| **P1** | Thin **ProdDeck** patch (e.g. 0.7.1): Dispatch default → upgrade hosts | ProdDeck promote crew | Q1 home-staging → Q2 home; no Cloud OS 0.8 hard-outs |
-| **P2** | Fleet SoT in `SUPPORTED-VERSIONS` + MyAgent `workflow/deps/` | EM + docs | One Dispatch peer: upgrade (recommended) |
-| **P3** | Hygiene: git tag `v0.3.1` if missing; DEEP-LINK-CONTRACT hosts list upgrade; ACTIVITY-LOG | Docs | Same turn as P1/P2 |
-| **P4** | Defer | — | Cloud OS 0.8 hard-outs · v2 · merge upgrade onto densify F/G |
+| **P0** | Truth check: operator sees latest upgrade fleet | QA / field-ops | **DONE 2026-07-15** — operator confirmed; proceed |
+| **P0** | Confirm edge pack is **0.3.1** (not 0.3.0) | Ops | **DONE** — upgrade hosts `/health` → 0.3.1 |
+| **P1** | Realme E2E: Home → Dispatch → upgrade Desk → return | QA | Optional polish evidence; wire already live |
+| **P1** | ProdDeck Dispatch → upgrade hosts on home[-staging] | ProdDeck | **DONE** — ProdDeck **0.8.0** F+G; Dispatch SoT = upgrade hosts (evidence `H:\releases\proddeck-0.8.0\evidence\dispatch-upgrade-wire.md`) |
+| **P2** | Fleet SoT in `SUPPORTED-VERSIONS` + MyAgent `workflow/deps/` | EM + docs | Register agentverse-upgrade 0.3.1 + Dispatch peer |
+| **P3** | Hygiene: git tag `v0.3.1` if missing; DEEP-LINK-CONTRACT hosts | Docs | Tag + contract host list |
+| **P4** | Defer | — | Cloud OS hard-outs · v2 · merge onto densify F/G |
 
 **SemVer:** Call AV upgrade train **done at 0.3.1** after P0–P1 pass. Only cut **0.3.2** if phone E2E finds a real bug.
 
