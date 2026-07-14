@@ -28,7 +28,8 @@ Evidence: `H:\releases\agentverse-upgrade-0.3.1\`
 |-----|------|-------|------|
 | **P0** | Truth check: operator sees latest upgrade fleet | QA / field-ops | **DONE 2026-07-15** — operator confirmed; proceed |
 | **P0** | Confirm edge pack is **0.3.1** (not 0.3.0) | Ops | **DONE** — upgrade hosts `/health` → 0.3.1 |
-| **P1** | Realme E2E: Home → Dispatch → upgrade Desk → return | QA | Optional polish evidence; wire already live |
+| **P1** | Realme E2E / Device Lab Playwright | Kabilan + Aravind | **DONE** — 6 passed / 1 skipped (auth) vs upgrade-staging; `docs/E2E.md` |
+| **P1b** | Playwright suite vs upgrade-staging | Kabilan + Aravind | **DONE** — evidence `H:\releases\agentverse-upgrade-0.3.1\evidence\e2e\` |
 | **P1** | ProdDeck Dispatch → upgrade hosts on home[-staging] | ProdDeck | **DONE** — ProdDeck **0.8.0** F+G; Dispatch SoT = upgrade hosts (evidence `H:\releases\proddeck-0.8.0\evidence\dispatch-upgrade-wire.md`) |
 | **P2** | Fleet SoT in `SUPPORTED-VERSIONS` + MyAgent `workflow/deps/` | EM + docs | Register agentverse-upgrade 0.3.1 + Dispatch peer |
 | **P3** | Hygiene: git tag `v0.3.1` if missing; DEEP-LINK-CONTRACT hosts | Docs | Tag + contract host list |
