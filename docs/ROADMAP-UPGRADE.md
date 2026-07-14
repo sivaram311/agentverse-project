@@ -28,9 +28,9 @@ Evidence: `H:\releases\agentverse-upgrade-0.3.1\`
 |-----|------|-------|------|
 | **P0** | Truth check: operator sees latest upgrade fleet | QA / field-ops | **DONE 2026-07-15** — operator confirmed; proceed |
 | **P0** | Confirm edge pack is **0.3.1** (not 0.3.0) | Ops | **DONE** — upgrade hosts `/health` → 0.3.1 |
-| **P1** | Realme E2E / Device Lab Playwright | Kabilan + Aravind | **DONE** baseline · **CLOSEOUT** deeper E2E in progress — [CLOSEOUT-PENDING.md](./CLOSEOUT-PENDING.md) |
-| **P2** | Fleet SoT in `SUPPORTED-VERSIONS` + MyAgent `workflow/deps/` | EM + docs | **CLOSEOUT** — implement this turn |
-| **P3** | Hygiene: git tag `v0.3.1`; DEEP-LINK-CONTRACT hosts | Docs | Tag done · contract refresh **CLOSEOUT** |
+| **P1** | Realme E2E / Device Lab Playwright | Kabilan + Aravind | **DONE** — closeout suite + auth (CSS env) — [CLOSEOUT-PENDING.md](./CLOSEOUT-PENDING.md) · [E2E.md](./E2E.md) |
+| **P2** | Fleet SoT in `SUPPORTED-VERSIONS` + MyAgent `workflow/deps/` | EM + docs | **DONE** — upgrade 0.3.1 Dispatch peer |
+| **P3** | Hygiene: git tag `v0.3.1`; DEEP-LINK-CONTRACT hosts | Docs | **DONE** — tag + upgrade hosts SoT |
 | **P4** | Defer | — | Cloud OS hard-outs · v2 · merge onto densify F/G |
 
 **SemVer:** Call AV upgrade train **done at 0.3.1** after P0–P1 pass. Only cut **0.3.2** if phone E2E finds a real bug.

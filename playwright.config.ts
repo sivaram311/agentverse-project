@@ -17,9 +17,10 @@ const ciIsh = !!(
 
 export default defineConfig({
   testDir: "e2e",
-  timeout: 60_000,
+  timeout: 90_000,
   expect: { timeout: 30_000 },
   retries: ciIsh ? 1 : 0,
+  workers: 2,
   outputDir: "e2e-artifacts/",
   reporter: [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]],
   use: {

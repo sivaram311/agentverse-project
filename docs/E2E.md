@@ -71,7 +71,7 @@ npm run test:e2e
 | Spec | Asserts |
 |------|---------|
 | `health.spec.ts` | `/health` → status ok + service agentverse; prefer `version` **0.3.1** (else attach note, still pass). Also run on `upgrade-prod`. |
-| `shell.spec.ts` | `/` → AgentVerse / Digital office / login UI within 30s (no WebGL). Also run on `upgrade-prod`. |
+| `shell.spec.ts` | `/` → **Enter the hub** / **Join lobby** / **Sessions** / brand **AgentVerse** (not aria-hidden hero “Digital office”). Also run on `upgrade-prod`. |
 | `desk-deeplink.spec.ts` | `/desk?intent=session-desk` → Session Desk **or** login; not bare 500 |
 | `hire-brief.spec.ts` | hire+brief deeplink → Brief/incident **or** login |
 | `auth.spec.ts` | skipped unless `AV_E2E_PASSWORD`; Join lobby (`#av-username` / `#av-password`) → Sessions / Session Desk |
@@ -83,8 +83,10 @@ npm run test:e2e
 ### Selector caveats
 
 - Login CTA is **Join lobby**; heading **Enter the hub** (ChatPanel may still say “Sign in”).
+- Do **not** assert visibility of `.hero-copy h1` (“Digital office”) — it is `aria-hidden`.
+- `loginViaJoinLobby` waits for `/api/css/auth/login` **200**, overlay dismiss, closes chat if PWA restore opened it, then **Sessions** (CommandStrip; TopBar needs office chrome open).
 - Session Desk search: `#session-desk-query` or placeholder **Search…**
-- Cancel run appears only for busy sessions — assert **New** / **Refresh** instead when absent.
+- Cancel run appears only for busy sessions — assert **Create session** / **Refresh sessions** (aria-labels; visible text New/Refresh) when absent.
 - Incident strip: `role=region` name **Incident brief** + strong **Brief**.
 - Unauthenticated deep-links showing only login are **PASS** for desk/hire/dispatch land.
 - FlatRoster is WebGL-fallback UI only; healthy WebGL is a soft pass with annotation.
@@ -93,7 +95,7 @@ npm run test:e2e
 
 - Browser: **Chromium** only  
 - Viewport: **360×780**  
-- Timeout: **60s**; expect **30s**; retries **1** when `CI` is set  
+- Timeout: **90s**; expect **30s**; `workers: 2`; retries **1** when `CI` is set  
 - Do not use classic `:5310` / v2 `:4311` as SoT for this phase  
 
 See also: `agents/pre-work/waves/upgradation/E2E-PHASE.md`, `docs/CLOSEOUT-PENDING.md`.

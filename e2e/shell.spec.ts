@@ -6,10 +6,14 @@ test.describe("shell cold load", () => {
   }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
+    // Prefer interactive login/chrome. Avoid `.hero-copy h1` ("Digital office") —
+    // that node is aria-hidden and fails toBeVisible even when the hub renders.
     const shellOrLogin = page
-      .getByText(/AgentVerse|Digital office|Enter the hub|Join lobby|Sign in/i)
-      .first();
+      .getByRole("heading", { name: /Enter the hub/i })
+      .or(page.getByRole("button", { name: /Join lobby|Sign in/i }))
+      .or(page.getByRole("button", { name: /^Sessions$/i }))
+      .or(page.getByRole("strong", { name: /^AgentVerse$/i }));
 
-    await expect(shellOrLogin).toBeVisible({ timeout: 30_000 });
+    await expect(shellOrLogin.first()).toBeVisible({ timeout: 30_000 });
   });
 });

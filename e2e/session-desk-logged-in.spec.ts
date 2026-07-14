@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { hasAuthPassword, loginViaJoinLobby } from "./helpers";
+import {
+  hasAuthPassword,
+  loginViaJoinLobby,
+  openSessionDesk,
+} from "./helpers";
 
 test.describe("logged-in Session Desk", () => {
   test.skip(!hasAuthPassword(), "no credentials (set AV_E2E_PASSWORD)");
@@ -9,14 +13,7 @@ test.describe("logged-in Session Desk", () => {
   }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await loginViaJoinLobby(page);
-
-    const sessionsBtn = page.getByRole("button", { name: /^Sessions$/i });
-    await expect(sessionsBtn).toBeVisible({ timeout: 30_000 });
-    await sessionsBtn.click();
-
-    await expect(page.getByText(/Session Desk/i).first()).toBeVisible({
-      timeout: 20_000,
-    });
+    await openSessionDesk(page);
 
     const search = page
       .locator("#session-desk-query")
@@ -37,11 +34,12 @@ test.describe("logged-in Session Desk", () => {
       .isVisible()
       .catch(() => false);
     if (!cancelVisible) {
+      // Accessible names: aria-label "Create session" / "Refresh sessions"
       await expect(
-        page.getByRole("button", { name: /^New$/i }),
+        page.getByRole("button", { name: /Create session|^New$/i }),
       ).toBeVisible();
       await expect(
-        page.getByRole("button", { name: /Refresh/i }),
+        page.getByRole("button", { name: /Refresh sessions|^Refresh$/i }),
       ).toBeVisible();
     } else {
       await expect(cancelRun.first()).toBeVisible();

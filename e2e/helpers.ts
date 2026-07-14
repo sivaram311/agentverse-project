@@ -79,6 +79,7 @@ export function buildDispatchDeskUrl(opts: {
 
 /**
  * Fill Join lobby / #av-username #av-password when visible; no-op if already authed.
+ * Waits for CSS login HTTP + overlay dismiss + Sessions chrome (CommandStrip).
  */
 export async function loginViaJoinLobby(page: Page): Promise<void> {
   const creds = authCredentials();
@@ -87,15 +88,76 @@ export async function loginViaJoinLobby(page: Page): Promise<void> {
   }
 
   const passwordField = page.locator("#av-password");
-  const loginVisible = await passwordField
-    .isVisible({ timeout: 20_000 })
-    .catch(() => false);
+  const sessionsBtn = page.getByRole("button", { name: /^Sessions$/i });
 
-  if (!loginVisible) return;
+  // Either already in, or login form — do not early-return on a slow hydrate.
+  const formOrSessions = passwordField.or(sessionsBtn);
+  await expect(formOrSessions.first()).toBeVisible({ timeout: 45_000 });
+
+  if (await sessionsBtn.isVisible().catch(() => false)) return;
 
   await page.locator("#av-username").fill(creds.user);
   await passwordField.fill(creds.password);
-  await page.getByRole("button", { name: /Join lobby|Sign in|Sign/i }).click();
+  await expect(passwordField).toHaveValue(creds.password);
+
+  const join = page.getByRole("button", { name: /Join lobby|Sign in/i });
+  await expect(join).toBeEnabled();
+
+  const loginResponse = page.waitForResponse(
+    (r) =>
+      r.url().includes("/api/css/auth/login") &&
+      r.request().method() === "POST",
+    { timeout: 45_000 },
+  );
+  await join.click();
+  const res = await loginResponse;
+  if (!res.ok()) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`CSS login HTTP ${res.status()}: ${text.slice(0, 200)}`);
+  }
+
+  // Overlay stays on portal reject — surface on-page error instead of hanging.
+  await expect(passwordField).toBeHidden({ timeout: 45_000 });
+
+  // PWA / last-desk restore may open ChatPanel — that unmounts CommandStrip Sessions.
+  const closeChat = page.getByRole("button", { name: /Close chat/i });
+  if (await closeChat.isVisible().catch(() => false)) {
+    await closeChat.click();
+  }
+
+  // Prefer CommandStrip; else open office chrome for TopBar Sessions.
+  if (!(await sessionsBtn.isVisible().catch(() => false))) {
+    const showOffice = page.getByRole("button", {
+      name: /Show office controls|Office/i,
+    });
+    if (await showOffice.first().isVisible().catch(() => false)) {
+      await showOffice.first().click();
+    }
+  }
+
+  await expect(sessionsBtn).toBeVisible({ timeout: 30_000 });
+}
+
+/** Open Session Desk from Sessions chip (assumes logged in; closes chat if needed). */
+export async function openSessionDesk(page: Page): Promise<void> {
+  const closeChat = page.getByRole("button", { name: /Close chat/i });
+  if (await closeChat.isVisible().catch(() => false)) {
+    await closeChat.click();
+  }
+  const sessionsBtn = page.getByRole("button", { name: /^Sessions$/i });
+  if (!(await sessionsBtn.isVisible().catch(() => false))) {
+    const showOffice = page.getByRole("button", {
+      name: /Show office controls|Office/i,
+    });
+    if (await showOffice.first().isVisible().catch(() => false)) {
+      await showOffice.first().click();
+    }
+  }
+  await expect(sessionsBtn).toBeVisible({ timeout: 20_000 });
+  await sessionsBtn.click();
+  await expect(page.getByText(/Session Desk/i).first()).toBeVisible({
+    timeout: 20_000,
+  });
 }
 
 /** Soft visibility check — continues the test on failure (Playwright soft expect). */

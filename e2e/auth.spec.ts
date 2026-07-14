@@ -10,10 +10,7 @@ test.describe("optional CSS login", () => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await loginViaJoinLobby(page);
 
-    const sessionsOrDesk = page
-      .getByRole("button", { name: /^Sessions$/i })
-      .or(page.getByText(/Session Desk/i));
-
-    await expect(sessionsOrDesk.first()).toBeVisible({ timeout: 30_000 });
+    // loginViaJoinLobby already waits for Sessions (CommandStrip after auth).
+    await expect(page.getByRole("button", { name: /^Sessions$/i })).toBeVisible();
   });
 });
