@@ -1,6 +1,6 @@
 # AgentVerse — Implementation Guide
 
-**Status:** **0.4.0** on branch `feature/stable-v2` (side fleet **agentverse-v2**). Classic PROD remains **0.2.2-stable** on :5310.  
+**Status:** **0.4.2** on branch `feature/stable-v2` (side fleet **agentverse-v2**). Classic PROD remains **0.2.2-stable** on :5310.  
 **Stack:** Next.js 15 + R3F / Three.js  
 **API:** agent-portal DEV `:8080` / PREPROD `:4080` / PROD `:5080`  
 **UI ports (stable-v2):** DEV **3311** · PREPROD **4311** · PROD **5311**  
@@ -62,9 +62,18 @@ Env:
 - `NEXT_PUBLIC_DEFAULT_WORKSPACE` — default path/name (e.g. `demo`)
 - `NEXT_PUBLIC_WORKSPACE_ALLOWLIST` — optional comma-separated quick-picks; empty = unrestricted (portal root still applies)
 
-## Stable-v2 (0.4.0)
+## Stable-v2 (0.4.2)
 
-Parallel product line off **`v0.2.2-stable`**: same Siruseri office scale, brighter day lighting, PREPROD-style camera UX, separate ship paths/ports so classic :4310/:5310 stay undisturbed.
+Parallel product line off **`v0.2.2-stable`**: same Siruseri office scale, brighter day lighting, PREPROD-style camera UX, separate ship paths/ports so classic :4310/:5310 stay undisturbed. **0.4.2** restyles the plate as a bright industrial open-plan office.
+
+### Bright industrial office (0.4.2)
+
+| Piece | Role |
+|-------|------|
+| `src/lib/office-palette.ts` | Shared SoT — `PALETTE` + `INDUSTRIAL_BOUNDS` (walls/floor teal desks, black chairs, beams, lockers) |
+| `IndustrialCeiling.tsx` | Exposed ceiling: I-beams/trusses, HVAC ducts/pipes, cool downlights |
+| `OfficeStorage.tsx` | Perimeter lockers, cabinets, whiteboards (LOD-aware) |
+| `HubScene.tsx` | Composes shell (`SiruseriOffice`) + `IndustrialCeiling` + `OfficeStorage` + hex collab + desks / avatars |
 
 ### Camera framing
 
@@ -107,7 +116,7 @@ Default mood **day**; canvas exposure ≈ **1.32** for a bright office read.
 Follow MyAgent Q1/Q2 + project skill `.cursor/skills/agentverse-promote`.  
 Evidence: `H:\releases\agentverse-<ver>\evidence\` (or `agentverse-v2-<ver>` when packing the side fleet).  
 **Side deploy:** pack to agentverse-v2 paths only; never recycle classic :4310/:5310.  
-Current side-fleet version: **0.4.0**. Classic PROD tag remains **v0.2.2-stable**.
+Current side-fleet version: **0.4.2**. Classic PROD tag remains **v0.2.2-stable**.
 
 ## Crew / skills
 

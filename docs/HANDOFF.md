@@ -1,12 +1,12 @@
 # AgentVerse — Handoff (continue from here)
 
 **When:** 2026-07-14  
-**Branch:** `feature/stable-v2` · **Version:** **0.4.0**  
+**Branch:** `feature/stable-v2` · **Version:** **0.4.2**  
 **Scope:** Docs + side-deploy package for **agentverse-v2** (parallel to classic). Do **not** touch F:/G: classic apps unless explicitly asked.
 
 ## What’s this branch
 
-- Based on **`v0.2.2-stable`** Siruseri office.
+- Based on **`v0.2.2-stable`** Siruseri office, now a **bright industrial open-plan prototype** (0.4.2): white/blue industrial floor and walls, exposed ceiling beams/ducts (`IndustrialCeiling`), teal desk tops with black mesh chairs, perimeter lockers/cabinets/whiteboards (`OfficeStorage`), shared colors in `office-palette.ts`, composed from `HubScene`.
 - Adds PREPROD-style camera framing / first-person + TopBar **Joystick** / **Views** toggles, bright day office.
 - Chat panel stays closed on persona select/summon; open only via Talk / command strip / CommsDock / `openChat` (PREPROD-matched).
 - Ships as **agentverse-v2** on ports **3311 / 4311 / 5311**.
@@ -20,7 +20,7 @@
 
 Never recycle `:4310` / `:5310` when deploying v2.
 
-## What’s next for stable-v2 (0.4.0)
+## What’s next for stable-v2 (0.4.2)
 
 | Env | Port | Path | Host |
 |-----|------|------|------|
@@ -40,5 +40,5 @@ Side deploy only — pack/release to **agentverse-v2** paths. Classic fleet stay
 ## Docs touchpoints
 
 - [OPS.md](./OPS.md) — both fleets, DNS, camera, Session Desk
-- [IMPLEMENTATION-GUIDE.md](./IMPLEMENTATION-GUIDE.md) — Stable-v2 (0.4.0) + Session Desk
+- [IMPLEMENTATION-GUIDE.md](./IMPLEMENTATION-GUIDE.md) — Stable-v2 (0.4.2) + industrial office composition + Session Desk
 - [README.md](../README.md) — fleet ports/URLs

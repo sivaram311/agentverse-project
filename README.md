@@ -2,7 +2,7 @@
 
 Next.js + React Three Fiber **Tamil Nadu digital office** — agents sit at desks, walk over when summoned, and talk via the Agent Portal API.
 
-**Current branch:** `feature/stable-v2` · **0.4.0** (ships as **agentverse-v2** alongside classic AgentVerse). Ops detail: [`docs/OPS.md`](docs/OPS.md).
+**Current branch:** `feature/stable-v2` · **0.4.2** (ships as **agentverse-v2** alongside classic AgentVerse). Ops detail: [`docs/OPS.md`](docs/OPS.md).
 
 ## Office crew
 
@@ -23,6 +23,7 @@ Crew / pre-work: `agents/`
 ## Features
 
 - Mandala office floor, holographic desks, work-loop animations
+- **Bright industrial office** (0.4.2) — white/blue industrial floor, exposed ceiling, teal desks, black chairs, perimeter storage (`OfficeStorage`)
 - Click agent → stand → walk → greet → return to desk (chat opens only via Talk / command strip / CommsDock / `openChat`)
 - Multi-project desk clusters (ask Rajesh: `new project: …`)
 - Per-directory portal sessions (workspace picker + session tabs)
@@ -36,7 +37,7 @@ Two fleets share CSS (`agent-portal` clientId) and portal APIs but use **differe
 | Fleet | DEV | PREPROD | PROD |
 |-------|-----|---------|------|
 | **Classic** (do not disturb) | **3310** | **4310** · https://agentverse-staging.delena.buzz · `F:\apps\agentverse` · `v0.3.15-unstable` | **5310** · https://agentverse.delena.buzz · `G:\apps\agentverse` · `v0.2.2-stable` |
-| **stable-v2** (this branch, 0.4.0) | **3311** | **4311** · https://agentverse-v2-staging.delena.buzz · `F:\apps\agentverse-v2` | **5311** · https://agentverse-v2.delena.buzz · `G:\apps\agentverse-v2` |
+| **stable-v2** (this branch, 0.4.2) | **3311** | **4311** · https://agentverse-v2-staging.delena.buzz · `F:\apps\agentverse-v2` | **5311** · https://agentverse-v2.delena.buzz · `G:\apps\agentverse-v2` |
 
 Bypass (v2): http://103.118.183.185:4311 · http://103.118.183.185:5311  
 Staging/prod portal `:4080`/`:5080`, CSS `:5900`. Full tables + DNS: [`docs/OPS.md`](docs/OPS.md).

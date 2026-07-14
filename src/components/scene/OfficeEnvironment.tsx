@@ -3,6 +3,7 @@
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { PALETTE } from "@/lib/office-palette";
 import { useVerseStore, type OfficeMood } from "@/lib/store";
 
 /** Soft gold guides under the hex collab carpet (indoor tower L1). */
@@ -106,58 +107,58 @@ type MoodPalette = {
 
 const MOOD: Record<OfficeMood, MoodPalette> = {
   morning: {
-    ambient: 0.48,
-    hemiSky: "#d0e4ff",
-    hemiGround: "#1a1810",
-    hemi: 0.42,
-    key: "#e8f0ff",
-    keyI: 1.05,
-    fill: "#8eb8ff",
-    fillI: 0.55,
-    left: "#b8d4ff",
-    leftI: 0.32,
-    right: "#ffe0b8",
-    rightI: 0.16,
-    hub: "#a8c8ff",
-    hubI: 0.45,
-    spot: "#f0f6ff",
-    spotI: 0.5,
+    ambient: 0.72,
+    hemiSky: "#e8f2ff",
+    hemiGround: "#d0d4da",
+    hemi: 0.55,
+    key: "#f0f6ff",
+    keyI: 1.15,
+    fill: "#c8dcff",
+    fillI: 0.62,
+    left: "#d0e4ff",
+    leftI: 0.38,
+    right: "#e8f0f8",
+    rightI: 0.22,
+    hub: "#E8F8FA",
+    hubI: 0.42,
+    spot: "#f4f8ff",
+    spotI: 0.48,
   },
   day: {
-    ambient: 0.48,
-    hemiSky: "#d8e8f8",
-    hemiGround: "#1a1810",
-    hemi: 0.42,
-    key: "#fff8ec",
-    keyI: 1.05,
-    fill: "#9ec4ff",
-    fillI: 0.55,
-    left: "#b8d8ff",
-    leftI: 0.32,
-    right: "#ffd0a0",
-    rightI: 0.28,
-    hub: "#E8A838",
-    hubI: 0.62,
-    spot: "#ffeac8",
-    spotI: 0.58,
+    ambient: 0.82,
+    hemiSky: "#f2f7fc",
+    hemiGround: "#c8ccd2",
+    hemi: 0.6,
+    key: "#f5f8fc",
+    keyI: 1.2,
+    fill: "#d0e4f8",
+    fillI: 0.7,
+    left: "#e0ecf8",
+    leftI: 0.4,
+    right: "#e8f0f6",
+    rightI: 0.32,
+    hub: "#1EB6C9",
+    hubI: 0.38,
+    spot: "#ffffff",
+    spotI: 0.52,
   },
   evening: {
-    ambient: 0.28,
-    hemiSky: "#ffc8a0",
-    hemiGround: "#12080a",
-    hemi: 0.28,
-    key: "#ffd0a0",
-    keyI: 0.7,
-    fill: "#6080c0",
-    fillI: 0.28,
-    left: "#8090c8",
-    leftI: 0.14,
-    right: "#ff9060",
-    rightI: 0.38,
-    hub: "#FF8A3D",
-    hubI: 0.7,
-    spot: "#ffc090",
-    spotI: 0.55,
+    ambient: 0.55,
+    hemiSky: "#ffe4d0",
+    hemiGround: "#c8c4c0",
+    hemi: 0.4,
+    key: "#fff0e4",
+    keyI: 0.85,
+    fill: "#a8c0e0",
+    fillI: 0.36,
+    left: "#b0c0d8",
+    leftI: 0.2,
+    right: "#ffb898",
+    rightI: 0.32,
+    hub: "#7EC8D4",
+    hubI: 0.48,
+    spot: "#fff4ec",
+    spotI: 0.45,
   },
 };
 
@@ -224,30 +225,45 @@ export function OfficeLighting({
   );
 }
 
-/** Night exterior beyond the glass — subtle city void, not a game void. */
+/** Bright soft sky dome beyond the glass — daylit office exterior, not a night void. */
 export function OfficeBackdrop({ lod = "full" }: { lod?: "full" | "simple" }) {
+  const segs = lod === "simple" ? 16 : 32;
+  const rings = lod === "simple" ? 12 : 24;
   return (
     <group>
       <mesh position={[0, 2.5, 0]}>
-        <sphereGeometry args={[22, lod === "simple" ? 16 : 32, lod === "simple" ? 12 : 24]} />
+        <sphereGeometry args={[22, segs, rings]} />
         <meshStandardMaterial
-          color="#060a12"
-          emissive="#0c1828"
-          emissiveIntensity={0.35}
+          color={PALETTE.bg}
+          emissive={PALETTE.skylight}
+          emissiveIntensity={0.55}
           side={THREE.BackSide}
           roughness={1}
           metalness={0}
         />
       </mesh>
-      <mesh position={[0, 0.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 8.5, 0]}>
+        <sphereGeometry args={[18, segs, Math.max(8, rings / 2), 0, Math.PI * 2, 0, Math.PI * 0.45]} />
+        <meshStandardMaterial
+          color={PALETTE.skylight}
+          emissive={PALETTE.skylight}
+          emissiveIntensity={0.7}
+          side={THREE.BackSide}
+          roughness={1}
+          metalness={0}
+          transparent
+          opacity={0.85}
+        />
+      </mesh>
+      <mesh position={[0, 0.15, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[16, 21, lod === "simple" ? 24 : 48]} />
         <meshStandardMaterial
-          color="#101828"
-          emissive="#1a3048"
-          emissiveIntensity={0.25}
+          color={PALETTE.fog}
+          emissive={PALETTE.skylight}
+          emissiveIntensity={0.2}
           side={THREE.DoubleSide}
           transparent
-          opacity={0.7}
+          opacity={0.45}
         />
       </mesh>
     </group>

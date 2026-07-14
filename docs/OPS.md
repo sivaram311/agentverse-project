@@ -23,7 +23,7 @@ Two **parallel fleets** share CSS/portal but never share ports or app paths. Dep
 
 Leave this fleet running when promoting or smoking **agentverse-v2**.
 
-### AgentVerse stable-v2 (this branch — 0.4.1)
+### AgentVerse stable-v2 (this branch — 0.4.2)
 
 | Env | Drive / path | Port | URL | Portal API | CSS |
 |-----|--------------|------|-----|------------|-----|
@@ -33,7 +33,7 @@ Leave this fleet running when promoting or smoking **agentverse-v2**.
 
 | Piece | Value |
 |-------|--------|
-| Version | **0.4.1** |
+| Version | **0.4.2** |
 | Branch | `feature/stable-v2` (based on `v0.2.2-stable`) |
 | Package / ship name | `agentverse-v2` |
 | CSS clientId | `agent-portal` (same as classic) |
@@ -42,7 +42,7 @@ Leave this fleet running when promoting or smoking **agentverse-v2**.
 | Start PROD | `G:\apps\agentverse-v2\start.ps1 -EnvName prod` |
 | Launcher source | `scripts/start-release.ps1` → copied as `start.ps1` on F:/G: (`PORT` 3311 / 4311 / 5311) |
 
-**Features (v2):** bright day office (`toneMappingExposure` ≈ 1.32) + PREPROD-style camera angles / first-person + TopBar **Joystick** / **Views** toggles. Chat does **not** auto-open on select/summon (Talk / command strip / Comms only — PREPROD-matched). Persist key `agentverse-office-v2-stable`.
+**Features (v2):** bright industrial open-plan office — white/blue industrial floor, exposed ceiling (`IndustrialCeiling`), teal desks / black chairs, perimeter `OfficeStorage`. Still bright day lighting (`toneMappingExposure` ≈ 1.32) + PREPROD-style camera angles / first-person + TopBar **Joystick** / **Views** toggles. Chat does **not** auto-open on select/summon (Talk / command strip / Comms only — PREPROD-matched). Persist key `agentverse-office-v2-stable`.
 
 > **Never** stop, recycle, or bind classic **:4310** / **:5310** when deploying or restarting agentverse-v2. Use **:4311** / **:5311** and paths `F:\apps\agentverse-v2` / `G:\apps\agentverse-v2` only.
 
@@ -134,6 +134,7 @@ Token: Account API token in `.env` / `E:\MyAgent\workflow\secrets\cloudflare.tok
 
 | Version | Notes |
 |---------|--------|
+| **0.4.2** | Bright industrial office prototype: white/blue industrial floor, exposed ceiling, teal desks, black chairs, `OfficeStorage`; palette SoT `office-palette.ts` |
 | **0.4.1** | Chat does not auto-open on select/summon (Talk/Comms only; PREPROD-matched) |
 | **0.4.0** | `feature/stable-v2` side deploy. Siruseri 0.2.2-stable base + bright day office + OrbitShot / FP / ViewAngles + TopBar Joystick/Views. Ports **3311/4311/5311**, paths `agentverse-v2`. Persist `agentverse-office-v2-stable`. |
 | 0.2.2 | Classic PROD tag `v0.2.2-stable` on :5310 (`G:\apps\agentverse`). Do not overwrite with v2. |

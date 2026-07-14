@@ -14,10 +14,13 @@ import { DataOrbs } from "./DataOrbs";
 import { ProjectCluster } from "./DeskCluster";
 import { FramingControls } from "./FramingControls";
 import { HexCollabOffice } from "./HexCollabOffice";
+import { IndustrialCeiling } from "./IndustrialCeiling";
 import { OfficeLighting, OfficeBackdrop } from "./OfficeEnvironment";
+import { OfficeStorage } from "./OfficeStorage";
 import { PersonaAvatar } from "./PersonaAvatar";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { SiruseriOffice } from "./SiruseriOffice";
+import { PALETTE } from "@/lib/office-palette";
 
 function SceneInner({
   reducedMotion,
@@ -37,15 +40,17 @@ function SceneInner({
 
   return (
     <>
-      <color attach="background" args={["#0a1218"]} />
+      <color attach="background" args={[PALETTE.bg]} />
       <fog
         attach="fog"
-        args={portrait ? ["#0a1218", 16, 36] : ["#0a1218", 18, 40]}
+        args={portrait ? [PALETTE.fog, 18, 42] : [PALETTE.fog, 20, 48]}
       />
       <OfficeLighting reducedMotion={reducedMotion} narrow={narrow} />
       <OfficeBackdrop lod={lod} />
-      <Environment preset="city" />
+      <Environment preset="warehouse" />
       <SiruseriOffice lod={lod} reducedMotion={reducedMotion} />
+      <IndustrialCeiling lod={lod} />
+      <OfficeStorage lod={lod} />
       <HexCollabOffice lod={lod} />
       {/* Soft project orbs above collab */}
       <group position={[0, 3.6, 0]}>
@@ -76,7 +81,7 @@ function SceneInner({
         <AmbientWalkers lod={lod} reducedMotion={reducedMotion} />
       ) : null}
       <ContactShadows
-        opacity={0.5}
+        opacity={0.28}
         scale={26}
         blur={2.4}
         far={12}
@@ -139,7 +144,7 @@ export function HubScene() {
         gl={{
           antialias: !narrow && !compact,
           powerPreference: "high-performance",
-          toneMappingExposure: 1.32,
+          toneMappingExposure: 1.28,
         }}
       >
         <Suspense fallback={null}>

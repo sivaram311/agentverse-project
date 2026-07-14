@@ -7,6 +7,7 @@ import type { Group } from "three";
 import * as THREE from "three";
 import { PLAYER_AVATAR, PLAYER_GREET_RADIUS, AVATAR_SCALE } from "@/lib/avatar-catalog";
 import { hexSeatPosition, seatWorldPosition } from "@/lib/hex-office";
+import { INDUSTRIAL_BOUNDS } from "@/lib/office-palette";
 import { personas } from "@/lib/orchestrator";
 import { setPlayerPose } from "@/lib/player-pose";
 import { useVerseStore } from "@/lib/store";
@@ -14,7 +15,7 @@ import type { PersonaId } from "@/lib/types";
 import { RpmAvatar } from "./RpmAvatar";
 
 const MOVE_SPEED = 3.2;
-const FLOOR_HALF = 9.2;
+const FLOOR_HALF = INDUSTRIAL_BOUNDS.halfW - 1.2;
 const KEYS = new Set(["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"]);
 
 /**

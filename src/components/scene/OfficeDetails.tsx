@@ -5,10 +5,11 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { Mesh } from "three";
 import * as THREE from "three";
+import { PALETTE } from "@/lib/office-palette";
 
 type Lod = "full" | "simple";
 
-/** Desk / corridor plant — biophilic MNC feel. */
+/** Desk / corridor plant — neutral pot, muted greens. */
 export function OfficePlant({
   position,
   scale = 1,
@@ -18,12 +19,12 @@ export function OfficePlant({
   scale?: number;
   variant?: number;
 }) {
-  const leaf = variant % 2 === 0 ? "#1f4d38" : "#2d6b4a";
+  const leaf = variant % 2 === 0 ? "#2a5a48" : "#357056";
   return (
     <group position={position} scale={scale}>
       <mesh position={[0, 0.08, 0]} castShadow>
         <cylinderGeometry args={[0.06, 0.08, 0.16, 8]} />
-        <meshStandardMaterial color="#2a1810" roughness={0.85} />
+        <meshStandardMaterial color={PALETTE.floor} roughness={0.8} />
       </mesh>
       <mesh position={[0, 0.28, 0]} castShadow>
         <sphereGeometry args={[0.14, 8, 8]} />
@@ -31,7 +32,7 @@ export function OfficePlant({
       </mesh>
       <mesh position={[0.08, 0.38, 0.04]}>
         <sphereGeometry args={[0.09, 6, 6]} />
-        <meshStandardMaterial color="#2d6b4a" roughness={0.65} />
+        <meshStandardMaterial color="#357056" roughness={0.65} />
       </mesh>
     </group>
   );
@@ -123,7 +124,11 @@ export function FocusPod({
       </mesh>
       <mesh position={[0, 1.7, 0]}>
         <torusGeometry args={[0.5, 0.03, 6, 16]} />
-        <meshStandardMaterial color="#E8A838" emissive="#E8A838" emissiveIntensity={0.35} />
+        <meshStandardMaterial
+          color={PALETTE.tealAccent}
+          emissive={PALETTE.tealAccent}
+          emissiveIntensity={0.25}
+        />
       </mesh>
       <Html position={[0, 2.05, 0]} center distanceFactor={16}>
         <div className="zone-badge">Focus · கவனம்</div>
@@ -251,7 +256,7 @@ export function FilterCoffeePantry({
       {/* Snack tray */}
       <mesh position={[0.7, 1.18, 0.1]} castShadow>
         <boxGeometry args={[0.35, 0.04, 0.25]} />
-        <meshStandardMaterial color="#E8A838" roughness={0.55} />
+        <meshStandardMaterial color={PALETTE.floor} roughness={0.55} />
       </mesh>
       {lod === "full" ? (
         <pointLight position={[0, 1.8, 0.3]} intensity={0.25} distance={3.5} color="#ffd8a8" />
@@ -283,11 +288,11 @@ export function EntrancePlaza({ lod = "full" }: { lod?: Lod }) {
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.015, 0]}>
         <ringGeometry args={[1.8, 2.1, 48]} />
         <meshStandardMaterial
-          color="#E8A838"
-          emissive="#E8A838"
-          emissiveIntensity={0.25}
+          color={PALETTE.tealAccent}
+          emissive={PALETTE.tealAccent}
+          emissiveIntensity={0.12}
           transparent
-          opacity={0.4}
+          opacity={0.28}
         />
       </mesh>
       {/* Water feature */}
