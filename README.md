@@ -55,6 +55,7 @@ PROD: https://agentverse.delena.buzz (`G:\apps\agentverse` :5310).
 
 - `docs/IMPLEMENTATION-GUIDE.md`
 - `docs/OPS.md`
+- `docs/ROADMAP-UPGRADE.md` — post–0.3.1 backlog + how to confirm upgrade fleet
 - `docs/DEEP-LINK-CONTRACT.md`
 - `docs/PROMOTE-UPGRADATION.md`
 - `docs/HANDOFF.md`
