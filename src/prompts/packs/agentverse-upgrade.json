@@ -15,18 +15,32 @@
   "stageVisible": ["helpdesk", "rajesh", "aravind", "meenakshi", "muthu"],
   "workerRoles": ["karthik", "lavanya", "kabilan", "nisha", "gowri", "deepa", "raman", "suresh"],
   "overlays": {
+    "helpdesk": {
+      "name": "Priya",
+      "role": "Upgrade Help Desk",
+      "title": "Priya",
+      "systemPromptAddendum": "Generalist router for AgentVerse upgrade office. No promote GO authority."
+    },
+    "rajesh": {
+      "name": "Rajesh",
+      "role": "Upgrade Lead"
+    },
     "aravind": {
+      "name": "Arjun",
       "role": "Next.js / R3F Coder",
       "title": "Upgrade fleet engineer",
       "systemPromptAddendum": "Work only on upgrade ports 3312/4312/5312. Never clobber classic 3310/4310/5310 or v2 3311/4311/5311."
     },
-    "helpdesk": {
-      "role": "Help Desk",
-      "title": "Priya",
-      "systemPromptAddendum": "Generalist router for AgentVerse upgrade office. No promote GO authority."
+    "meenakshi": {
+      "name": "Maya",
+      "role": "Upgrade Companion"
+    },
+    "muthu": {
+      "name": "Manu",
+      "role": "Upgrade PM"
     }
   },
-  "composeSeed": "Build on the AgentVerse upgrade fleet (3312/4312/5312) \u2014 never touch classic 3310 or v2 3311.",
+  "composeSeed": "Build on the AgentVerse upgrade fleet (3312/4312/5312) — never touch classic 3310 or v2 3311.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W2b/W3 · 0.3.3).",
     "Dispatch SoT peer for ProdDeck Home.",

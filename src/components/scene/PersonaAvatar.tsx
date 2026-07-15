@@ -128,7 +128,6 @@ export function PersonaAvatar({ persona, reducedMotion, showLabels, lod }: Props
     store.setInteraction({ mode: "greeting", focusId: persona.id as PersonaId });
     store.setSubtitle(line);
     store.markGreeted(persona.id as PersonaId);
-    store.bumpChatFocus();
     store.setAgentState(persona.id as PersonaId, {
       pose: "standing",
       status: "Greeting",

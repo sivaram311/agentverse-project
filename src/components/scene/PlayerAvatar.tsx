@@ -2,17 +2,12 @@
 
 import { Billboard, Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import type { Group } from "three";
 import * as THREE from "three";
-import { PLAYER_AVATAR, PLAYER_GREET_RADIUS, AVATAR_SCALE } from "@/lib/avatar-catalog";
-import { hexSeatPosition, seatWorldPosition } from "@/lib/hex-office";
-import { getPack } from "@/lib/pack-loader";
-import { personas } from "@/lib/orchestrator";
+import { PLAYER_AVATAR, AVATAR_SCALE } from "@/lib/avatar-catalog";
 import { setPlayerPose } from "@/lib/player-pose";
-import { stageCast } from "@/lib/stage-cast";
 import { useVerseStore } from "@/lib/store";
-import type { PersonaId } from "@/lib/types";
 import { RpmAvatar } from "./RpmAvatar";
 
 const MOVE_SPEED = 3.2;
@@ -21,7 +16,7 @@ const KEYS = new Set(["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "
 
 /**
  * Logged-in visitor — WASD / touch joystick free roam on the office floor.
- * Walking near an agent triggers summon → greet → chat.
+ * Tap an agent to talk; proximity alone does not open chat.
  */
 export function PlayerAvatar({
   reducedMotion,
@@ -30,33 +25,13 @@ export function PlayerAvatar({
 }) {
   const group = useRef<Group>(null);
   const keys = useRef<Record<string, boolean>>({});
-  const lastGreet = useRef<PersonaId | null>(null);
-  const greetCooldown = useRef(0);
   const [walking, setWalking] = useState(false);
 
   const moveInput = useVerseStore((s) => s.playerMoveInput);
   const setPlayerPos = useVerseStore((s) => s.setPlayerPosition);
   const username = useVerseStore((s) => s.username);
   const authenticated = useVerseStore((s) => s.authenticated);
-  const focusId = useVerseStore((s) => s.interaction.focusId);
-  const interactionMode = useVerseStore((s) => s.interaction.mode);
-  const activePackId = useVerseStore((s) => s.activePackId);
-  const packEpoch = useVerseStore((s) => s.packEpoch);
   const lastStorePos = useRef({ x: 0, z: 5.2 });
-
-  const seats = useMemo(() => {
-    const cast = stageCast(getPack(activePackId));
-    return personas
-      .filter((p) => cast.includes(p.id as PersonaId))
-      .map((p) => ({
-        id: p.id as PersonaId,
-        seat: seatWorldPosition(hexSeatPosition(p.deskIndex ?? 0)),
-      }));
-  }, [activePackId]);
-
-  useEffect(() => {
-    lastGreet.current = null;
-  }, [activePackId, packEpoch]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -80,7 +55,6 @@ export function PlayerAvatar({
     const g = group.current;
     if (!g) return;
     const clamped = Math.min(dt, 0.05);
-    greetCooldown.current = Math.max(0, greetCooldown.current - clamped);
 
     let ix = moveInput.x;
     let iz = moveInput.z;
@@ -138,27 +112,6 @@ export function PlayerAvatar({
     ) {
       lastStorePos.current = { x: g.position.x, z: g.position.z };
       setPlayerPos([g.position.x, 0, g.position.z]);
-    }
-
-    // Proximity greet — only when idle / not already in a focused walk cycle
-    if (
-      greetCooldown.current <= 0 &&
-      (!focusId || interactionMode === "idle" || interactionMode === "talking")
-    ) {
-      let nearest: { id: PersonaId; d: number } | null = null;
-      for (const s of seats) {
-        const d = Math.hypot(g.position.x - s.seat[0], g.position.z - s.seat[2]);
-        if (d < PLAYER_GREET_RADIUS && (!nearest || d < nearest.d)) {
-          nearest = { id: s.id, d };
-        }
-      }
-      if (nearest && nearest.id !== lastGreet.current) {
-        lastGreet.current = nearest.id;
-        greetCooldown.current = 4.5;
-        useVerseStore.getState().summonPersona(nearest.id);
-      } else if (!nearest) {
-        lastGreet.current = null;
-      }
     }
   });
 

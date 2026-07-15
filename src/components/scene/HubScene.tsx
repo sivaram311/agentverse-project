@@ -16,7 +16,7 @@ import {
 } from "react";
 import { isPortraitView, presetForView, resolveViewMode, type ViewMode } from "@/lib/camera-framing";
 import { getPack } from "@/lib/pack-loader";
-import { personas } from "@/lib/orchestrator";
+import { getPersona, personas } from "@/lib/orchestrator";
 import { stageCast } from "@/lib/stage-cast";
 import { useVerseStore } from "@/lib/store";
 import type { PersonaId } from "@/lib/types";
@@ -91,8 +91,11 @@ function SceneInner({
 }) {
   const projects = useVerseStore((s) => s.projects);
   const activePackId = useVerseStore((s) => s.activePackId);
-  const cast = stageCast(getPack(activePackId));
-  const onStage = personas.filter((p) => cast.includes(p.id as PersonaId));
+  const pack = getPack(activePackId);
+  const cast = stageCast(pack);
+  const onStage = personas
+    .filter((p) => cast.includes(p.id as PersonaId))
+    .map((p) => getPersona(p.id as PersonaId, pack));
   const portrait = isPortraitView(viewMode);
 
   return (

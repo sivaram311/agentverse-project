@@ -15,13 +15,23 @@
   "stageVisible": ["helpdesk", "rajesh", "aravind", "karthik"],
   "workerRoles": ["muthu", "vikram", "deepa", "gowri", "raman", "kabilan"],
   "overlays": {
+    "helpdesk": {
+      "name": "Priya",
+      "role": "CSS Help Desk"
+    },
+    "rajesh": {
+      "name": "Rajesh",
+      "role": "CSS Lead"
+    },
     "aravind": {
+      "name": "Amrit",
       "role": "Java / Spring Security Coder",
       "title": "CSS engineer",
       "systemPromptAddendum": "Classic CSS IdP on :9000/:4900/:5900. Do not confuse with css-next side fleet :4910/:5910."
     },
     "karthik": {
-      "role": "Security / Research Architect",
+      "name": "Kiran",
+      "role": "IdP Research Architect",
       "title": "CSS research seat",
       "systemPromptAddendum": "Classic IdP research + JWKS/CORS hygiene. Vikram remains Layer B promote-security (no stage body yet)."
     },
@@ -31,7 +41,7 @@
       "systemPromptAddendum": "clientId registry, JWKS, CORS. No secrets in git."
     }
   },
-  "composeSeed": "Work the classic CSS IdP on :9000/:4900/:5900 \u2014 clientId registry + JWKS clean, no secrets in git.",
+  "composeSeed": "Work the classic CSS IdP on :9000/:4900/:5900 — clientId registry + JWKS clean, no secrets in git.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W2b/W3 · 0.3.3).",
     "css-next is a separate pack (css-next.json); do not replace classic.",

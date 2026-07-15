@@ -16,13 +16,23 @@
   "stageVisible": ["helpdesk", "rajesh", "aravind", "muthu"],
   "workerRoles": ["karthik", "vikram", "deepa", "gowri", "raman", "kabilan"],
   "overlays": {
+    "helpdesk": {
+      "name": "Priya",
+      "role": "OAuth Help Desk"
+    },
+    "rajesh": {
+      "name": "Rajesh",
+      "role": "css-next Lead"
+    },
     "aravind": {
+      "name": "Amrit",
       "role": "Java / OAuth SSO Coder",
       "title": "css-next engineer",
       "systemPromptAddendum": "OAuth side fleet on :9000/:4910/:5910. Do NOT confuse with classic CSS :4900/:5900."
     },
     "muthu": {
-      "role": "Product Manager",
+      "name": "Mahesh",
+      "role": "css-next Owner",
       "title": "css-next owner seat",
       "systemPromptAddendum": "Own OAuth side-fleet roadmap; do not clobber classic CSS ports."
     },
@@ -32,7 +42,7 @@
       "systemPromptAddendum": "OAuth clientId registry, PKCE, JWKS. No secrets in git."
     }
   },
-  "composeSeed": "Work the css-next OAuth side fleet on :9000/:4910/:5910 \u2014 PKCE authorize flow, clientId registry, no classic port clash.",
+  "composeSeed": "Work the css-next OAuth side fleet on :9000/:4910/:5910 — PKCE authorize flow, clientId registry, no classic port clash.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
     "Separate pack from classic css; same E: tree, F: side-fleet bake.",

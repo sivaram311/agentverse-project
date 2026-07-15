@@ -16,12 +16,22 @@
   "stageVisible": ["helpdesk", "rajesh", "muthu", "karthik"],
   "workerRoles": ["aravind", "anand", "deepa", "gowri", "raman", "kabilan"],
   "overlays": {
+    "helpdesk": {
+      "name": "Priya",
+      "role": "Stack Help Desk"
+    },
+    "rajesh": {
+      "name": "Rajesh",
+      "role": "Stack Pilot Lead"
+    },
     "muthu": {
-      "role": "Product / Control Plane Owner",
+      "name": "Murali",
+      "role": "Control Plane Owner",
       "title": "Stack Pilot owner",
       "systemPromptAddendum": "control.delena.buzz fleet; no port clashes with agent-portal or CSS."
     },
     "karthik": {
+      "name": "Karthik",
       "role": "Control Plane Architect",
       "title": "Stack Pilot research",
       "systemPromptAddendum": "Java control plane research; Aravind hired Layer B for code bursts."
@@ -37,7 +47,7 @@
       "systemPromptAddendum": "control.delena.buzz fleet; no port clashes with agent-portal or CSS. Layer B only until stage body exists."
     }
   },
-  "composeSeed": "Ship Stack Pilot control-plane work \u2014 honor fleetPorts 8091/4091/5091.",
+  "composeSeed": "Ship Stack Pilot control-plane work — honor fleetPorts 8091/4091/5091.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
     "DEV legacy :8091 live; preferred offset :3091 reserved.",

@@ -16,16 +16,34 @@
   "stageVisible": ["helpdesk", "rajesh", "aravind", "lavanya", "kabilan"],
   "workerRoles": ["karthik", "nisha", "gowri", "deepa", "raman"],
   "overlays": {
+    "helpdesk": {
+      "name": "Priya",
+      "role": "ProdDeck Help Desk"
+    },
+    "rajesh": {
+      "name": "Rajesh",
+      "role": "ProdDeck Lead"
+    },
     "aravind": {
+      "name": "Ravi",
       "role": "Next.js / Cloud OS Coder",
       "title": "ProdDeck engineer",
-      "systemPromptAddendum": "Stack: Next.js ProdDeck. Honor fleetPorts. Dispatch \u2192 agentverse-upgrade only."
+      "systemPromptAddendum": "Stack: Next.js ProdDeck. Honor fleetPorts. Dispatch → agentverse-upgrade only."
+    },
+    "lavanya": {
+      "name": "Lena",
+      "role": "ProdDeck Design"
+    },
+    "kabilan": {
+      "name": "Keerthi",
+      "role": "Device Lab QA"
     }
   },
-  "composeSeed": "Ship a ProdDeck Cloud OS feature \u2014 honor fleetPorts 3320/4320/5320, dispatch to agentverse-upgrade only.",
+  "composeSeed": "Ship a ProdDeck Cloud OS feature — honor fleetPorts 3320/4320/5320, dispatch to agentverse-upgrade only.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W2b/W3 · 0.3.3).",
-    "Canonical workspace path is E:/wt/proddeck-integrate; workspacePathAlias is a known second location \u2014 do not treat as a second SoT.",
-    "Cast policy 0.3.6: specialists lavanya+kabilan (≠ upgrade meenakshi+muthu)."
+    "Canonical workspace path is E:/wt/proddeck-integrate; workspacePathAlias is a known second location — do not treat as a second SoT.",
+    "Cast policy 0.3.6: specialists lavanya+kabilan (≠ upgrade meenakshi+muthu).",
+    "Display names 0.3.7: overlay.name on avatar tag."
   ]
 }

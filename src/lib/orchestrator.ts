@@ -31,6 +31,7 @@ export function applyPackOverlay(persona: PersonaDef, pack?: Pack | null): Perso
   if (!overlay) return persona;
   return {
     ...persona,
+    name: overlay.name ?? persona.name,
     role: overlay.role ?? persona.role,
     title: overlay.title ?? persona.title,
     systemPrompt: overlay.systemPromptAddendum

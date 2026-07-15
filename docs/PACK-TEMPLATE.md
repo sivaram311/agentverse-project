@@ -21,6 +21,7 @@
   "workerRoles": ["karthik", "nisha", "gowri", "deepa", "raman"],
   "overlays": {
     "aravind": {
+      "name": "Ravi",
       "role": "Next.js / Cloud OS Coder",
       "title": "ProdDeck engineer",
       "systemPromptAddendum": "Stack: Next.js ProdDeck. Honor fleetPorts. Dispatch → agentverse-upgrade only."

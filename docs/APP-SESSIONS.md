@@ -22,20 +22,22 @@ Opening Session Desk (logged in) runs **ensure work-plane sessions** at most **o
 
 Chips open the matching session (or create then open) and flip the active pack (title wins over path so CSS vs CSS Next do not collide).
 
-## Stage cast policy (0.3.6)
+## Stage cast policy (0.3.7)
 
 **Shared anchors on every work-plane stage:** Priya (`helpdesk`) · Rajesh.  
-**Switch-feel:** specialists diverge by pack (not unique Help Desks). Ghost ids without bodies (`anand`, `vikram`) are **not** listed in `stageVisible`.
+**Switch-feel:** specialists diverge by pack (not unique Help Desks). Ghost ids without bodies (`anand`, `vikram`) are **not** listed in `stageVisible`.  
+**Display names:** pack `overlays.<id>.name` overrides the label on the avatar tag / crew bar (same GLB body; catalog id unchanged).  
+**Chat:** tap an agent (or crew pill) to open chat; walking near or approach greet alone does **not** open the chat panel.
 
-| Pack | On stage (`stageVisible`) |
+| Pack | On stage (display names) |
 |------|---------------------------|
-| proddeck | Priya, Rajesh, Aravind, **Lavanya**, **Kabilan** |
-| agentverse-upgrade | Priya, Rajesh, Aravind, **Meenakshi**, **Muthu** |
-| css | Priya, Rajesh, Aravind, **Karthik** |
-| css-next | Priya, Rajesh, Aravind, **Muthu** |
-| agent-portal | Priya, Rajesh, Aravind, **Muthu**, **Kabilan** |
-| stack-pilot | Priya, Rajesh, **Muthu**, **Karthik** |
-| h-drive-server | Priya, Rajesh, Aravind, **Karthik** |
+| proddeck | Priya, Rajesh, Aravind, **Ravi**, **Lena**, Keerthi |
+| agentverse-upgrade | Priya, Rajesh, Aravind, **Arjun**, **Maya**, Manu |
+| css | Priya, Rajesh, Aravind, **Amrit**, Kiran |
+| css-next | Priya, Rajesh, Aravind, **Amrit**, Mahesh |
+| agent-portal | Priya, Rajesh, Aravind, **Arjun**, Manoj, Kavi |
+| stack-pilot | Priya, Rajesh, **Murali**, Karthik |
+| h-drive-server | Priya, Rajesh, Aravind, **Naveen**, Kiran |
 
 ## Portal rate-limit friendliness
 

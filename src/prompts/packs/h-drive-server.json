@@ -16,21 +16,31 @@
   "stageVisible": ["helpdesk", "rajesh", "aravind", "karthik"],
   "workerRoles": ["anand", "muthu", "deepa", "gowri", "raman", "kabilan"],
   "overlays": {
+    "helpdesk": {
+      "name": "Priya",
+      "role": "H-Drive Help Desk"
+    },
+    "rajesh": {
+      "name": "Rajesh",
+      "role": "H-Drive Lead"
+    },
     "aravind": {
+      "name": "Naveen",
       "role": "Node / H: Expose Coder",
       "title": "H-Drive engineer",
       "systemPromptAddendum": "Expose H:\\ read-only API. Honor fleetPorts 3010/4010/5010; open CORS policy as documented."
     },
     "karthik": {
-      "role": "API / Expose Research",
+      "name": "Kiran",
+      "role": "Expose API Research",
       "title": "H-Drive research seat",
       "systemPromptAddendum": "H:\\ expose research; Anand ops stays Layer B until stage body exists."
     }
   },
-  "composeSeed": "Work H-Drive server \u2014 honor fleetPorts 3010/4010/5010, H:\\ expose only, no secrets in git.",
+  "composeSeed": "Work H-Drive server — honor fleetPorts 3010/4010/5010, H:\\ expose only, no secrets in git.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
-    "https://hdrive.delena.buzz \u2192 :5010 PROD.",
+    "https://hdrive.delena.buzz → :5010 PROD.",
     "Cast policy 0.3.6: aravind+karthik on stage (≠ stack-pilot); drop ghost anand from stageVisible."
   ]
 }

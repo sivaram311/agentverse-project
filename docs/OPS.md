@@ -1,6 +1,6 @@
 # AgentVerse — Ops (upgradation side fleet)
 
-**Branch:** `feature/upgradation-functionality` · **Version:** **0.3.6** · Base `v0.2.2-stable`
+**Branch:** `feature/upgradation-functionality` · **Version:** **0.3.7** · Base `v0.2.2-stable`
 
 **This fleet must NOT recycle classic or v2 ports.**
 

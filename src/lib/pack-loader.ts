@@ -16,6 +16,8 @@ import libraryPackJson from "@/prompts/packs/library.json";
 import type { Session } from "./types";
 
 export type PackOverlay = {
+  /** Optional display name on avatar tag (catalog id unchanged). */
+  name?: string;
   role?: string;
   title?: string;
   /** Appended to the persona's base systemPrompt (capped — see PACK-TEMPLATE.md). */

@@ -1,7 +1,7 @@
 "use client";
 
 import { getPack } from "@/lib/pack-loader";
-import { personas } from "@/lib/orchestrator";
+import { getPersona, personas } from "@/lib/orchestrator";
 import { stageCast } from "@/lib/stage-cast";
 import { useVerseStore } from "@/lib/store";
 import type { PersonaId } from "@/lib/types";
@@ -29,8 +29,11 @@ export function FlatRoster() {
   );
 
   const onStage = useMemo(() => {
-    const cast = stageCast(getPack(activePackId));
-    return personas.filter((p) => cast.includes(p.id as PersonaId));
+    const pack = getPack(activePackId);
+    const cast = stageCast(pack);
+    return personas
+      .filter((p) => cast.includes(p.id as PersonaId))
+      .map((p) => getPersona(p.id as PersonaId, pack));
   }, [activePackId]);
 
   return (
