@@ -1,7 +1,7 @@
 # HANDOFF — Upgradation side fleet
 
 **When:** 2026-07-15  
-**Branch:** `feature/upgradation-functionality` · **Version:** **`0.3.6` candidate → promote**  
+**Branch:** `feature/upgradation-functionality` · **Version:** **`v0.3.6` LIVE** (F+G)
 **Side ports:** **3312 / 4312 / 5312**  
 **Hosts:** https://agentverse-upgrade-staging.delena.buzz · https://agentverse-upgrade.delena.buzz
 
