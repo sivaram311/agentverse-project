@@ -20,4 +20,11 @@ Chips open the matching session (or create then open) and flip the active pack (
 2. Open Session Desk once — work-plane sessions appear under **App sessions**  
 3. Optionally **Seed labeled too** for classic / v2 / library  
 
-Pack JSON: `src/prompts/packs/*.json` · loader: `src/lib/pack-loader.ts` · ensure: `src/lib/app-sessions.ts`
+## Portal allowlist (PROD)
+
+Prod Portal must include absolute work-plane roots or create fails with `workspacePath is not allowed; must stay under …`:
+
+`AGENT_WORKSPACE_ALLOWED_ROOTS=E:\MyWorkspace,E:\Source,E:\wt,F:\apps,G:\apps`
+
+Set on `G:\apps\agent-portal\.env` (and F for staging). Restart Portal `:5080` / `:4080` after change.
+
