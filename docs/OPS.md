@@ -33,7 +33,13 @@ Live F/G Portal `.env`:
 AGENT_WORKSPACE_ALLOWED_ROOTS=E:\MyWorkspace,E:\Source,E:\wt,F:\apps,G:\apps
 ```
 
-Restart Portal `:4080` / `:5080` after changing. Details: [APP-SESSIONS.md](./APP-SESSIONS.md) · Portal [OPS.md](../../agent-portal/docs/OPS.md) (sibling repo).
+AV client bake (must match at **build** time):
+
+```env
+NEXT_PUBLIC_WORKSPACE_ALLOWLIST=E:/MyWorkspace,E:/Source,E:/wt,F:/apps,G:/apps
+```
+
+Do not use short labels (`AgentVerse,MyAgent`) — they reject absolute pack paths. Restart Portal after server `.env` changes; rebuild AV after allowlist changes.
 
 ## Start
 
