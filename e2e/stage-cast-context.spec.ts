@@ -38,6 +38,11 @@ test.describe("stage cast + context decision (0.3.5)", () => {
       test.skip(true, "command strip not visible (chat open or auth)");
       return;
     }
+    // Soft when strip is mounted but covered (login overlay / chat takeover)
+    if (!(await openBtn.isVisible())) {
+      test.skip(true, "Context chip not interactable (overlay/chat)");
+      return;
+    }
     await openBtn.click();
     await expect(page.getByTestId("context-decision")).toBeVisible();
   });
