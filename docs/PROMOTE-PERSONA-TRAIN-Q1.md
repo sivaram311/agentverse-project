@@ -1,6 +1,6 @@
 # Promote plan (Q1) — agentverse-upgrade 0.3.2 · persona-train W1
 
-**Status:** PLAN ONLY — no deploy, no git tag/push, no copy to F:. Written by **Lane D** (Selvam EM + Raman field-ops) for Lead review.
+**Status:** Q1 **COMPLETE** — F:`:4312` live **0.3.2** · tag `v0.3.2` · evidence `H:\releases\agentverse-upgrade-0.3.2\evidence\q1\` · G still 0.3.1 until Q2  
 **Crew personas:** `selvam` (promote-em) · `raman` (promote-field-ops) — see `docs/APP-PERSONA-CAST.md`
 **Fleet:** `agentverse-upgrade` side fleet **only** — see `docs/ROADMAP-UPGRADE.md`, `agents/pre-work/waves/upgradation/…`, `docs/ACTION-PLAN-APP-PERSONAS.md` (W1)
 **Read first:** `E:\MyAgent\workflow\promote\README.md` · `gates.md` · `field-lessons.md` · `E:\MyAgent\workflow\deps\DEPENDENCY-MATRIX.md`
