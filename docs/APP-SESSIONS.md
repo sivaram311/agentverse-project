@@ -10,6 +10,14 @@
 | **Work plane** (auto-ensure) | css · css-next · agent-portal · agentverse-upgrade · proddeck · stack-pilot · h-drive-server | `AgentVerse · CSS`, `… · CSS Next`, `… · Agent Portal`, `… · Upgrade`, `… · ProdDeck`, `… · Stack Pilot`, `… · H-Drive` |
 | **Labeled** (optional seed) | agentverse · agentverse-v2 · library | `AgentVerse · Classic`, `… · V2`, `… · Library` |
 
+### Inventory labels (W0 SoT — not default work plane)
+
+| Pack / label | Inventory label | Meaning |
+|--------------|-----------------|--------|
+| `agentverse` | **rollback** | Classic fleet label (3310/4310/5310) — seed/open only; never Dispatch default |
+| `agentverse-v2` | **experiment** | V2 side fleet label (3311/4311/5311) — optional seed; not work plane |
+| `library` | **candidate** | Ports reserved; not PROD yet — optional seed only |
+
 Opening Session Desk (logged in) runs **ensure work-plane sessions** at most **once per browser-tab hour** (sessionStorage debounce): create missing titles via Portal `POST /sessions` bound to each pack’s `workspacePath`. Creates are spaced **~350ms** apart. Buttons **Ensure app sessions** / **Seed labeled too** always run on demand.
 
 Chips open the matching session (or create then open) and flip the active pack (title wins over path so CSS vs CSS Next do not collide).

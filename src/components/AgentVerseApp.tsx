@@ -12,6 +12,7 @@ import { QuestPanel } from "@/components/hud/QuestPanel";
 import { SessionDesk } from "@/components/hud/SessionDesk";
 import { StageControls } from "@/components/hud/StageControls";
 import { TeamMemberBar } from "@/components/hud/TeamMemberBar";
+import { ContextDecisionOffer } from "@/components/hud/ContextDecisionOffer";
 import { TopBar } from "@/components/hud/TopBar";
 import { TouchJoystick } from "@/components/hud/TouchJoystick";
 import {
@@ -211,6 +212,7 @@ export function AgentVerseApp() {
         ) : null}
       </div>
       <TeamMemberBar />
+      <ContextDecisionOffer />
       <main className="verse-main">
         <HubScene />
         {showLogin ? null : (

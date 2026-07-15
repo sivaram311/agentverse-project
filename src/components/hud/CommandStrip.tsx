@@ -31,6 +31,7 @@ export function CommandStrip({
   const openChat = useVerseStore((s) => s.openChat);
   const bumpChatFocus = useVerseStore((s) => s.bumpChatFocus);
   const setComposeDraft = useVerseStore((s) => s.setComposeDraft);
+  const setContextDecisionOpen = useVerseStore((s) => s.setContextDecisionOpen);
   const activePackId = useVerseStore((s) => s.activePackId);
   const pack = getPack(activePackId);
   const persona = getPersona(selected, pack);
@@ -99,6 +100,15 @@ export function CommandStrip({
             Sessions
           </button>
         ) : null}
+        <button
+          type="button"
+          className="chip command-chip"
+          data-testid="context-decision-open"
+          title="Adopt / Switch / Hire — one decision per turn"
+          onClick={() => setContextDecisionOpen(true)}
+        >
+          Context
+        </button>
         <button
           type="button"
           className="chip command-chip"

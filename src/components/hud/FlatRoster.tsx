@@ -1,8 +1,11 @@
 "use client";
 
+import { getPack } from "@/lib/pack-loader";
 import { personas } from "@/lib/orchestrator";
+import { stageCast } from "@/lib/stage-cast";
 import { useVerseStore } from "@/lib/store";
 import type { PersonaId } from "@/lib/types";
+import { useMemo } from "react";
 
 function initials(name: string): string {
   return name
@@ -20,9 +23,15 @@ export function FlatRoster() {
   const selectPersona = useVerseStore((s) => s.selectPersona);
   const summonPersona = useVerseStore((s) => s.summonPersona);
   const openChat = useVerseStore((s) => s.openChat);
+  const activePackId = useVerseStore((s) => s.activePackId);
   const requestSessionDesk = useVerseStore((s) =>
     "requestSessionDesk" in s ? s.requestSessionDesk : undefined,
   );
+
+  const onStage = useMemo(() => {
+    const cast = stageCast(getPack(activePackId));
+    return personas.filter((p) => cast.includes(p.id as PersonaId));
+  }, [activePackId]);
 
   return (
     <div className="webgl-fallback flat-roster" role="region" aria-label="2D crew roster">
@@ -30,11 +39,11 @@ export function FlatRoster() {
         <p className="flat-roster__kicker">WebGL unavailable</p>
         <h2 className="flat-roster__title">Crew roster</h2>
         <p className="flat-roster__hint">
-          Tap an agent to talk. 3D office is disabled on this device.
+          Stage cast for <strong>{activePackId}</strong>. Tap an agent to talk.
         </p>
       </header>
-      <ul className="flat-roster__list">
-        {personas.map((p) => {
+      <ul className="flat-roster__list" data-testid="flat-roster-cast">
+        {onStage.map((p) => {
           const id = p.id as PersonaId;
           const on = selected === id;
           const working = agentStates[id]?.working;
@@ -46,6 +55,7 @@ export function FlatRoster() {
                 style={{ ["--p" as string]: p.color }}
                 aria-pressed={on}
                 aria-label={`${p.name}, ${p.role}. Open chat.`}
+                data-persona-id={id}
                 onClick={() => {
                   selectPersona(id);
                   summonPersona(id);

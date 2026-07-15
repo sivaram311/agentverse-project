@@ -36,9 +36,11 @@ https://agentverse-upgrade[-staging].delena.buzz/desk?src=&crew=&session=&intent
 
 Others → ignored.
 
-## `src` → pack `appId` (W2b SoT)
+## `src` → pack `appId` (W0 LOCKED · W2b runtime)
 
-Runtime resolver: `src/lib/pack-loader.ts` (`SRC_TO_APPID` · `resolvePackIdFromSrc`).
+**W0 decision (locked 2026-07-15):** Pack key = map query **`src` → pack `appId`**.  
+Already wired in `src/lib/pack-loader.ts` (`SRC_TO_APPID` · `resolvePackIdFromSrc`).  
+**Do not** add a new `app=` query param or fork resolver — callers keep using `src=` only.
 
 | `src` param | Pack `appId` | Notes |
 |-------------|--------------|-------|

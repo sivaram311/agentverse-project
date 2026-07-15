@@ -506,6 +506,15 @@ export function ChatPanel() {
             </span>
           </h2>
           <div className="chat-head-actions">
+            <button
+              type="button"
+              className="ghost"
+              data-testid="context-decision-open-chat"
+              title="Adopt / Switch / Hire"
+              onClick={() => useVerseStore.getState().setContextDecisionOpen(true)}
+            >
+              Context
+            </button>
             {session ? (
               <span className={statusChipClass(session.status)} title={session.status}>
                 {session.status.replace(/_/g, " ").toLowerCase()}

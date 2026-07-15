@@ -1,6 +1,6 @@
 # App persona cast — stable names (AgentVerse stage + worker ids)
 
-**Status:** DRAFT with ACTION-PLAN · 2026-07-15  
+**Status:** W0 closeout **awaiting Human GO** · 2026-07-15  
 **Companion:** [ACTION-PLAN-APP-PERSONAS.md](./ACTION-PLAN-APP-PERSONAS.md)
 
 Persona **ids** are stable. Display **name/role/prompt** may overlay per `packs/<appId>.json`.
@@ -41,14 +41,19 @@ Persona **ids** are stable. Display **name/role/prompt** may overlay per `packs/
 
 | id | Skill / SoT |
 |----|-------------|
-| `kabilan` / `nisha` | `workflow/testing/E2E-HIRE.md` · Playwright slot |
+| `meenakshi` | Companion — stage presence / continuity; no promote or gate authority · cast catalog |
+| `karthik` | Research — Layer B research workers · `E:\machine-docs\personas\` pre-work vision |
+| `lavanya` | Creative / design · `E:\machine-docs\personas\web-app-standards.md` (+ design-system pre-work) |
+| `aravind` | Coder — implement after pre-work GO · stack from active pack |
+| `muthu` | Project Manager — parallel hire ownership · `agents/hires/_TEMPLATE-parallel-workers.md` |
+| `kabilan` / `nisha` | `workflow/testing/E2E-HIRE.md` · Playwright slot (#15) · devices Realme 360×780 |
 | `selvam` | `promote-em` |
 | `anand` | `promote-ops` |
 | `divya` | `promote-qa` |
 | `vikram` | `promote-security` |
 | `deepa` | `promote-review` · `workflow/review/` (#17) |
-| `raman` | `promote-field-ops` · `field-lessons.md` |
+| `raman` | `promote-field-ops` · `workflow/promote/field-lessons.md` |
 | `gowri` | CONSCIOUS #12 docs |
 | `suresh` | `git-release` · `GIT-RELEASE-MANAGEMENT.md` |
-| `rajesh` | Crew Lead / hire — `machine-docs/personas` |
+| `rajesh` | Crew Lead / hire — `E:\machine-docs\personas\` |
 | `helpdesk` | Generalist router — no promote authority |

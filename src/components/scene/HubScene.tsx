@@ -15,8 +15,11 @@ import {
   type ReactNode,
 } from "react";
 import { isPortraitView, presetForView, resolveViewMode, type ViewMode } from "@/lib/camera-framing";
+import { getPack } from "@/lib/pack-loader";
 import { personas } from "@/lib/orchestrator";
+import { stageCast } from "@/lib/stage-cast";
 import { useVerseStore } from "@/lib/store";
+import type { PersonaId } from "@/lib/types";
 import { FlatRoster } from "@/components/hud/FlatRoster";
 import { AmbientWalkers } from "./AmbientWalkers";
 import { DataOrbs } from "./DataOrbs";
@@ -87,6 +90,9 @@ function SceneInner({
   viewMode: ViewMode;
 }) {
   const projects = useVerseStore((s) => s.projects);
+  const activePackId = useVerseStore((s) => s.activePackId);
+  const cast = stageCast(getPack(activePackId));
+  const onStage = personas.filter((p) => cast.includes(p.id as PersonaId));
   const portrait = isPortraitView(viewMode);
 
   return (
@@ -116,7 +122,7 @@ function SceneInner({
             satellite
           />
         ))}
-      {personas.map((p) => (
+      {onStage.map((p) => (
         <PersonaAvatar
           key={p.id}
           persona={p}

@@ -7,8 +7,10 @@ import type { Group } from "three";
 import * as THREE from "three";
 import { PLAYER_AVATAR, PLAYER_GREET_RADIUS, AVATAR_SCALE } from "@/lib/avatar-catalog";
 import { hexSeatPosition, seatWorldPosition } from "@/lib/hex-office";
+import { getPack } from "@/lib/pack-loader";
 import { personas } from "@/lib/orchestrator";
 import { setPlayerPose } from "@/lib/player-pose";
+import { stageCast } from "@/lib/stage-cast";
 import { useVerseStore } from "@/lib/store";
 import type { PersonaId } from "@/lib/types";
 import { RpmAvatar } from "./RpmAvatar";
@@ -38,16 +40,23 @@ export function PlayerAvatar({
   const authenticated = useVerseStore((s) => s.authenticated);
   const focusId = useVerseStore((s) => s.interaction.focusId);
   const interactionMode = useVerseStore((s) => s.interaction.mode);
+  const activePackId = useVerseStore((s) => s.activePackId);
+  const packEpoch = useVerseStore((s) => s.packEpoch);
   const lastStorePos = useRef({ x: 0, z: 5.2 });
 
-  const seats = useMemo(
-    () =>
-      personas.map((p) => ({
+  const seats = useMemo(() => {
+    const cast = stageCast(getPack(activePackId));
+    return personas
+      .filter((p) => cast.includes(p.id as PersonaId))
+      .map((p) => ({
         id: p.id as PersonaId,
         seat: seatWorldPosition(hexSeatPosition(p.deskIndex ?? 0)),
-      })),
-    [],
-  );
+      }));
+  }, [activePackId]);
+
+  useEffect(() => {
+    lastGreet.current = null;
+  }, [activePackId, packEpoch]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {

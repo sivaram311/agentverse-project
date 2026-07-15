@@ -10,6 +10,13 @@ import {
 } from "./orchestrator";
 import { resolveProjectWorkspacePath } from "./project-workspace";
 import { getPack, resolvePackIdFromWorkspace } from "./pack-loader";
+import {
+  defaultTalkTarget,
+  isOnStage,
+  nowIstStamp,
+  type HireReplacementArgs,
+  type PackContextActivityEvent,
+} from "./stage-cast";
 import type {
   AgentRuntimeState,
   AuthConfig,
@@ -163,6 +170,12 @@ type VerseState = {
   packEpoch: number;
   /** Brief "Stage → appId" toast on pack switch — UI clears after a timeout */
   packToast: string | null;
+  /** Ring buffer of W4 context events (not persisted) */
+  activityEvents: PackContextActivityEvent[];
+  /** ISO ms of last Adopt/Switch/Hire confirm — one decision latch */
+  lastContextDecisionAt: number | null;
+  /** Open the ContextDecisionOffer panel */
+  contextDecisionOpen: boolean;
   setAuthConfig: (c: AuthConfig | null) => void;
   setAuthenticated: (v: boolean, username?: string | null) => void;
   setAccessToken: (token: string | null) => void;
@@ -220,6 +233,15 @@ type VerseState = {
   cycleCameraView: () => void;
   setActivePack: (appId: string, reason?: string) => void;
   setPackToast: (text: string | null) => void;
+  /** Adopt: rebind talk target within current stage cast (same epoch). */
+  adoptPersona: (id: PersonaId) => boolean;
+  /** Switch: operator alias for setActivePack (hard default via pack policy). */
+  switchPack: (appId: string, reason?: string) => void;
+  /** Hire: SOP-only log — no Cursor/CLI product API. */
+  hireReplacement: (args: HireReplacementArgs) => PackContextActivityEvent | null;
+  setContextDecisionOpen: (open: boolean) => void;
+  /** True if another context decision is blocked this turn (~2.5s latch). */
+  canMakeContextDecision: () => boolean;
 };
 
 export const useVerseStore = create<VerseState>()(
@@ -271,6 +293,9 @@ export const useVerseStore = create<VerseState>()(
       activePackId: "agentverse-upgrade",
       packEpoch: 1,
       packToast: null,
+      activityEvents: [],
+      lastContextDecisionAt: null,
+      contextDecisionOpen: false,
       setAuthConfig: (c) => set({ authConfig: c }),
       setAuthenticated: (v, username = null) => set({ authenticated: v, username }),
       setAccessToken: (accessToken) => set({ accessToken }),
@@ -314,8 +339,20 @@ export const useVerseStore = create<VerseState>()(
           }),
         }));
       },
-      selectPersona: (id) => set({ selectedPersona: id, chatOpen: true }),
+      selectPersona: (id) => {
+        const pack = getPack(get().activePackId);
+        if (!isOnStage(id, pack)) {
+          set({
+            error: `${id} is not on this stage — Adopt a cast member or Switch pack.`,
+            contextDecisionOpen: true,
+          });
+          return;
+        }
+        set({ selectedPersona: id, chatOpen: true, error: null });
+      },
       summonPersona: (id) => {
+        const pack = getPack(get().activePackId);
+        if (!isOnStage(id, pack)) return;
         set({
           selectedPersona: id,
           chatOpen: true,
@@ -568,21 +605,130 @@ export const useVerseStore = create<VerseState>()(
             get().setComposeDraft(pack.composeSeed);
           }
         }
+        const talk = defaultTalkTarget(pack, state.selectedPersona);
         if (!changing) {
-          if (reason) {
+          // Re-assert: coerce talk target if somehow off-cast
+          if (!isOnStage(state.selectedPersona, pack)) {
+            set({
+              selectedPersona: talk,
+              packToast: reason
+                ? `Stage → ${appId} (${reason})`
+                : state.packToast,
+            });
+          } else if (reason) {
             set({ packToast: `Stage → ${appId} (${reason})` });
           }
           return;
         }
         const nextEpoch =
           pack.switchPolicy === "hard" ? state.packEpoch + 1 : state.packEpoch;
+        const event: PackContextActivityEvent = {
+          at: nowIstStamp(),
+          session: "agentverse-feature-branch-2026-07-15",
+          provider: "cursor",
+          role: "operator",
+          kind: "switch",
+          appId,
+          packEpoch: nextEpoch,
+          reason: reason ?? "pack-flip",
+          fleet: "3312/4312/5312",
+        };
         set({
           activePackId: appId,
           packEpoch: nextEpoch,
+          selectedPersona: talk,
           packToast: reason ? `Stage → ${appId} (${reason})` : `Stage → ${appId}`,
+          activityEvents: [...state.activityEvents.slice(-39), event],
+          lastContextDecisionAt:
+            reason === "switch" || reason?.startsWith("switch")
+              ? Date.now()
+              : state.lastContextDecisionAt,
         });
       },
       setPackToast: (packToast) => set({ packToast }),
+      canMakeContextDecision: () => {
+        const at = get().lastContextDecisionAt;
+        if (at == null) return true;
+        return Date.now() - at > 2500;
+      },
+      setContextDecisionOpen: (contextDecisionOpen) =>
+        set({ contextDecisionOpen }),
+      adoptPersona: (id) => {
+        if (!get().canMakeContextDecision()) {
+          set({ error: "One context decision per turn — wait a moment." });
+          return false;
+        }
+        const state = get();
+        const pack = getPack(state.activePackId);
+        if (!isOnStage(id, pack)) {
+          set({ error: `${id} is not on this stage.` });
+          return false;
+        }
+        const from = state.selectedPersona;
+        const event: PackContextActivityEvent = {
+          at: nowIstStamp(),
+          session: "agentverse-feature-branch-2026-07-15",
+          provider: "cursor",
+          role: "operator",
+          kind: "adopt",
+          appId: state.activePackId,
+          packEpoch: state.packEpoch,
+          personaId: id,
+          fromPersonaId: from,
+          fleet: "3312/4312/5312",
+        };
+        set({
+          selectedPersona: id,
+          chatOpen: true,
+          error: null,
+          packToast: `Adopt → ${id}`,
+          lastContextDecisionAt: Date.now(),
+          contextDecisionOpen: false,
+          activityEvents: [...state.activityEvents.slice(-39), event],
+        });
+        get().summonPersona(id);
+        return true;
+      },
+      switchPack: (appId, reason) => {
+        if (!get().canMakeContextDecision()) {
+          set({ error: "One context decision per turn — wait a moment." });
+          return;
+        }
+        set({ lastContextDecisionAt: Date.now(), contextDecisionOpen: false });
+        get().setActivePack(appId, reason ?? "switch");
+      },
+      hireReplacement: (args) => {
+        if (!get().canMakeContextDecision()) {
+          set({ error: "One context decision per turn — wait a moment." });
+          return null;
+        }
+        const state = get();
+        let epoch = state.packEpoch;
+        if (args.bumpEpoch) epoch = state.packEpoch + 1;
+        const event: PackContextActivityEvent = {
+          at: nowIstStamp(),
+          session: "agentverse-feature-branch-2026-07-15",
+          provider: "cursor",
+          role: "operator",
+          kind: "hire",
+          appId: state.activePackId,
+          packEpoch: epoch,
+          personaId: args.personaId,
+          hireNotePath: args.hireNotePath,
+          ownershipPaths: args.ownershipPaths,
+          reason: args.reason,
+          fleet: "3312/4312/5312",
+        };
+        set({
+          packEpoch: epoch,
+          packToast: `Hire logged → ${args.personaId} (SOP)`,
+          lastContextDecisionAt: Date.now(),
+          contextDecisionOpen: false,
+          activityEvents: [...state.activityEvents.slice(-39), event],
+          error: null,
+        });
+        return event;
+      },
     }),
     {
       name: "agentverse-office-v2",
@@ -604,7 +750,16 @@ export const useVerseStore = create<VerseState>()(
         joystickEnabled: s.joystickEnabled,
         cameraViewOverride: s.cameraViewOverride,
         activePackId: s.activePackId,
+        packEpoch: s.packEpoch,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        const pack = getPack(state.activePackId);
+        const talk = defaultTalkTarget(pack, state.selectedPersona);
+        if (talk !== state.selectedPersona) {
+          state.selectedPersona = talk;
+        }
+      },
     },
   ),
 );

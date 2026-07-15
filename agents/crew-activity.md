@@ -1,5 +1,18 @@
 ﻿# Crew Activity â€” AgentVerse
 
+## 2026-07-15 — W4 Vision 0.3.5 (stage truth)
+
+- Role: Vision SME
+- Cut: **0.3.5** = cast swap via `stageVisible` + Adopt / Switch / Hire (one decision/turn)
+- Doc: `agents/pre-work/waves/0.3.5/01-vision-walkthrough.md`
+- Hire: `agents/hires/2026-07-15-w4-vision-0.3.5.md`
+- Verdict: docs **GO-WITH-CHANGES**; product coding **NO-GO** until human GO + Architect
+- Fleet: 3312/4312/5312 only · no `src/` · no push
+
+| Timestamp (IST) | Role | Action | Result |
+|-----------------|------|--------|--------|
+| 2026-07-15 09:06 | vision-sme | W4 vision walkthrough + hire note + ACTIVITY-LOG | ok |
+
 ## 2026-07-15 — Rate-limit remedy (Portal + upgrade fleet)
 
 - Roles: ops + fix

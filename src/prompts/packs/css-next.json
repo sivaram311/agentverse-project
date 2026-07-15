@@ -13,7 +13,7 @@
   "playwrightOwner": "kabilan",
   "fleetPorts": { "dev": 9000, "preprod": 4910, "prod": 5910 },
   "cssClientId": "css-next",
-  "stageVisible": ["helpdesk", "rajesh", "vikram", "aravind"],
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "muthu"],
   "workerRoles": ["karthik", "deepa", "gowri", "raman"],
   "overlays": {
     "aravind": {

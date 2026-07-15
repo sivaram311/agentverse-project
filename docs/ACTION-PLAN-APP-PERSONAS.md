@@ -1,6 +1,7 @@
 # Action plan — App-stage personas + parallel off-stage workers
 
-**Status:** W0–W3 **shipped** · W6 pack matrix + App sessions **0.3.4** · Q2 PROD train  
+**Status:** W0 **Human GO 2026-07-15** · W4/`stageVisible` **0.3.5 in train** · W1–W3 shipped · W6 packs **0.3.4** live  
+
 **Date:** 2026-07-15  
 **Branch / fleet:** `feature/upgradation-functionality` · upgrade side fleet only  
 **Workspace root:** `E:\MyWorkspace` (ProdDeck: one canonical path in pack)  
@@ -94,10 +95,16 @@ Full role table lives in companion doc: [APP-PERSONA-CAST.md](./APP-PERSONA-CAST
 - [x] ACTION-PLAN + CAST + PACK-TEMPLATE + parallel hire template  
 - [x] ROADMAP P5 pointer  
 - [x] Grok review → fold (this Revision)  
-- [ ] Human GO on revised W0  
-- [ ] Decide pack key: map `src` → appId **or** optional allowlisted `app=`  
-- [ ] Cast id → MyAgent skill path table (in CAST doc)  
-- [ ] Inventory labels: rollback / experiment / candidate  
+- [x] **Human GO on revised W0** — operator **GO** 2026-07-15 09:09 (docs closeout · Gowri hire `agents/hires/2026-07-15-w0-closeout.md`)  
+- [x] Decide pack key: map `src` → appId (**LOCKED**; no `app=` fork) — stamped [DEEP-LINK-CONTRACT.md](./DEEP-LINK-CONTRACT.md); wired in `pack-loader`  
+- [x] Cast id → MyAgent skill path table (in CAST doc) — workflow faces + build cast (`karthik`/`lavanya`/`aravind`/`muthu`/`meenakshi`) · [APP-PERSONA-CAST.md](./APP-PERSONA-CAST.md)  
+- [x] Inventory labels: rollback / experiment / candidate — `agentverse` / `agentverse-v2` / `library` · [APP-SESSIONS.md](./APP-SESSIONS.md)  
+
+**Decision notes (W0 closeout):**
+- Pack key = **`src` → `appId` only**. No new `app=` query param.
+- Inventory: `agentverse` = classic **rollback** · `agentverse-v2` = **experiment** · `library` = **candidate** (labeled seed only; not default work plane).
+- Cast→skill SoT complete in APP-PERSONA-CAST.md (always-on + build + workflow faces).
+- Docs ready for operator tick; **no product code** until Human GO.
 
 **Exit:** Human GO on W0; **no** product code.
 
@@ -131,20 +138,23 @@ Full role table lives in companion doc: [APP-PERSONA-CAST.md](./APP-PERSONA-CAST
 **Exit:** Session/src/project flip packs on stage. **Candidate 0.3.3** — promote after EM GO (Lane H).
 
 ### W4 — Context adoption
-- [ ] Adopt / Hire / Switch with `packEpoch`; one decision per operator turn  
-- [ ] ACTIVITY-LOG every event  
-- [ ] No default mid-task prompt injection  
+- [x] Adopt / Hire / Switch with `packEpoch`; one decision per operator turn (`ContextDecisionOffer` · store latch)  
+- [x] ACTIVITY-LOG every event (runtime `activityEvents` buffer → Lead paste)  
+- [x] No default mid-task prompt injection  
+- [x] `stageVisible` cast swap (Hub / FlatRoster / TeamMemberBar / nearest seats) · **0.3.5**
 
 ### W5 — Parallel worker pool (ops pattern)
+- [x] Caps + dry-run hire SOP (`docs/PARALLEL-WORKER-SOP.md` · hire `2026-07-15-w5-parallel-pool-dryrun.md`) — Layer B docs only, no in-app hire API  
 - Caps: feature **2–4**; Device Lab **3 authors ∥ / 1 Playwright run**; promote EM+QA+Sec+Review ∥, Ops after GO, field-ops always; machine-wide **~3–5** concurrent Tasks  
-- Dry-run hire with ≥3 workers, no extra WebGL bodies  
+- Dry-run hire with ≥3 workers, no extra WebGL bodies
 
 ### W6 — Pilot packs then fill
 - [x] Pilots: proddeck, agentverse-upgrade, css  
 - [x] Remaining work-plane + labeled packs · Session Desk ensure ([APP-SESSIONS.md](./APP-SESSIONS.md)) · **0.3.4**  
-- [ ] Workflow faces as stage bodies (keep workers-only)  
+- [x] Workflow faces as stage bodies — **deferred** (Grok + Vision; Layer B SOP ids only)
 
 ### W7 — Gates glue
+- [x] Prep checklist only ([PROMOTE-PERSONA-TRAIN-Q1.md](./PROMOTE-PERSONA-TRAIN-Q1.md) · hire `2026-07-15-w7-gates-prep.md`) — **not authorized for Q1** until human + EM GO  
 - E2E + promote name mapping; H: evidence; deps matrix — only when train ready for EM GO.
 
 ---
