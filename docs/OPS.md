@@ -1,6 +1,6 @@
 # AgentVerse — Ops (upgradation side fleet)
 
-**Branch:** `feature/upgradation-functionality` · **Version:** **0.3.7** · Base `v0.2.2-stable`
+**Branch:** `feature/upgradation-functionality` · **Version:** **0.3.8** · Base `v0.2.2-stable`
 
 **This fleet must NOT recycle classic or v2 ports.**
 
@@ -19,9 +19,13 @@
 
 ## Auth / API
 
-- CSS: `:5900` / `https://css.delena.buzz` — bake `NEXT_PUBLIC_CSS_ISSUER=https://css.delena.buzz`
+- IdP: **css-next** `:5910` / `https://css-next.delena.buzz` (lockstep with Portal)
+  - bake `NEXT_PUBLIC_CSS_ISSUER=https://css-next.delena.buzz`
+  - runtime `CSS_AUTH_URL=http://127.0.0.1:5910` (AV BFF `/api/css` → password login)
+  - `CSS_CLIENT_ID=agent-portal` (shared with Portal — intentional)
+- Classic CSS `:5900` / `css.delena.buzz` left for other fleets — do not flip densify `agentverse` from here
 - Portal PREPROD `:4080` · PROD `:5080`
-- clientId: `agent-portal` (shared)
+- Login path: AV `LoginOverlay` → `POST /api/css/auth/login` → css-next; JWT `iss` must match bake; Portal JWKS on `:5910`
 
 ## App sessions / Portal workspace allowlist
 

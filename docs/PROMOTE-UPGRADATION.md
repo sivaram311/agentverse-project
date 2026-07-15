@@ -18,7 +18,7 @@ promote-em + qa + security + review + ops + **field-ops**
 
 ## Bake
 
-`NEXT_PUBLIC_CSS_ISSUER=https://css.delena.buzz` · `NEXT_PUBLIC_AV_ENV=PREPROD|PROD`
+`NEXT_PUBLIC_CSS_ISSUER=https://css-next.delena.buzz` · `CSS_AUTH_URL=http://127.0.0.1:5910` · `CSS_CLIENT_ID=agent-portal` · `NEXT_PUBLIC_AV_ENV=PREPROD|PROD`
 
 ## Evidence
 
