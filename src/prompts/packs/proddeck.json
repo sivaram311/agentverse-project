@@ -2,6 +2,8 @@
   "appId": "proddeck",
   "version": "0.1.0",
   "packEpoch": 1,
+  "sessionTitle": "AgentVerse · ProdDeck",
+  "workPlane": true,
   "workspacePath": "E:/wt/proddeck-integrate",
   "workspacePathAlias": "E:/MyWorkspace/sandbox/proddeck",
   "cameraPreset": "portrait",

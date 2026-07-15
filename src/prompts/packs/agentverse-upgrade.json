@@ -2,6 +2,8 @@
   "appId": "agentverse-upgrade",
   "version": "0.1.0",
   "packEpoch": 1,
+  "sessionTitle": "AgentVerse · Upgrade",
+  "workPlane": true,
   "workspacePath": "E:/MyWorkspace/agentverse-project",
   "cameraPreset": "portrait",
   "singleShot": true,

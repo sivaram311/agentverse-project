@@ -1,0 +1,30 @@
+{
+  "appId": "h-drive-server",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "sessionTitle": "AgentVerse · H-Drive",
+  "workPlane": true,
+  "workspacePath": "E:/MyWorkspace/h-drive-server",
+  "workspacePathAlias": "F:/apps/h-drive-server",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 3,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 3010, "preprod": 4010, "prod": 5010 },
+  "cssClientId": "agent-portal",
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "anand"],
+  "workerRoles": ["karthik", "deepa", "gowri", "raman"],
+  "overlays": {
+    "aravind": {
+      "role": "Node / H: Expose Coder",
+      "title": "H-Drive engineer",
+      "systemPromptAddendum": "Expose H:\\ read-only API. Honor fleetPorts 3010/4010/5010; open CORS policy as documented."
+    }
+  },
+  "composeSeed": "Work H-Drive server \u2014 honor fleetPorts 3010/4010/5010, H:\\ expose only, no secrets in git.",
+  "notes": [
+    "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
+    "https://hdrive.delena.buzz \u2192 :5010 PROD."
+  ]
+}

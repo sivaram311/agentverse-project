@@ -2,6 +2,8 @@
   "appId": "css",
   "version": "0.1.0",
   "packEpoch": 1,
+  "sessionTitle": "AgentVerse · CSS",
+  "workPlane": true,
   "workspacePath": "E:/MyWorkspace/centralized-security-system",
   "cameraPreset": "portrait",
   "singleShot": true,
@@ -27,6 +29,6 @@
   "composeSeed": "Work the classic CSS IdP on :9000/:4900/:5900 \u2014 clientId registry + JWKS clean, no secrets in git.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W2b/W3 · 0.3.3).",
-    "css-next is a separate pack later; do not replace classic."
+    "css-next is a separate pack (css-next.json); do not replace classic."
   ]
 }

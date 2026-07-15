@@ -1,8 +1,19 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { portalApi } from "@/lib/api";
-import { resolvePackIdFromWorkspace } from "@/lib/pack-loader";
+import {
+  ensureAllPlannedSessions,
+  ensureWorkPlaneSessions,
+  findSessionForPack,
+  packSessionTitle,
+} from "@/lib/app-sessions";
+import {
+  listLabeledPacks,
+  listWorkPlanePacks,
+  resolvePackIdForSession,
+  type Pack,
+} from "@/lib/pack-loader";
 import { useVerseStore } from "@/lib/store";
 import type { Session, SessionStatus } from "@/lib/types";
 import {
@@ -72,6 +83,11 @@ export function SessionDesk({
   const [createOpen, setCreateOpen] = useState(false);
   const [draftPath, setDraftPath] = useState(workspacePath);
   const [draftTitle, setDraftTitle] = useState("");
+  const [ensureNote, setEnsureNote] = useState<string | null>(null);
+  const ensuredOnOpenRef = useRef(false);
+
+  const workPlanePacks = useMemo(() => listWorkPlanePacks(), []);
+  const labeledPacks = useMemo(() => listLabeledPacks(), []);
 
   const allowlist = useMemo(() => getWorkspaceAllowlist(), []);
 
@@ -88,12 +104,54 @@ export function SessionDesk({
     }
   }, [authConfig]);
 
+  const runEnsure = useCallback(
+    async (includeLabeled = false) => {
+      if (!authConfig) return;
+      setBusy("ensure");
+      setEnsureNote(null);
+      try {
+        const result = includeLabeled
+          ? await ensureAllPlannedSessions(authConfig)
+          : await ensureWorkPlaneSessions(authConfig);
+        if (result.created.length > 0) {
+          await refresh();
+        }
+        const parts: string[] = [];
+        if (result.created.length > 0) {
+          parts.push(`Created ${result.created.length}`);
+        }
+        if (result.existing.length > 0) {
+          parts.push(`${result.existing.length} already present`);
+        }
+        if (result.errors.length > 0) {
+          parts.push(`${result.errors.length} skipped`);
+        }
+        setEnsureNote(parts.length > 0 ? parts.join(" · ") : "No packs to ensure");
+      } catch (error) {
+        reportError(error, "Failed to ensure app sessions");
+      } finally {
+        setBusy(null);
+      }
+    },
+    [authConfig, refresh],
+  );
+
   useEffect(() => {
     if (open) {
       setDraftPath(workspacePath);
       void refresh();
     }
   }, [open, refresh, workspacePath]);
+
+  useEffect(() => {
+    if (!open) {
+      ensuredOnOpenRef.current = false;
+      return;
+    }
+    if (!authConfig || ensuredOnOpenRef.current) return;
+    ensuredOnOpenRef.current = true;
+    void runEnsure(false);
+  }, [open, authConfig, runEnsure]);
 
   const visibleSessions = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -151,7 +209,7 @@ export function SessionDesk({
       store.setWorkspacePath(resolvedPath);
       store.rememberWorkspace(resolvedPath);
       store.syncQuestFromSessionStatus(latest.id, latest.status);
-      store.setActivePack(resolvePackIdFromWorkspace(resolvedPath), "session");
+      store.setActivePack(resolvePackIdForSession(latest), "session");
       store.openChat();
       onClose?.();
     } catch (error) {
@@ -231,6 +289,7 @@ export function SessionDesk({
       store.registerSessionForPath(trimmed, created.id, label);
       store.setWorkspacePath(trimmed);
       store.rememberWorkspace(trimmed);
+      store.setActivePack(resolvePackIdForSession(created), "session");
       store.openChat();
       setCreateOpen(false);
       setDraftTitle("");
@@ -241,6 +300,54 @@ export function SessionDesk({
     } finally {
       setBusy(null);
     }
+  }
+
+  async function openPackSession(pack: Pack) {
+    const existing = findSessionForPack(sessions, pack);
+    if (existing) {
+      await openSession(existing);
+      return;
+    }
+
+    setBusy(`pack:${pack.appId}`);
+    try {
+      const created = await portalApi.createSession(
+        {
+          workspacePath: pack.workspacePath,
+          title: packSessionTitle(pack),
+          provider: "cursor",
+        },
+        authConfig,
+      );
+      setSessions((prev) => [...prev.filter((s) => s.id !== created.id), created].sort(sortSessions));
+      await openSession(created);
+    } catch (error) {
+      reportError(error, `Failed to open ${packSessionTitle(pack)}`);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  function renderAppSessionChips(packs: Pack[], muted = false) {
+    return packs.map((pack) => {
+      const hasSession = Boolean(findSessionForPack(sessions, pack));
+      const packBusy = busy === `pack:${pack.appId}`;
+      return (
+        <button
+          key={pack.appId}
+          type="button"
+          className={muted ? "muted" : undefined}
+          data-testid="app-session-chip"
+          data-app-id={pack.appId}
+          onClick={() => void openPackSession(pack)}
+          disabled={busy !== null}
+          title={pack.workspacePath}
+        >
+          {packBusy ? "Opening…" : packSessionTitle(pack)}
+          {!hasSession ? " +" : ""}
+        </button>
+      );
+    });
   }
 
   if (!open || !authConfig) return null;
@@ -263,6 +370,25 @@ export function SessionDesk({
           </p>
         </div>
         <div className="session-desk-actions">
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => void runEnsure(false)}
+            disabled={busy !== null}
+            aria-label="Ensure work-plane app sessions"
+          >
+            {busy === "ensure" ? "Ensuring" : "Ensure app sessions"}
+          </button>
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => void runEnsure(true)}
+            disabled={busy !== null}
+            aria-label="Ensure work-plane and labeled app sessions"
+            title="Also seed classic, v2, and library sessions"
+          >
+            Seed labeled too
+          </button>
           <button
             type="button"
             className="ghost"
@@ -296,6 +422,20 @@ export function SessionDesk({
           ) : null}
         </div>
       </header>
+
+      <div className="session-desk-apps" aria-label="App sessions">
+        <p className="session-desk-apps-label">App sessions</p>
+        <div className="session-desk-apps-chips">{renderAppSessionChips(workPlanePacks)}</div>
+        {labeledPacks.length > 0 ? (
+          <div className="session-desk-apps-labeled">
+            <p className="session-desk-apps-label muted">Labeled</p>
+            <div className="session-desk-apps-chips muted">
+              {renderAppSessionChips(labeledPacks, true)}
+            </div>
+          </div>
+        ) : null}
+        {ensureNote ? <p className="session-desk-hint muted">{ensureNote}</p> : null}
+      </div>
 
       <div className="session-desk-search">
         <label htmlFor="session-desk-query" className="sr-only">

@@ -2169,6 +2169,34 @@ body {
   font-size: 0.68rem;
 }
 
+.session-desk-apps {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.session-desk-apps-label {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--av-muted);
+}
+
+.session-desk-apps-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.session-desk-apps-chips button {
+  font-size: 0.62rem;
+  padding: 0.3rem 0.55rem;
+}
+
+.session-desk-apps-chips button.muted,
+.session-desk-apps-labeled .session-desk-apps-label {
+  opacity: 0.82;
+}
+
 .session-desk-status-filters {
   display: flex;
   flex-wrap: wrap;

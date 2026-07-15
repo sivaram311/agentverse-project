@@ -1,0 +1,29 @@
+{
+  "appId": "agent-portal",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "sessionTitle": "AgentVerse · Agent Portal",
+  "workPlane": true,
+  "workspacePath": "E:/MyWorkspace/agent-portal",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 4,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 8080, "preprod": 4080, "prod": 5080 },
+  "cssClientId": "agent-portal",
+  "stageVisible": ["helpdesk", "rajesh", "aravind"],
+  "workerRoles": ["karthik", "nisha", "gowri", "deepa", "raman", "suresh"],
+  "overlays": {
+    "aravind": {
+      "role": "Java / Angular Coder",
+      "title": "Portal engineer",
+      "systemPromptAddendum": "Stack: Spring API + Angular UI. Honor fleetPorts 8080/4080/5080. Sessions SoT for AgentVerse desk."
+    }
+  },
+  "composeSeed": "Ship Agent Portal API or UI work \u2014 honor fleetPorts 8080/4080/5080, sessions + CSS clientId agent-portal.",
+  "notes": [
+    "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
+    "Legacy DEV :8080; migrate toward :3080 when cut over."
+  ]
+}

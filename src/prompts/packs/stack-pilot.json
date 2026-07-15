@@ -1,0 +1,35 @@
+{
+  "appId": "stack-pilot",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "sessionTitle": "AgentVerse · Stack Pilot",
+  "workPlane": true,
+  "workspacePath": "E:/Source/stack-pilot",
+  "workspacePathAlias": "F:/apps/stack-pilot",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 3,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 8091, "preprod": 4091, "prod": 5091 },
+  "cssClientId": "agent-portal",
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "anand"],
+  "workerRoles": ["karthik", "deepa", "gowri", "raman"],
+  "overlays": {
+    "aravind": {
+      "role": "Java / Control Plane Coder",
+      "title": "Stack Pilot engineer",
+      "systemPromptAddendum": "Stack control plane. Honor fleetPorts 8091/4091/5091; migrate DEV toward :3091 when cut over."
+    },
+    "anand": {
+      "role": "Ops",
+      "title": "Stack ops",
+      "systemPromptAddendum": "control.delena.buzz fleet; no port clashes with agent-portal or CSS."
+    }
+  },
+  "composeSeed": "Ship Stack Pilot control-plane work \u2014 honor fleetPorts 8091/4091/5091.",
+  "notes": [
+    "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
+    "DEV legacy :8091 live; preferred offset :3091 reserved."
+  ]
+}

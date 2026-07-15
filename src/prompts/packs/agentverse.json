@@ -1,0 +1,31 @@
+{
+  "appId": "agentverse",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "sessionTitle": "AgentVerse · Classic",
+  "workPlane": false,
+  "workspacePath": "E:/MyWorkspace/agentverse-project",
+  "workspacePathAlias": "F:/apps/agentverse",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 4,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 3310, "preprod": 4310, "prod": 5310 },
+  "cssClientId": "agent-portal",
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "meenakshi", "kabilan"],
+  "workerRoles": ["karthik", "lavanya", "nisha", "gowri", "deepa", "raman"],
+  "overlays": {
+    "aravind": {
+      "role": "Next.js / R3F Coder",
+      "title": "Classic fleet engineer",
+      "systemPromptAddendum": "Classic fleet 3310/4310/5310 only. Rollback label \u2014 do not ship new features here without EM GO."
+    }
+  },
+  "composeSeed": "Classic AgentVerse rollback fleet (3310/4310/5310) \u2014 emergency use only.",
+  "notes": [
+    "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
+    "Rollback only \u2014 labeled, not default Session Desk / Dispatch work plane.",
+    "SoT fleet is agentverse-upgrade (3312/4312/5312)."
+  ]
+}

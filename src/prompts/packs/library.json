@@ -1,0 +1,29 @@
+{
+  "appId": "library",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "sessionTitle": "AgentVerse · Library",
+  "workPlane": false,
+  "workspacePath": "E:/MyWorkspace/sandbox/library",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 3,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 3330, "preprod": 4330, "prod": 5330 },
+  "cssClientId": "agent-portal",
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "lavanya"],
+  "workerRoles": ["karthik", "nisha", "gowri", "deepa"],
+  "overlays": {
+    "aravind": {
+      "role": "Next.js PWA Coder",
+      "title": "Library engineer",
+      "systemPromptAddendum": "Phone-first Library PWA candidate. Ports reserved; not PROD-deployed yet."
+    }
+  },
+  "composeSeed": "Library PWA candidate \u2014 phone-first 360\u00d7780, honor fleetPorts 3330/4330/5330 when wired.",
+  "notes": [
+    "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
+    "Labeled only \u2014 candidate app, ports reserved, not default Session Desk work plane."
+  ]
+}

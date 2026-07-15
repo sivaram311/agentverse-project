@@ -1,0 +1,30 @@
+{
+  "appId": "agentverse-v2",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "sessionTitle": "AgentVerse · V2",
+  "workPlane": false,
+  "workspacePath": "E:/MyWorkspace/agentverse-project",
+  "workspacePathAlias": "F:/apps/agentverse-v2",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 4,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 3311, "preprod": 4311, "prod": 5311 },
+  "cssClientId": "agent-portal",
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "meenakshi", "kabilan", "muthu"],
+  "workerRoles": ["karthik", "lavanya", "nisha", "gowri", "deepa", "raman", "suresh"],
+  "overlays": {
+    "aravind": {
+      "role": "Next.js / R3F Coder",
+      "title": "V2 experiment engineer",
+      "systemPromptAddendum": "V2 side fleet 3311/4311/5311. Experiment label \u2014 not default Dispatch; never clobber upgrade 3312 or classic 3310."
+    }
+  },
+  "composeSeed": "AgentVerse V2 experiment fleet (3311/4311/5311) \u2014 isolated from upgrade and classic.",
+  "notes": [
+    "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
+    "Labeled only \u2014 experiment fleet, not default Session Desk work plane."
+  ]
+}

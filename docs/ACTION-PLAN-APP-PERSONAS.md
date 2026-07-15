@@ -1,6 +1,6 @@
 # Action plan — App-stage personas + parallel off-stage workers
 
-**Status:** W0 **HUMAN GO** 2026-07-15 · W1 **shipped 0.3.2** (chrome toggles) · **W2b/W3 in progress** → candidate **0.3.3** · Q1 PREPROD for 0.3.3 **after integrate + EM GO**  
+**Status:** W0–W3 **shipped** · W6 pack matrix + App sessions **0.3.4** · Q2 PROD train  
 **Date:** 2026-07-15  
 **Branch / fleet:** `feature/upgradation-functionality` · upgrade side fleet only  
 **Workspace root:** `E:\MyWorkspace` (ProdDeck: one canonical path in pack)  
@@ -110,9 +110,9 @@ Full role table lives in companion doc: [APP-PERSONA-CAST.md](./APP-PERSONA-CAST
 **Exit:** Operator can hide joystick + change views. **Shipped 0.3.2.**
 
 ### W2a — Pack schema + Priya catalog + hire SOP (docs/config only)
-- [ ] Schema fields: `packEpoch`/`version`, `switchPolicy` default `hard`, `fleetPorts`, `cssClientId` pointer, `hireBurstMax`, `playwrightOwner`, capped addenda (no secrets)  
-- [ ] Priya entry in personas **catalog docs** (runtime talkable = W2b)  
-- [ ] Layer B = hire-note SOP only (no in-app hire API)  
+- [x] Schema fields: `packEpoch`/`version`, `switchPolicy` default `hard`, `fleetPorts`, `cssClientId` pointer, `hireBurstMax`, `playwrightOwner`, capped addenda (no secrets) · + `sessionTitle` / `workPlane`  
+- [x] Priya entry in personas **catalog docs** (runtime talkable = W2b)  
+- [x] Layer B = hire-note SOP only (no in-app hire API)  
 
 **Exit:** Schema + templates frozen.
 
@@ -140,8 +140,9 @@ Full role table lives in companion doc: [APP-PERSONA-CAST.md](./APP-PERSONA-CAST
 - Dry-run hire with ≥3 workers, no extra WebGL bodies  
 
 ### W6 — Pilot packs then fill
-- [ ] Pilots: proddeck, agentverse-upgrade, css  
-- [ ] Then remaining matrix apps; workflow faces mostly workers-only  
+- [x] Pilots: proddeck, agentverse-upgrade, css  
+- [x] Remaining work-plane + labeled packs · Session Desk ensure ([APP-SESSIONS.md](./APP-SESSIONS.md)) · **0.3.4**  
+- [ ] Workflow faces as stage bodies (keep workers-only)  
 
 ### W7 — Gates glue
 - E2E + promote name mapping; H: evidence; deps matrix — only when train ready for EM GO.

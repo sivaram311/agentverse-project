@@ -1,0 +1,35 @@
+{
+  "appId": "css-next",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "sessionTitle": "AgentVerse · CSS Next",
+  "workPlane": true,
+  "workspacePath": "E:/MyWorkspace/centralized-security-system",
+  "workspacePathAlias": "F:/apps/css-next",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 3,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 9000, "preprod": 4910, "prod": 5910 },
+  "cssClientId": "css-next",
+  "stageVisible": ["helpdesk", "rajesh", "vikram", "aravind"],
+  "workerRoles": ["karthik", "deepa", "gowri", "raman"],
+  "overlays": {
+    "aravind": {
+      "role": "Java / OAuth SSO Coder",
+      "title": "css-next engineer",
+      "systemPromptAddendum": "OAuth side fleet on :9000/:4910/:5910. Do NOT confuse with classic CSS :4900/:5900."
+    },
+    "vikram": {
+      "role": "Promote Security",
+      "title": "css-next security",
+      "systemPromptAddendum": "OAuth clientId registry, PKCE, JWKS. No secrets in git."
+    }
+  },
+  "composeSeed": "Work the css-next OAuth side fleet on :9000/:4910/:5910 \u2014 PKCE authorize flow, clientId registry, no classic port clash.",
+  "notes": [
+    "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
+    "Separate pack from classic css; same E: tree, F: side-fleet bake."
+  ]
+}
