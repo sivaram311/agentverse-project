@@ -83,6 +83,8 @@ async function ensureSessionsForPacks(
       );
       created.push(pack.appId);
       sessions = [...sessions, session];
+      // Spread creates so Portal rate-limit windows are not burned in a burst.
+      await new Promise((r) => setTimeout(r, 350));
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "createSession failed";

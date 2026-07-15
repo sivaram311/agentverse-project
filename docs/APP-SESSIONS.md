@@ -10,9 +10,13 @@
 | **Work plane** (auto-ensure) | css · css-next · agent-portal · agentverse-upgrade · proddeck · stack-pilot · h-drive-server | `AgentVerse · CSS`, `… · CSS Next`, `… · Agent Portal`, `… · Upgrade`, `… · ProdDeck`, `… · Stack Pilot`, `… · H-Drive` |
 | **Labeled** (optional seed) | agentverse · agentverse-v2 · library | `AgentVerse · Classic`, `… · V2`, `… · Library` |
 
-Opening Session Desk (logged in) runs **ensure work-plane sessions**: create missing titles via Portal `POST /sessions` bound to each pack’s `workspacePath`. Buttons: **Ensure app sessions** · **Seed labeled too**.
+Opening Session Desk (logged in) runs **ensure work-plane sessions** at most **once per browser-tab hour** (sessionStorage debounce): create missing titles via Portal `POST /sessions` bound to each pack’s `workspacePath`. Creates are spaced **~350ms** apart. Buttons **Ensure app sessions** / **Seed labeled too** always run on demand.
 
 Chips open the matching session (or create then open) and flip the active pack (title wins over path so CSS vs CSS Next do not collide).
+
+## Portal rate-limit friendliness
+
+Chat message poll base **8s**; status poll **8s** while busy (`STREAMING` / waiting) else **20s**. Pair with Portal XFF + user-keyed rate limit (Portal OPS). Avoid opening Desk repeatedly in the same minute after a cold ensure.
 
 ## Operator note after Q2
 

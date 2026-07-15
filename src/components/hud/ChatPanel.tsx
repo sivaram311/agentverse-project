@@ -206,11 +206,23 @@ export function ChatPanel() {
       }
     };
     void pollStatus();
-    const timer = window.setInterval(() => void pollStatus(), 4000);
-
+    // Busy statuses need tighter refresh; idle/terminal can wait longer (rate-limit friendly).
+    const busy = new Set(["STREAMING", "WAITING_PERMISSION", "WAITING_PLAN"]);
+    let delay = busy.has(session.status) ? 8_000 : 20_000;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const schedule = () => {
+      timer = setTimeout(async () => {
+        await pollStatus();
+        if (cancelled) return;
+        const st = useVerseStore.getState().session?.status ?? session.status;
+        delay = busy.has(st) ? 8_000 : 20_000;
+        schedule();
+      }, delay);
+    };
+    schedule();
     return () => {
       cancelled = true;
-      window.clearInterval(timer);
+      if (timer) clearTimeout(timer);
       void connection.disconnect();
     };
   }, [session?.id, authConfig]);

@@ -1,5 +1,26 @@
 ﻿# Crew Activity â€” AgentVerse
 
+## 2026-07-15 — Rate-limit remedy (Portal + upgrade fleet)
+
+- Roles: ops + fix
+- Portal: XFF/user-keyed RateLimitFilter, JWT before RL, 180/min F/G JAR swap (still 0.1.8)
+- AV 0.3.4 hotfix: poll 8s / adaptive status, ensure spacing + Desk ≤1/hour auto-ensure
+- Live: F:4312 + G:5312 rebuilt; classic/v2 untouched
+
+| Timestamp (IST) | Role | Action | Result |
+|-----------------|------|--------|--------|
+| 2026-07-15 08:55 | ops + fix | Deploy rate-limit remedy F/G Portal + AV upgrade | ok |
+
+## 2026-07-15 — Grok feature backlog (upgrade fleet)
+
+- Roles: Meenakshi (companion) + Grok 4.5
+- Ask: features still needed on agentverse-upgrade after 0.3.4
+- Verdict: next cut **W4 Adopt/Switch/Hire + stageVisible** as **0.3.5**; Dispatch/Portal polish after stage truth
+
+| Timestamp (IST) | Role | Action | Result |
+|-----------------|------|--------|--------|
+| 2026-07-15 08:34 | Meenakshi + Grok | Recommend post-0.3.4 upgrade backlog (3312/4312/5312 only) | ok |
+
 ## 2026-07-13 — Q1 promote 0.2.2 (Session Desk) → PREPROD
 
 - Session: `agentverse-0.2.2-promote-2026-07-13`

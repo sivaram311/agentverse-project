@@ -15,7 +15,7 @@ export type RealtimeConnection = {
   disconnect: () => Promise<void>;
 };
 
-const BASE_MS = 2000;
+const BASE_MS = 8000;
 const MAX_MS = 30000;
 
 /**

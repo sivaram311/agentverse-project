@@ -41,6 +41,10 @@ NEXT_PUBLIC_WORKSPACE_ALLOWLIST=E:/MyWorkspace,E:/Source,E:/wt,F:/apps,G:/apps
 
 Do not use short labels (`AgentVerse,MyAgent`) — they reject absolute pack paths. Restart Portal after server `.env` changes; rebuild AV after allowlist changes.
 
+## Rate limit / polling (2026-07-15 hotfix on live 0.3.4)
+
+AV previously poll-hammered Portal through loopback (`127.0.0.1` shared bucket → 429). Client: message poll **8s**, status **8s/20s** adaptive, ensure spaced + Desk auto-ensure **≤1/hour**. Portal F/G: XFF/user-keyed filter + **180**/min. See [APP-SESSIONS.md](./APP-SESSIONS.md) and Portal `docs/OPS.md` § Rate limit.
+
 ## Start
 
 ```powershell

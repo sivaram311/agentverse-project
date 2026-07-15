@@ -150,6 +150,15 @@ export function SessionDesk({
     }
     if (!authConfig || ensuredOnOpenRef.current) return;
     ensuredOnOpenRef.current = true;
+    // Auto-ensure at most once per browser tab hour — avoids burning Portal rate limit on every Desk open.
+    try {
+      const key = "av-ensure-workplane-at";
+      const last = Number(sessionStorage.getItem(key) || "0");
+      if (Date.now() - last < 60 * 60 * 1000) return;
+      sessionStorage.setItem(key, String(Date.now()));
+    } catch {
+      /* private mode */
+    }
     void runEnsure(false);
   }, [open, authConfig, runEnsure]);
 
