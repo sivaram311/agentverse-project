@@ -2,7 +2,8 @@
 
 **Status:** Frozen for Upgradation 0.2.4+ · **SoT fleet = upgrade** (2026-07-15)  
 **Primary hosts:** `agentverse-upgrade.delena.buzz` · `agentverse-upgrade-staging.delena.buzz` · DEV `:3312`  
-**Legacy (still accepted):** classic `agentverse.delena.buzz` / staging / DEV `:3310` · `/?session=<id>`
+**Also live (nginx alias → upgrade ports):** `agentverse.delena.buzz` → `:5312` · `agentverse-staging.delena.buzz` → `:4312` (2026-07-15; classic densify `:5310`/`:4310` rollback-only, often stopped)  
+**Legacy ports (rollback trees, not public SoT):** classic DEV `:3310` · `/?session=<id>`
 
 ## Canonical URL
 

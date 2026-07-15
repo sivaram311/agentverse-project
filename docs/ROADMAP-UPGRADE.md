@@ -6,8 +6,8 @@
 
 | Fleet | Ports | Hosts | Role |
 |-------|-------|-------|------|
-| **Upgrade (this train)** | 3312 / **4312** / **5312** | `agentverse-upgrade-staging.delena.buzz` · `agentverse-upgrade.delena.buzz` | Operator work plane (new UX) |
-| Classic | 3310 / 4310 / 5310 | `agentverse[-staging].delena.buzz` | Rollback / peer matrix classic |
+| **Upgrade (this train)** | 3312 / **4312** / **5312** | `agentverse-upgrade[-staging].delena.buzz` **and** short `agentverse[-staging].delena.buzz` (nginx → upgrade since 2026-07-15) | Operator work plane / Dispatch SoT |
+| Classic | 3310 / 4310 / 5310 | densify trees only (F/G:\apps\agentverse) — **no longer** short public hostname SoT | Rollback peer |
 | stable-v2 | 3311 / 4311 / 5311 | `agentverse-v2[-staging].delena.buzz` | Industrial experiment — not Dispatch target |
 
 Do **not** recycle classic/v2 ports for this train.
@@ -45,7 +45,7 @@ Evidence: `H:\releases\agentverse-upgrade-0.3.1\`
 | You opened… | Fleet |
 |-------------|--------|
 | `https://agentverse-upgrade.delena.buzz` or `…-staging…` | **NEW (upgrade)** |
-| `https://agentverse.delena.buzz` or `agentverse-staging…` | Classic |
+| `https://agentverse.delena.buzz` or `agentverse-staging…` | **Upgrade via nginx alias** (→ `:5312` / `:4312` since 2026-07-15). Classic densify ports are rollback-only. |
 | `https://agentverse-v2.delena.buzz` or `…-v2-staging…` | v2 industrial |
 
 ### 2. Health JSON

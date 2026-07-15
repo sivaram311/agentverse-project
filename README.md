@@ -48,8 +48,10 @@ npm run dev:stack
 
 Open `http://127.0.0.1:3310`.
 
-PREPROD: https://agentverse-staging.delena.buzz (`F:\apps\agentverse` :4310).  
-PROD: https://agentverse.delena.buzz (`G:\apps\agentverse` :5310).
+PREPROD short host: https://agentverse-staging.delena.buzz → nginx **`:4312`** (upgrade).  
+PROD short host: https://agentverse.delena.buzz → nginx **`:5312`** (upgrade).  
+Named upgrade hosts: https://agentverse-upgrade[-staging].delena.buzz (`F/G:\apps\agentverse-upgrade`).  
+Classic densify trees remain on `:4310`/`:5310` for rollback only (often stopped).
 
 ## Docs
 
