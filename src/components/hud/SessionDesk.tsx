@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { portalApi } from "@/lib/api";
+import { resolvePackIdFromWorkspace } from "@/lib/pack-loader";
 import { useVerseStore } from "@/lib/store";
 import type { Session, SessionStatus } from "@/lib/types";
 import {
@@ -150,6 +151,7 @@ export function SessionDesk({
       store.setWorkspacePath(resolvedPath);
       store.rememberWorkspace(resolvedPath);
       store.syncQuestFromSessionStatus(latest.id, latest.status);
+      store.setActivePack(resolvePackIdFromWorkspace(resolvedPath), "session");
       store.openChat();
       onClose?.();
     } catch (error) {

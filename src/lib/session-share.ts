@@ -15,6 +15,7 @@ const PERSONA_IDS = new Set<PersonaId>([
   "meenakshi",
   "muthu",
   "kabilan",
+  "helpdesk",
 ]);
 
 /** Hosts allowed for deep-link `return` (open-redirect guard). */

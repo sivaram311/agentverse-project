@@ -9,6 +9,7 @@ import {
   projectColor,
 } from "./orchestrator";
 import { resolveProjectWorkspacePath } from "./project-workspace";
+import { getPack, resolvePackIdFromWorkspace } from "./pack-loader";
 import type {
   AgentRuntimeState,
   AuthConfig,
@@ -68,6 +69,7 @@ const HUB_PROJECT: OfficeProject = {
     "meenakshi",
     "muthu",
     "kabilan",
+    "helpdesk",
   ],
   createdAt: 0,
   workspacePath: DEFAULT_WORKSPACE,
@@ -82,6 +84,7 @@ function defaultAgentStates(): Record<PersonaId, AgentRuntimeState> {
     "meenakshi",
     "muthu",
     "kabilan",
+    "helpdesk",
   ];
   return Object.fromEntries(
     ids.map((id) => [
@@ -154,6 +157,12 @@ type VerseState = {
   joystickEnabled: boolean;
   /** Manual camera view — null = auto from resolveViewMode on resize */
   cameraViewOverride: ViewMode | null;
+  /** Active per-app persona/camera pack — see src/lib/pack-loader.ts */
+  activePackId: string;
+  /** Bumped on hard pack switches; Layer B workers retire on epoch change */
+  packEpoch: number;
+  /** Brief "Stage → appId" toast on pack switch — UI clears after a timeout */
+  packToast: string | null;
   setAuthConfig: (c: AuthConfig | null) => void;
   setAuthenticated: (v: boolean, username?: string | null) => void;
   setAccessToken: (token: string | null) => void;
@@ -209,6 +218,8 @@ type VerseState = {
   toggleJoystickEnabled: () => void;
   setCameraViewOverride: (mode: ViewMode | null) => void;
   cycleCameraView: () => void;
+  setActivePack: (appId: string, reason?: string) => void;
+  setPackToast: (text: string | null) => void;
 };
 
 export const useVerseStore = create<VerseState>()(
@@ -257,6 +268,9 @@ export const useVerseStore = create<VerseState>()(
       playerMoveInput: { x: 0, z: 0 },
       joystickEnabled: true,
       cameraViewOverride: null,
+      activePackId: "agentverse-upgrade",
+      packEpoch: 1,
+      packToast: null,
       setAuthConfig: (c) => set({ authConfig: c }),
       setAuthenticated: (v, username = null) => set({ authenticated: v, username }),
       setAccessToken: (accessToken) => set({ accessToken }),
@@ -372,6 +386,7 @@ export const useVerseStore = create<VerseState>()(
           const path = project.workspacePath;
           set({ activeProjectId: id, workspacePath: path });
           get().rememberWorkspace(path);
+          get().setActivePack(resolvePackIdFromWorkspace(path), "project");
           return;
         }
         set({ activeProjectId: id });
@@ -533,6 +548,41 @@ export const useVerseStore = create<VerseState>()(
           const next = CAMERA_VIEW_CYCLE[(i + 1) % CAMERA_VIEW_CYCLE.length];
           return { cameraViewOverride: next };
         }),
+      setActivePack: (appId, reason) => {
+        const pack = getPack(appId);
+        if (!pack) return; // unknown appId — keep current stage, no-op
+        const state = get();
+        const changing = state.activePackId !== appId;
+        const preset = pack.cameraPreset;
+        const viewMode: ViewMode | null =
+          preset === "portrait" ||
+          preset === "portrait-compact" ||
+          preset === "landscape" ||
+          preset === "landscape-compact"
+            ? preset
+            : null;
+        get().setCameraViewOverride(viewMode);
+        if (pack.composeSeed) {
+          const hardSwitch = pack.switchPolicy === "hard" && changing;
+          if (!state.composeDraft || hardSwitch) {
+            get().setComposeDraft(pack.composeSeed);
+          }
+        }
+        if (!changing) {
+          if (reason) {
+            set({ packToast: `Stage → ${appId} (${reason})` });
+          }
+          return;
+        }
+        const nextEpoch =
+          pack.switchPolicy === "hard" ? state.packEpoch + 1 : state.packEpoch;
+        set({
+          activePackId: appId,
+          packEpoch: nextEpoch,
+          packToast: reason ? `Stage → ${appId} (${reason})` : `Stage → ${appId}`,
+        });
+      },
+      setPackToast: (packToast) => set({ packToast }),
     }),
     {
       name: "agentverse-office-v2",
@@ -553,6 +603,7 @@ export const useVerseStore = create<VerseState>()(
         officeMood: s.officeMood,
         joystickEnabled: s.joystickEnabled,
         cameraViewOverride: s.cameraViewOverride,
+        activePackId: s.activePackId,
       }),
     },
   ),

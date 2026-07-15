@@ -1,12 +1,12 @@
 # Action plan — App-stage personas + parallel off-stage workers
 
-**Status:** W0 **HUMAN GO** 2026-07-15 · W1 **landed** (chrome toggles) · Q1 PREPROD **plan only** until EM GO  
+**Status:** W0 **HUMAN GO** 2026-07-15 · W1 **shipped 0.3.2** (chrome toggles) · **W2b/W3 in progress** → candidate **0.3.3** · Q1 PREPROD for 0.3.3 **after integrate + EM GO**  
 **Date:** 2026-07-15  
 **Branch / fleet:** `feature/upgradation-functionality` · upgrade side fleet only  
 **Workspace root:** `E:\MyWorkspace` (ProdDeck: one canonical path in pack)  
 **SoT rules:** `E:\MyAgent\workflow\CONSCIOUS.md` (#14–18) · promote / E2E / ACTIVITY-LOG  
 
-**Locked:** `src`→appId · hard switch + packEpoch · Layer B = hire SOP · pilots proddeck / agentverse-upgrade / css · candidate **0.3.2** for Q1  
+**Locked:** `src`→appId · hard switch + packEpoch · Layer B = hire SOP · pilots proddeck / agentverse-upgrade / css · **0.3.2** shipped · **0.3.3** = W2b/W3 train  
 
 **User confirmations already in force:**
 - Chrome toggles (joystick + camera views) first  
@@ -102,12 +102,12 @@ Full role table lives in companion doc: [APP-PERSONA-CAST.md](./APP-PERSONA-CAST
 **Exit:** Human GO on W0; **no** product code.
 
 ### W1 — Operator chrome toggles (after W0 GO only)
-- [ ] Pref: show/hide joystick  
-- [ ] Pref: enable/cycle camera view modes  
-- [ ] Persist on upgrade fleet  
-- [ ] Realme E2E: claim Playwright slot (#15); baseURL upgrade DEV/staging only (#18 if login); assert toggles  
+- [x] Pref: show/hide joystick  
+- [x] Pref: enable/cycle camera view modes  
+- [x] Persist on upgrade fleet  
+- [x] Realme E2E: claim Playwright slot (#15); baseURL upgrade DEV/staging only (#18 if login); assert toggles  
 
-**Exit:** Operator can hide joystick + change views.
+**Exit:** Operator can hide joystick + change views. **Shipped 0.3.2.**
 
 ### W2a — Pack schema + Priya catalog + hire SOP (docs/config only)
 - [ ] Schema fields: `packEpoch`/`version`, `switchPolicy` default `hard`, `fleetPorts`, `cssClientId` pointer, `hireBurstMax`, `playwrightOwner`, capped addenda (no secrets)  
@@ -117,13 +117,18 @@ Full role table lives in companion doc: [APP-PERSONA-CAST.md](./APP-PERSONA-CAST
 **Exit:** Schema + templates frozen.
 
 ### W2b — Runtime pack load + Priya talkable (upgrade branch)
-- [ ] Load packs by appId; Priya on stage  
-- [ ] After W1 or with W3  
+- [x] Load packs by appId (`src/lib/pack-loader.ts` · pilot JSON under `src/prompts/packs/`)  
+- [x] Priya on stage (`personas.json` id `helpdesk` · Lane A)  
+
+**Exit:** Pack loader + Help Desk seated. **In train toward 0.3.3** — see [hire note](../agents/hires/2026-07-15-w2b-w3-helpdesk-packs.md).
 
 ### W3 — Session flip (stage)
-- [ ] Binding per W0 deep-link decision  
-- [ ] Camera + overlays; toast stage name  
-- [ ] Default **hard** switch  
+- [x] Binding per W0 deep-link decision (SessionDesk · ProjectSwitcher · desk boot → `setActivePack` — Lane C)  
+- [x] Camera + overlays (`setActivePack` → `cameraPreset`; `orchestrator.applyPackOverlay` — Lane B/E)  
+- [x] Toast stage name (`packToast` + `data-testid="pack-toast"` — Lane C)  
+- [x] Default **hard** switch (`packEpoch` bump on `switchPolicy: hard`)  
+
+**Exit:** Session/src/project flip packs on stage. **Candidate 0.3.3** — promote after EM GO (Lane H).
 
 ### W4 — Context adoption
 - [ ] Adopt / Hire / Switch with `packEpoch`; one decision per operator turn  

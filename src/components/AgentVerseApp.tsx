@@ -19,6 +19,7 @@ import {
   resolveCrewPersona,
   sanitizeReturnUrl,
 } from "@/lib/session-share";
+import { resolvePackIdFromSrc } from "@/lib/pack-loader";
 import { useVerseStore } from "@/lib/store";
 
 const HubScene = dynamic(
@@ -56,12 +57,18 @@ function applyDeepLinkAfterAuth() {
   if (deep.intent === "session-desk" || deep.intent === "hire") {
     store.requestSessionDesk();
   }
+
+  store.setActivePack(
+    resolvePackIdFromSrc(deep.src),
+    deep.src ? `src=${deep.src}` : "boot",
+  );
 }
 
 export function AgentVerseApp() {
   const authConfig = useVerseStore((s) => s.authConfig);
   const authenticated = useVerseStore((s) => s.authenticated);
   const error = useVerseStore((s) => s.error);
+  const packToast = useVerseStore((s) => s.packToast);
   const subtitle = useVerseStore((s) => s.subtitle);
   const focusId = useVerseStore((s) => s.interaction.focusId);
   const interactionMode = useVerseStore((s) => s.interaction.mode);
@@ -155,6 +162,14 @@ export function AgentVerseApp() {
   }, [sessionDeskRequestNonce]);
 
   useEffect(() => {
+    if (!packToast) return;
+    const t = window.setTimeout(() => {
+      useVerseStore.getState().setPackToast(null);
+    }, 2800);
+    return () => window.clearTimeout(t);
+  }, [packToast]);
+
+  useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key !== "agentverse-verse" || !e.newValue) return;
       try {
@@ -245,6 +260,11 @@ export function AgentVerseApp() {
           <button type="button" onClick={() => useVerseStore.getState().setError(null)}>
             Dismiss
           </button>
+        </div>
+      ) : null}
+      {packToast && !showLogin ? (
+        <div className="toast" role="status" data-testid="pack-toast">
+          {packToast}
         </div>
       ) : null}
       {showLogin ? <LoginOverlay /> : null}

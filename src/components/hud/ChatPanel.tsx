@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ApiError, portalApi } from "@/lib/api";
 import { clearTokens, getAccessToken } from "@/lib/auth";
+import { getPack } from "@/lib/pack-loader";
 import {
   getPersona,
   makeQuest,
@@ -129,12 +130,17 @@ export function ChatPanel() {
   const chatFocusNonce = useVerseStore((s) => s.chatFocusNonce);
   const activeProjectId = useVerseStore((s) => s.activeProjectId);
   const returnUrl = useVerseStore((s) => s.returnUrl);
+  const activePackId = useVerseStore((s) => s.activePackId);
   const [text, setText] = useState("");
   const [pendingPerms, setPendingPerms] = useState<PermissionDto[]>([]);
   const [permBusy, setPermBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const persona = useMemo(() => getPersona(selectedPersona), [selectedPersona]);
+  const pack = getPack(activePackId);
+  const persona = useMemo(
+    () => getPersona(selectedPersona, pack),
+    [selectedPersona, activePackId],
+  );
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -401,7 +407,7 @@ export function ChatPanel() {
       store.addQuest(quest);
       store.selectPersona(routed.assignee);
       if (!routed.projectIdea) {
-        store.setStreamingHint(`${getPersona(routed.assignee).name} is on it…`);
+        store.setStreamingHint(`${getPersona(routed.assignee, pack).name} is on it…`);
       }
 
       try {

@@ -9,6 +9,7 @@
 | `meenakshi` | Meenakshi | Companion | (prompt in personas.json) |
 | `muthu` | Muthu | Project Manager | `muthu-project-manager.md` |
 | `kabilan` | Kabilan | Device Lab QA | `kabilan-device-lab-qa.md` |
+| `helpdesk` | Priya | Help Desk / Generalist | `docs/PRIYA-HELPDESK.md` |
 
 **Legacy:** `kabir-device-lab-qa.md` redirects to Kabilan.
 

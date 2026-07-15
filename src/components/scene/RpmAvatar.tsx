@@ -179,4 +179,5 @@ useGLTF.preload("/avatars/aravind.glb");
 useGLTF.preload("/avatars/meenakshi.glb");
 useGLTF.preload("/avatars/muthu.glb");
 useGLTF.preload("/avatars/kabilan.glb");
+useGLTF.preload("/avatars/helpdesk.glb");
 useGLTF.preload("/avatars/player.glb");

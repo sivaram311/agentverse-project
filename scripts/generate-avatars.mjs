@@ -65,6 +65,7 @@ const VARIANTS = [
   { file: "meenakshi.glb", gender: "female", skin: "#E8B896", hair: "#4A2C1A", shirt: "#3a2840", accent: "#FF6BCB", pants: "#2a2430" },
   { file: "muthu.glb", gender: "male", skin: "#D2A07A", hair: "#1C1410", shirt: "#2a3020", accent: "#C4A35A", pants: "#1a2030" },
   { file: "kabilan.glb", gender: "male", skin: "#C48A62", hair: "#1A120C", shirt: "#203040", accent: "#7EB0FF", pants: "#1a2030" },
+  { file: "helpdesk.glb", gender: "female", skin: "#DCAE85", hair: "#3A2317", shirt: "#204540", accent: "#2A9D8F", pants: "#2a2430" },
 ];
 
 function mat(color, opts = {}) {

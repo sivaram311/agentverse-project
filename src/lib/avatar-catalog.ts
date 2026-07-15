@@ -27,6 +27,7 @@ export const AVATAR_BY_PERSONA: Record<PersonaId, AvatarDef> = {
   meenakshi: { url: "/avatars/meenakshi.glb", gender: "female" },
   muthu: { url: "/avatars/muthu.glb", gender: "male" },
   kabilan: { url: "/avatars/kabilan.glb", gender: "male" },
+  helpdesk: { url: "/avatars/helpdesk.glb", gender: "female" },
 };
 
 /** Controllable logged-in visitor on the office floor. */

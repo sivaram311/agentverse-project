@@ -24,8 +24,9 @@
       "systemPromptAddendum": "Generalist router for AgentVerse upgrade office. No promote GO authority."
     }
   },
+  "composeSeed": "Build on the AgentVerse upgrade fleet (3312/4312/5312) \u2014 never touch classic 3310 or v2 3311.",
   "notes": [
-    "Status: DRAFT config stub — not wired in runtime (W2a).",
+    "Status: WIRED in runtime via pack-loader (W2b/W3 · 0.3.3).",
     "Dispatch SoT peer for ProdDeck Home."
   ]
 }

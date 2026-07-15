@@ -1,5 +1,6 @@
 "use client";
 
+import { getPack } from "@/lib/pack-loader";
 import { getPersona } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
 
@@ -13,7 +14,9 @@ export function CommsDock() {
   const streamingHint = useVerseStore((s) => s.streamingHint);
   const openChat = useVerseStore((s) => s.openChat);
   const bumpChatFocus = useVerseStore((s) => s.bumpChatFocus);
-  const persona = getPersona(selected);
+  const activePackId = useVerseStore((s) => s.activePackId);
+  const pack = getPack(activePackId);
+  const persona = getPersona(selected, pack);
 
   return (
     <button

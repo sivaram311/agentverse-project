@@ -1,8 +1,8 @@
 # Pack template — per appId (schema sketch)
 
-**Status:** DRAFT · not wired in code yet  
-**Path (planned):** `src/prompts/packs/<appId>.json`  
-**Loaded by:** session / deep-link / project map → overlay onto cast ids
+**Status:** **WIRED in runtime** (W2b) via [`src/lib/pack-loader.ts`](../src/lib/pack-loader.ts) — pilot packs: `proddeck` · `agentverse-upgrade` · `css`  
+**Path:** `src/prompts/packs/<appId>.json`  
+**Loaded by:** `getPack(appId)` · deep-link `src` → `resolvePackIdFromSrc` · Session Desk / project switch → `setActivePack` (W3 bindings)
 
 ```json
 {
@@ -25,8 +25,11 @@
       "title": "ProdDeck engineer",
       "systemPromptAddendum": "Stack: Next.js ProdDeck. Honor fleetPorts. Dispatch → agentverse-upgrade only."
     }
-  }
+  },
+  "composeSeed": "One-line seed for the compose box when this pack becomes active (optional)."
 }
 ```
+
+**`composeSeed`** — short operator hint applied when the pack lands (deep-link / session flip); not a second Portal session. Merged with hire `brief` when both present (brief wins for incident strip).
 
 Forbidden in packs: secrets, unbounded prompt dumps. Cap addenda.

@@ -18,6 +18,7 @@ export function StageControls() {
   const joystickEnabled = useVerseStore((s) => s.joystickEnabled);
   const toggleJoystick = useVerseStore((s) => s.toggleJoystickEnabled);
   const cameraViewOverride = useVerseStore((s) => s.cameraViewOverride);
+  const activePackId = useVerseStore((s) => s.activePackId);
   const cycleCamera = useVerseStore((s) => s.cycleCameraView);
 
   const viewLabel = cameraViewOverride ? VIEW_LABELS[cameraViewOverride] : "Auto";
@@ -37,7 +38,7 @@ export function StageControls() {
         type="button"
         className="stage-chip"
         onClick={cycleCamera}
-        title="Cycle camera view"
+        title={`Cycle camera view · pack: ${activePackId}`}
       >
         View: {viewLabel}
       </button>

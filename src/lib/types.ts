@@ -68,7 +68,8 @@ export type PersonaId =
   | "aravind"
   | "meenakshi"
   | "muthu"
-  | "kabilan";
+  | "kabilan"
+  | "helpdesk";
 
 export type UiLanguage = "ta" | "hi" | "en";
 

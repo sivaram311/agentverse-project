@@ -1,20 +1,46 @@
 {
   "version": 1,
   "note": "RPM-style office avatars (Mixamo bone names + SitIdle/Typing/Walk/Greet/StandIdle)",
-  "scale": 0.78,
-  "animations": ["SitIdle", "Typing", "Walk", "Greet", "StandIdle"],
+  "scale": 0.55,
+  "animations": [
+    "SitIdle",
+    "Typing",
+    "Walk",
+    "Greet",
+    "StandIdle"
+  ],
   "personas": {
-    "rajesh": { "file": "/avatars/rajesh.glb", "gender": "male" },
-    "karthik": { "file": "/avatars/karthik.glb", "gender": "male" },
-    "lavanya": { "file": "/avatars/lavanya.glb", "gender": "female" },
-    "aravind": { "file": "/avatars/aravind.glb", "gender": "male" },
-    "meenakshi": { "file": "/avatars/meenakshi.glb", "gender": "female" },
-    "muthu": { "file": "/avatars/muthu.glb", "gender": "male" },
-    "kabilan": { "file": "/avatars/kabilan.glb", "gender": "male" }
-  },
-  "player": {
-    "file": "/avatars/player.glb",
-    "gender": "male",
-    "note": "Logged-in visitor — replace this GLB to customize appearance"
+    "rajesh": {
+      "file": "/avatars/rajesh.glb",
+      "gender": "male"
+    },
+    "karthik": {
+      "file": "/avatars/karthik.glb",
+      "gender": "male"
+    },
+    "lavanya": {
+      "file": "/avatars/lavanya.glb",
+      "gender": "female"
+    },
+    "aravind": {
+      "file": "/avatars/aravind.glb",
+      "gender": "male"
+    },
+    "meenakshi": {
+      "file": "/avatars/meenakshi.glb",
+      "gender": "female"
+    },
+    "muthu": {
+      "file": "/avatars/muthu.glb",
+      "gender": "male"
+    },
+    "kabilan": {
+      "file": "/avatars/kabilan.glb",
+      "gender": "male"
+    },
+    "helpdesk": {
+      "file": "/avatars/helpdesk.glb",
+      "gender": "female"
+    }
   }
 }

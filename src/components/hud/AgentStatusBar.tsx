@@ -1,5 +1,6 @@
 "use client";
 
+import { getPack } from "@/lib/pack-loader";
 import { getPersona, orchestratorId } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
 
@@ -11,7 +12,9 @@ export function AgentStatusBar() {
   const quests = useVerseStore((s) => s.quests);
   const interaction = useVerseStore((s) => s.interaction);
   const agentState = useVerseStore((s) => s.agentStates[selected]);
-  const persona = getPersona(selected);
+  const activePackId = useVerseStore((s) => s.activePackId);
+  const pack = getPack(activePackId);
+  const persona = getPersona(selected, pack);
 
   const activeTasks = quests.filter(
     (q) => q.status === "active" || q.status === "open",

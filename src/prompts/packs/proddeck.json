@@ -20,8 +20,9 @@
       "systemPromptAddendum": "Stack: Next.js ProdDeck. Honor fleetPorts. Dispatch \u2192 agentverse-upgrade only."
     }
   },
+  "composeSeed": "Ship a ProdDeck Cloud OS feature \u2014 honor fleetPorts 3320/4320/5320, dispatch to agentverse-upgrade only.",
   "notes": [
-    "Status: DRAFT config stub \u2014 not wired in runtime code yet (W2a docs/config only).",
+    "Status: WIRED in runtime via pack-loader (W2b/W3 · 0.3.3).",
     "Canonical workspace path is E:/wt/proddeck-integrate; workspacePathAlias is a known second location \u2014 do not treat as a second SoT."
   ]
 }

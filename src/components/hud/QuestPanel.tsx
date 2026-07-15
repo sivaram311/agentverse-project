@@ -1,5 +1,6 @@
 "use client";
 
+import { getPack } from "@/lib/pack-loader";
 import { getPersona } from "@/lib/orchestrator";
 import { useVerseStore } from "@/lib/store";
 import { portalApi } from "@/lib/api";
@@ -10,6 +11,8 @@ export function QuestPanel() {
   const projects = useVerseStore((s) => s.projects);
   const authConfig = useVerseStore((s) => s.authConfig);
   const sessionTabs = useVerseStore((s) => s.sessionTabs);
+  const activePackId = useVerseStore((s) => s.activePackId);
+  const pack = getPack(activePackId);
 
   async function focusQuest(
     assignee: Parameters<typeof selectPersona>[0],
@@ -47,7 +50,7 @@ export function QuestPanel() {
           <li className="muted">No active missions yet.</li>
         ) : (
           quests.map((q) => {
-            const agent = getPersona(q.assignee);
+            const agent = getPersona(q.assignee, pack);
             const project = projects.find((p) => p.id === q.projectId);
             return (
               <li key={q.id}>

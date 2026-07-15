@@ -1,6 +1,7 @@
 import personasDoc from "@/prompts/personas.json";
 import type { PersonaId, Quest, UiLanguage } from "./types";
 import { hexSeatPosition } from "./hex-office";
+import type { Pack } from "./pack-loader";
 
 export type PersonaDef = (typeof personasDoc.personas)[number] & {
   id: PersonaId;
@@ -24,10 +25,30 @@ export const personas = (personasDoc.personas as PersonaDef[]).map((p) => {
 });
 export const orchestratorId = personasDoc.orchestratorId as PersonaId;
 
-export function getPersona(id: PersonaId): PersonaDef {
+/** Merge a pack's overlay for this persona: role/title swap + addendum appended to systemPrompt. */
+export function applyPackOverlay(persona: PersonaDef, pack?: Pack | null): PersonaDef {
+  const overlay = pack?.overlays[persona.id];
+  if (!overlay) return persona;
+  return {
+    ...persona,
+    role: overlay.role ?? persona.role,
+    title: overlay.title ?? persona.title,
+    systemPrompt: overlay.systemPromptAddendum
+      ? `${persona.systemPrompt}\n\n${overlay.systemPromptAddendum}`
+      : persona.systemPrompt,
+  };
+}
+
+/**
+ * Base persona lookup, optionally overlaid by an active pack.
+ * Kept pack-agnostic by default (no store import here — avoids a
+ * store.ts <-> orchestrator.ts circular import). Callers that know the
+ * active pack (e.g. store.ts, UI) pass it explicitly.
+ */
+export function getPersona(id: PersonaId, pack?: Pack | null): PersonaDef {
   const p = personas.find((x) => x.id === id);
   if (!p) throw new Error(`Unknown persona ${id}`);
-  return p;
+  return pack ? applyPackOverlay(p, pack) : p;
 }
 
 /** Pick greeting for current UI language (Tamil default). */

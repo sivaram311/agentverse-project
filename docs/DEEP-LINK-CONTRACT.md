@@ -12,7 +12,7 @@ https://agentverse-upgrade[-staging].delena.buzz/desk?src=&crew=&session=&intent
 
 | Param | Meaning |
 |-------|---------|
-| `src` | Caller id (e.g. `proddeck`) |
+| `src` | Caller id — resolved to pack **`appId`** after auth (see table below) |
 | `crew` | Persona id: `rajesh` … `kabilan` |
 | `session` | Portal session UUID |
 | `intent` | `session-desk` \| `hire` |
@@ -36,13 +36,31 @@ https://agentverse-upgrade[-staging].delena.buzz/desk?src=&crew=&session=&intent
 
 Others → ignored.
 
+## `src` → pack `appId` (W2b SoT)
+
+Runtime resolver: `src/lib/pack-loader.ts` (`SRC_TO_APPID` · `resolvePackIdFromSrc`).
+
+| `src` param | Pack `appId` | Notes |
+|-------------|--------------|-------|
+| `proddeck` | `proddeck` | ProdDeck Cloud OS dispatch |
+| `home` | `proddeck` | Home / Watch caller alias |
+| `agentverse-upgrade` | `agentverse-upgrade` | This fleet (3312/4312/5312) |
+| `agentverse` | `agentverse-upgrade` | Classic label → upgrade pack (no classic port work) |
+| `css` | `css` | CSS IdP pilot |
+| `css-next` | `css` | CSS side-fleet alias |
+| *(missing / unknown)* | `agentverse-upgrade` | **DEFAULT** — safe fallback |
+
+Pilot packs only until W6 fills the matrix. Pack schema: [PACK-TEMPLATE.md](./PACK-TEMPLATE.md).
+
 ## Behavior
 
 1. After CSS auth, AV parses query.
-2. `intent=session-desk` → open Session Desk.
-3. `intent=hire` → select crew, open chat, seed compose from brief.
-4. Brief → Incident strip (dismissible) + compose prefills `Investigate: …`.
-5. `src=proddeck` → Incident strip banner **“ProdDeck dispatch params received”** even if `brief` empty (chat opens so strip is visible).
-6. Safe `return` → “Back to Home” in chat/TopBar/IncidentStrip.
+2. **`src`** → resolve pack `appId` → **`setActivePack(appId, reason)`** — applies camera preset, bumps `packEpoch` on hard switch, sets stage toast; optional **`composeSeed`** from active pack prefills compose when bindings land (W3 Lane C).
+3. **`crew`** — persona id for Talk target (e.g. `rajesh` … `kabilan`, or **`helpdesk`** for Priya). Informational at parse time; hire intent may default crew to Help Desk.
+4. `intent=session-desk` → open Session Desk.
+5. `intent=hire` → select crew, open chat, seed compose from brief.
+6. Brief → Incident strip (dismissible) + compose prefills `Investigate: …`.
+7. `src=proddeck` → Incident strip banner **“ProdDeck dispatch params received”** even if `brief` empty (chat opens so strip is visible).
+8. Safe `return` → “Back to Home” in chat/TopBar/IncidentStrip.
 
 **ProdDeck Dispatch SoT:** upgrade hosts (not classic). See ProdDeck `docs/SUPPORTED-VERSIONS.md`.
