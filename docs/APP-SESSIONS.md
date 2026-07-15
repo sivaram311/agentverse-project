@@ -26,5 +26,9 @@ Prod Portal must include absolute work-plane roots or create fails with `workspa
 
 `AGENT_WORKSPACE_ALLOWED_ROOTS=E:\MyWorkspace,E:\Source,E:\wt,F:\apps,G:\apps`
 
-Set on `G:\apps\agent-portal\.env` (and F for staging). Restart Portal `:5080` / `:4080` after change.
+`NEXT_PUBLIC_WORKSPACE_ALLOWLIST` (client) and Portal `AGENT_WORKSPACE_ALLOWED_ROOTS` must agree:
+
+`E:/MyWorkspace,E:/Source,E:/wt,F:/apps,G:/apps`
+
+Do **not** use short labels like `AgentVerse,MyAgent` — those reject absolute pack paths (e.g. `E:/MyWorkspace/agentverse-project`). Bake allowlist at **build** time; then restart Portal after server `.env` changes.
 

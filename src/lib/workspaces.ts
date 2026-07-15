@@ -22,12 +22,25 @@ export function isWorkspaceAllowed(path: string): boolean {
   const allowlist = getWorkspaceAllowlist();
   if (!allowlist) return true;
 
-  const normalizedPath = normalizeWorkspacePath(path);
+  const normalizedPath = normalizeWorkspacePath(path).toLowerCase();
 
-  return allowlist.some((allowedPath) => (
-    normalizedPath === normalizeWorkspacePath(allowedPath) ||
-    normalizedPath.startsWith(`${normalizeWorkspacePath(allowedPath)}/`)
-  ));
+  return allowlist.some((allowedPath) => {
+    const allowed = normalizeWorkspacePath(allowedPath).toLowerCase();
+    if (!allowed) return false;
+    // Absolute / prefix roots (e.g. E:/MyWorkspace/…)
+    if (
+      normalizedPath === allowed ||
+      normalizedPath.startsWith(`${allowed}/`)
+    ) {
+      return true;
+    }
+    // Legacy short labels (e.g. "demo") — path equals or has that segment
+    if (!allowed.includes("/") && !allowed.includes(":")) {
+      const segments = normalizedPath.split("/").filter(Boolean);
+      return segments.includes(allowed) || normalizedPath === allowed;
+    }
+    return false;
+  });
 }
 
 export function shortWorkspaceLabel(path: string): string {
