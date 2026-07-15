@@ -1,6 +1,6 @@
 # AgentVerse — Ops (upgradation side fleet)
 
-**Branch:** `feature/upgradation-functionality` · **Version:** **0.3.1** · Base `v0.2.2-stable`
+**Branch:** `feature/upgradation-functionality` · **Version:** **0.3.4** · Base `v0.2.2-stable`
 
 **This fleet must NOT recycle classic or v2 ports.**
 
@@ -22,6 +22,18 @@
 - CSS: `:5900` / `https://css.delena.buzz` — bake `NEXT_PUBLIC_CSS_ISSUER=https://css.delena.buzz`
 - Portal PREPROD `:4080` · PROD `:5080`
 - clientId: `agent-portal` (shared)
+
+## App sessions / Portal workspace allowlist
+
+Session Desk creates Portal sessions on absolute app trees (`E:\MyWorkspace\…`, `E:\Source\…`, `E:\wt\…`). Portal must allow those roots or create fails with `workspacePath is not allowed; must stay under …`.
+
+Live F/G Portal `.env`:
+
+```env
+AGENT_WORKSPACE_ALLOWED_ROOTS=E:\MyWorkspace,E:\Source,E:\wt,F:\apps,G:\apps
+```
+
+Restart Portal `:4080` / `:5080` after changing. Details: [APP-SESSIONS.md](./APP-SESSIONS.md) · Portal [OPS.md](../../agent-portal/docs/OPS.md) (sibling repo).
 
 ## Start
 
