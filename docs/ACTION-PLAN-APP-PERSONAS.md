@@ -1,6 +1,6 @@
 # Action plan — App-stage personas + parallel off-stage workers
 
-**Status:** W0 **Human GO 2026-07-15** · W4/`stageVisible` **0.3.5 in train** · W1–W3 shipped · W6 packs **0.3.4** live  
+**Status:** W0 **GO** · W4 cast swap **0.3.5** · specialist remap **0.3.6** · W1–W3 · W6 packs live
 
 **Date:** 2026-07-15  
 **Branch / fleet:** `feature/upgradation-functionality` · upgrade side fleet only  

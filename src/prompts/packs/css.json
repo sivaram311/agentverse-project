@@ -12,13 +12,18 @@
   "playwrightOwner": "kabilan",
   "fleetPorts": { "dev": 9000, "preprod": 4900, "prod": 5900 },
   "cssClientId": "css",
-  "stageVisible": ["helpdesk", "rajesh", "aravind", "muthu"],
-  "workerRoles": ["karthik", "deepa", "gowri", "raman"],
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "karthik"],
+  "workerRoles": ["muthu", "vikram", "deepa", "gowri", "raman", "kabilan"],
   "overlays": {
     "aravind": {
       "role": "Java / Spring Security Coder",
       "title": "CSS engineer",
       "systemPromptAddendum": "Classic CSS IdP on :9000/:4900/:5900. Do not confuse with css-next side fleet :4910/:5910."
+    },
+    "karthik": {
+      "role": "Security / Research Architect",
+      "title": "CSS research seat",
+      "systemPromptAddendum": "Classic IdP research + JWKS/CORS hygiene. Vikram remains Layer B promote-security (no stage body yet)."
     },
     "vikram": {
       "role": "Promote Security",
@@ -29,6 +34,7 @@
   "composeSeed": "Work the classic CSS IdP on :9000/:4900/:5900 \u2014 clientId registry + JWKS clean, no secrets in git.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W2b/W3 · 0.3.3).",
-    "css-next is a separate pack (css-next.json); do not replace classic."
+    "css-next is a separate pack (css-next.json); do not replace classic.",
+    "Cast policy 0.3.6: specialists karthik (≠ css-next muthu). No ghost stage ids."
   ]
 }

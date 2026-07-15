@@ -22,6 +22,21 @@ Opening Session Desk (logged in) runs **ensure work-plane sessions** at most **o
 
 Chips open the matching session (or create then open) and flip the active pack (title wins over path so CSS vs CSS Next do not collide).
 
+## Stage cast policy (0.3.6)
+
+**Shared anchors on every work-plane stage:** Priya (`helpdesk`) · Rajesh.  
+**Switch-feel:** specialists diverge by pack (not unique Help Desks). Ghost ids without bodies (`anand`, `vikram`) are **not** listed in `stageVisible`.
+
+| Pack | On stage (`stageVisible`) |
+|------|---------------------------|
+| proddeck | Priya, Rajesh, Aravind, **Lavanya**, **Kabilan** |
+| agentverse-upgrade | Priya, Rajesh, Aravind, **Meenakshi**, **Muthu** |
+| css | Priya, Rajesh, Aravind, **Karthik** |
+| css-next | Priya, Rajesh, Aravind, **Muthu** |
+| agent-portal | Priya, Rajesh, Aravind, **Muthu**, **Kabilan** |
+| stack-pilot | Priya, Rajesh, **Muthu**, **Karthik** |
+| h-drive-server | Priya, Rajesh, Aravind, **Karthik** |
+
 ## Portal rate-limit friendliness
 
 Chat message poll base **8s**; status poll **8s** while busy (`STREAMING` / waiting) else **20s**. Pair with Portal XFF + user-keyed rate limit (Portal OPS). Avoid opening Desk repeatedly in the same minute after a cold ensure.

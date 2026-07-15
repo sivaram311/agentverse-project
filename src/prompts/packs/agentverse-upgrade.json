@@ -12,8 +12,8 @@
   "playwrightOwner": "kabilan",
   "fleetPorts": { "dev": 3312, "preprod": 4312, "prod": 5312 },
   "cssClientId": "agent-portal",
-  "stageVisible": ["helpdesk", "rajesh", "aravind", "meenakshi", "kabilan", "muthu"],
-  "workerRoles": ["karthik", "lavanya", "nisha", "gowri", "deepa", "raman", "suresh"],
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "meenakshi", "muthu"],
+  "workerRoles": ["karthik", "lavanya", "kabilan", "nisha", "gowri", "deepa", "raman", "suresh"],
   "overlays": {
     "aravind": {
       "role": "Next.js / R3F Coder",
@@ -29,6 +29,7 @@
   "composeSeed": "Build on the AgentVerse upgrade fleet (3312/4312/5312) \u2014 never touch classic 3310 or v2 3311.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W2b/W3 · 0.3.3).",
-    "Dispatch SoT peer for ProdDeck Home."
+    "Dispatch SoT peer for ProdDeck Home.",
+    "Cast policy 0.3.6: anchors helpdesk+rajesh; specialists meenakshi+muthu (≠ proddeck lavanya+kabilan)."
   ]
 }

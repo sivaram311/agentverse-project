@@ -13,9 +13,19 @@
   "playwrightOwner": "kabilan",
   "fleetPorts": { "dev": 8091, "preprod": 4091, "prod": 5091 },
   "cssClientId": "agent-portal",
-  "stageVisible": ["helpdesk", "rajesh", "aravind", "anand"],
-  "workerRoles": ["karthik", "deepa", "gowri", "raman"],
+  "stageVisible": ["helpdesk", "rajesh", "muthu", "karthik"],
+  "workerRoles": ["aravind", "anand", "deepa", "gowri", "raman", "kabilan"],
   "overlays": {
+    "muthu": {
+      "role": "Product / Control Plane Owner",
+      "title": "Stack Pilot owner",
+      "systemPromptAddendum": "control.delena.buzz fleet; no port clashes with agent-portal or CSS."
+    },
+    "karthik": {
+      "role": "Control Plane Architect",
+      "title": "Stack Pilot research",
+      "systemPromptAddendum": "Java control plane research; Aravind hired Layer B for code bursts."
+    },
     "aravind": {
       "role": "Java / Control Plane Coder",
       "title": "Stack Pilot engineer",
@@ -24,12 +34,13 @@
     "anand": {
       "role": "Ops",
       "title": "Stack ops",
-      "systemPromptAddendum": "control.delena.buzz fleet; no port clashes with agent-portal or CSS."
+      "systemPromptAddendum": "control.delena.buzz fleet; no port clashes with agent-portal or CSS. Layer B only until stage body exists."
     }
   },
   "composeSeed": "Ship Stack Pilot control-plane work \u2014 honor fleetPorts 8091/4091/5091.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
-    "DEV legacy :8091 live; preferred offset :3091 reserved."
+    "DEV legacy :8091 live; preferred offset :3091 reserved.",
+    "Cast policy 0.3.6: muthu+karthik on stage; drop ghost anand from stageVisible; aravind Layer B."
   ]
 }

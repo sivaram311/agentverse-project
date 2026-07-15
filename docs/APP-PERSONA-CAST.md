@@ -1,11 +1,20 @@
 # App persona cast — stable names (AgentVerse stage + worker ids)
 
-**Status:** W0 closeout **awaiting Human GO** · 2026-07-15  
-**Companion:** [ACTION-PLAN-APP-PERSONAS.md](./ACTION-PLAN-APP-PERSONAS.md)
+**Status:** W0 GO · cast policy **0.3.6** (shared anchors + pack specialists) · 2026-07-15  
+**Companion:** [ACTION-PLAN-APP-PERSONAS.md](./ACTION-PLAN-APP-PERSONAS.md) · stage map [APP-SESSIONS.md](./APP-SESSIONS.md)
 
 Persona **ids** are stable. Display **name/role/prompt** may overlay per `packs/<appId>.json`.
 
-## Always on
+## Stage policy (Grok + human GO 2026-07-15)
+
+| Rule | What |
+|------|------|
+| **MUST shared** | `helpdesk` (Priya), `rajesh` (Lead) on every work-plane stage |
+| **SHOULD diverge** | 2–4 specialists per pack so Switch changes the floor (see APP-SESSIONS) |
+| **NEVER on stage by default** | Workflow faces (`selvam`, `anand`, `vikram`, …) until they have catalog bodies |
+| **NEVER** | Per-app Priyas / unique Help Desks |
+
+## Always on (anchors)
 
 | id | Name | Default role | Layer |
 |----|------|--------------|-------|

@@ -14,12 +14,17 @@
   "fleetPorts": { "dev": 9000, "preprod": 4910, "prod": 5910 },
   "cssClientId": "css-next",
   "stageVisible": ["helpdesk", "rajesh", "aravind", "muthu"],
-  "workerRoles": ["karthik", "deepa", "gowri", "raman"],
+  "workerRoles": ["karthik", "vikram", "deepa", "gowri", "raman", "kabilan"],
   "overlays": {
     "aravind": {
       "role": "Java / OAuth SSO Coder",
       "title": "css-next engineer",
       "systemPromptAddendum": "OAuth side fleet on :9000/:4910/:5910. Do NOT confuse with classic CSS :4900/:5900."
+    },
+    "muthu": {
+      "role": "Product Manager",
+      "title": "css-next owner seat",
+      "systemPromptAddendum": "Own OAuth side-fleet roadmap; do not clobber classic CSS ports."
     },
     "vikram": {
       "role": "Promote Security",
@@ -30,6 +35,7 @@
   "composeSeed": "Work the css-next OAuth side fleet on :9000/:4910/:5910 \u2014 PKCE authorize flow, clientId registry, no classic port clash.",
   "notes": [
     "Status: WIRED in runtime via pack-loader (W6 pack matrix).",
-    "Separate pack from classic css; same E: tree, F: side-fleet bake."
+    "Separate pack from classic css; same E: tree, F: side-fleet bake.",
+    "Cast policy 0.3.6: specialist muthu (≠ css karthik)."
   ]
 }
