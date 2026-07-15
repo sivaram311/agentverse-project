@@ -77,6 +77,7 @@ npm run test:e2e
 | `auth.spec.ts` | skipped unless `AV_E2E_PASSWORD`; Join lobby (`#av-username` / `#av-password`) → Sessions / Session Desk |
 | `session-desk-logged-in.spec.ts` | skipped unless password; login → Sessions → `#session-desk-query` / Search + Active/Archived; New/Refresh if no Cancel run |
 | `flat-roster.spec.ts` | Soft: `.flat-roster` / “Open Session Desk” **or** annotate WebGL healthy — never fail solely because WebGL works; optional stylesheet not 500 |
+| `chrome-toggles.spec.ts` | StageControls (W1-chrome, Lane A): joystick toggle (`/joystick/i`) + camera/view cycle (`/camera\|view\|auto/i`) by accessible name. Pre-auth test asserts whichever is visible on shell chrome, soft-notes the other, and skips gracefully if gated behind login. Post-auth test (skipped unless `AV_E2E_PASSWORD`) repeats the check after `loginViaJoinLobby`. Never hard-fails solely because StageControls isn't merged yet — soft note instead. **Claim the Playwright slot (#15) before running** — Integrate Lead runs this after Lane A merges. |
 | `dispatch-path.spec.ts` | `GET home-staging/api/pack` → `0.8.x`; staging `/health` → `0.3.1`; `buildDispatchDeskUrl` includes `agentverse-upgrade-staging`; optional desk land (login or desk); Home UI Dispatch click soft |
 | `smoke.spec.ts` | Scaffold: upgrade baseURL + `/` not 5xx |
 
@@ -90,6 +91,7 @@ npm run test:e2e
 - Incident strip: `role=region` name **Incident brief** + strong **Brief**.
 - Unauthenticated deep-links showing only login are **PASS** for desk/hire/dispatch land.
 - FlatRoster is WebGL-fallback UI only; healthy WebGL is a soft pass with annotation.
+- StageControls (joystick + camera/view) aria-labels are **not frozen yet** (Lane A, W1-chrome). `chrome-toggles.spec.ts` matches by flexible regex — accessible name containing "joystick" for the show/hide toggle, and "camera", "view", or "auto" for the view-cycle control (button/switch/checkbox/radio role, or `aria-label`/`getByLabel`). Lane A: pick any aria-label matching those patterns and the spec should pick it up without edits; if you land something outside that regex, ping Lane C to widen it.
 
 ## Defaults
 

@@ -1,0 +1,27 @@
+{
+  "appId": "proddeck",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "workspacePath": "E:/wt/proddeck-integrate",
+  "workspacePathAlias": "E:/MyWorkspace/sandbox/proddeck",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 4,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 3320, "preprod": 4320, "prod": 5320 },
+  "cssClientId": "proddeck",
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "lavanya", "kabilan"],
+  "workerRoles": ["karthik", "nisha", "gowri", "deepa", "raman"],
+  "overlays": {
+    "aravind": {
+      "role": "Next.js / Cloud OS Coder",
+      "title": "ProdDeck engineer",
+      "systemPromptAddendum": "Stack: Next.js ProdDeck. Honor fleetPorts. Dispatch \u2192 agentverse-upgrade only."
+    }
+  },
+  "notes": [
+    "Status: DRAFT config stub \u2014 not wired in runtime code yet (W2a docs/config only).",
+    "Canonical workspace path is E:/wt/proddeck-integrate; workspacePathAlias is a known second location \u2014 do not treat as a second SoT."
+  ]
+}

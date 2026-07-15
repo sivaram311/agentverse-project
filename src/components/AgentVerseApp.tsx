@@ -10,6 +10,7 @@ import { LoginOverlay } from "@/components/hud/LoginOverlay";
 import { OfficeSwitch } from "@/components/hud/OfficeSwitch";
 import { QuestPanel } from "@/components/hud/QuestPanel";
 import { SessionDesk } from "@/components/hud/SessionDesk";
+import { StageControls } from "@/components/hud/StageControls";
 import { TeamMemberBar } from "@/components/hud/TeamMemberBar";
 import { TopBar } from "@/components/hud/TopBar";
 import { TouchJoystick } from "@/components/hud/TouchJoystick";
@@ -225,6 +226,8 @@ export function AgentVerseApp() {
             <TouchJoystick />
           </>
         )}
+        {/* Reachable pre-auth and when chat closed — operator chrome prefs. */}
+        {!chatOpen ? <StageControls /> : null}
         <div className="hero-copy" aria-hidden="true">
           <p className="brand-kicker">Siruseri floor</p>
           <h1>Digital office</h1>

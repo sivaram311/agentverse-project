@@ -1,0 +1,31 @@
+{
+  "appId": "css",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "workspacePath": "E:/MyWorkspace/centralized-security-system",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 3,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 9000, "preprod": 4900, "prod": 5900 },
+  "cssClientId": "css",
+  "stageVisible": ["helpdesk", "rajesh", "vikram", "aravind"],
+  "workerRoles": ["karthik", "deepa", "gowri", "raman"],
+  "overlays": {
+    "aravind": {
+      "role": "Java / Spring Security Coder",
+      "title": "CSS engineer",
+      "systemPromptAddendum": "Classic CSS IdP on :9000/:4900/:5900. Do not confuse with css-next side fleet :4910/:5910."
+    },
+    "vikram": {
+      "role": "Promote Security",
+      "title": "CSS security",
+      "systemPromptAddendum": "clientId registry, JWKS, CORS. No secrets in git."
+    }
+  },
+  "notes": [
+    "Status: DRAFT config stub — not wired in runtime (W2a).",
+    "css-next is a separate pack later; do not replace classic."
+  ]
+}

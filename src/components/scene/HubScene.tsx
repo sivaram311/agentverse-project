@@ -144,7 +144,9 @@ function SceneInner({
 function HubCanvas({ onWebGLFail }: { onWebGLFail: () => void }) {
   const [reducedMotion, setReducedMotion] = useState(false);
   const [narrow, setNarrow] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>("portrait");
+  const [autoViewMode, setAutoViewMode] = useState<ViewMode>("portrait");
+  const cameraViewOverride = useVerseStore((s) => s.cameraViewOverride);
+  const viewMode = cameraViewOverride ?? autoViewMode;
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -159,10 +161,7 @@ function HubCanvas({ onWebGLFail }: { onWebGLFail: () => void }) {
       const w = window.innerWidth;
       const h = window.innerHeight;
       setNarrow(w <= 360 && h > w);
-      const mode = resolveViewMode(w, h);
-      setViewMode(mode);
-      document.body.dataset.avView = mode;
-      document.body.dataset.avLandscape = isPortraitView(mode) ? "0" : "1";
+      setAutoViewMode(resolveViewMode(w, h));
     };
     sync();
     window.addEventListener("resize", sync);
@@ -172,6 +171,11 @@ function HubCanvas({ onWebGLFail }: { onWebGLFail: () => void }) {
       window.removeEventListener("orientationchange", sync);
     };
   }, []);
+
+  useEffect(() => {
+    document.body.dataset.avView = viewMode;
+    document.body.dataset.avLandscape = isPortraitView(viewMode) ? "0" : "1";
+  }, [viewMode]);
 
   const compact =
     viewMode === "portrait-compact" || viewMode === "landscape-compact";

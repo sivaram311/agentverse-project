@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useVerseStore } from "@/lib/store";
 
 /**
@@ -8,6 +8,7 @@ import { useVerseStore } from "@/lib/store";
  * Hidden on wide pointers that prefer WASD (CSS), but still usable.
  */
 export function TouchJoystick() {
+  const enabled = useVerseStore((s) => s.joystickEnabled);
   const setMove = useVerseStore((s) => s.setPlayerMoveInput);
   const active = useRef(false);
   const origin = useRef({ x: 0, y: 0 });
@@ -35,6 +36,15 @@ export function TouchJoystick() {
     if (knob.current) knob.current.style.transform = "translate(0px, 0px)";
     setMove({ x: 0, z: 0 });
   }, [setMove]);
+
+  useEffect(() => {
+    if (!enabled) {
+      active.current = false;
+      setMove({ x: 0, z: 0 });
+    }
+  }, [enabled, setMove]);
+
+  if (!enabled) return null;
 
   return (
     <div

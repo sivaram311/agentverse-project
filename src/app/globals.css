@@ -1427,6 +1427,73 @@ body {
   }
 }
 
+/* —— Operator chrome toggles: joystick / camera view —— */
+.stage-controls {
+  position: absolute;
+  right: calc(0.6rem + var(--safe-right, 0px));
+  bottom: calc(5.8rem + var(--safe-bottom, 0px));
+  z-index: 5;
+  display: grid;
+  gap: 0.35rem;
+  justify-items: end;
+  pointer-events: none;
+}
+
+.stage-chip {
+  pointer-events: auto;
+  border: 1px solid var(--av-line);
+  background: rgba(10, 12, 16, 0.6);
+  backdrop-filter: blur(10px);
+  color: var(--av-muted);
+  border-radius: var(--radius-pill);
+  padding: 0.32rem 0.7rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.stage-chip:hover {
+  border-color: color-mix(in srgb, var(--av-accent) 55%, transparent);
+  color: var(--av-ink);
+}
+
+.stage-chip.on {
+  border-color: color-mix(in srgb, var(--av-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--av-accent) 16%, rgba(10, 12, 16, 0.6));
+  color: var(--av-ink);
+}
+
+@media (min-width: 900px) and (pointer: fine) {
+  .stage-controls {
+    opacity: 0.6;
+  }
+  .stage-controls:hover {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 420px) {
+  .stage-controls {
+    bottom: calc(6.4rem + var(--safe-bottom, 0px));
+    gap: 0.28rem;
+  }
+  .stage-chip {
+    padding: 0.28rem 0.55rem;
+    font-size: 0.56rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .stage-controls {
+    right: calc(0.5rem + var(--safe-right, 0px));
+    bottom: calc(0.5rem + var(--safe-bottom, 0px));
+  }
+}
+
 .persona-tag span,
 .persona-tag em {
   color: #b7c2ce;

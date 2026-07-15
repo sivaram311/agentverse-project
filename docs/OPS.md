@@ -37,6 +37,10 @@ cd G:\apps\agentverse-upgrade
 
 See [DEEP-LINK-CONTRACT.md](./DEEP-LINK-CONTRACT.md). Prefer upgrade hosts for Dispatch return URLs when targeting this fleet.
 
+## Operator chrome toggles
+
+A floating "stage controls" chip (bottom-right of the floor, hidden while chat is open) lets an operator turn the on-screen joystick off/on and cycle the camera view (Portrait → Portrait S → Landscape → Landscape S → Auto) without opening full office chrome. Both prefs persist via the zustand store (`joystickEnabled`, `cameraViewOverride`) so they survive reloads; `cameraViewOverride: null` means auto-detect from `resolveViewMode` on resize, same as before this change.
+
 ## Promote
 
 [PROMOTE-UPGRADATION.md](./PROMOTE-UPGRADATION.md) · Evidence `H:\releases\agentverse-upgrade-0.3.0\`

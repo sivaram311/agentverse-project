@@ -21,6 +21,7 @@ import type {
   UiLanguage,
 } from "./types";
 import type { VoiceGenderPref } from "./speech";
+import type { ViewMode } from "./camera-framing";
 
 export type InteractionMode =
   | "idle"
@@ -38,6 +39,15 @@ export type InteractionState = {
 export type OfficeMood = "morning" | "day" | "evening";
 
 const OFFICE_MOODS: OfficeMood[] = ["morning", "day", "evening"];
+
+/** Manual camera view cycle — `null` returns to auto (resolveViewMode on resize). */
+const CAMERA_VIEW_CYCLE: Array<ViewMode | null> = [
+  "portrait",
+  "portrait-compact",
+  "landscape",
+  "landscape-compact",
+  null,
+];
 
 const DEFAULT_WORKSPACE =
   (typeof process !== "undefined" && process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE) ||
@@ -140,6 +150,10 @@ type VerseState = {
   playerPosition: [number, number, number];
   /** WASD / joystick stick (−1..1) */
   playerMoveInput: { x: number; z: number };
+  /** On-screen touch joystick — operators can hide it (e.g. keep-mobile chrome) */
+  joystickEnabled: boolean;
+  /** Manual camera view — null = auto from resolveViewMode on resize */
+  cameraViewOverride: ViewMode | null;
   setAuthConfig: (c: AuthConfig | null) => void;
   setAuthenticated: (v: boolean, username?: string | null) => void;
   setAccessToken: (token: string | null) => void;
@@ -191,6 +205,10 @@ type VerseState = {
   cycleOfficeMood: () => void;
   setPlayerPosition: (p: [number, number, number]) => void;
   setPlayerMoveInput: (v: { x: number; z: number }) => void;
+  setJoystickEnabled: (v: boolean) => void;
+  toggleJoystickEnabled: () => void;
+  setCameraViewOverride: (mode: ViewMode | null) => void;
+  cycleCameraView: () => void;
 };
 
 export const useVerseStore = create<VerseState>()(
@@ -237,6 +255,8 @@ export const useVerseStore = create<VerseState>()(
       officeMood: "day",
       playerPosition: [0, 0, 5.2],
       playerMoveInput: { x: 0, z: 0 },
+      joystickEnabled: true,
+      cameraViewOverride: null,
       setAuthConfig: (c) => set({ authConfig: c }),
       setAuthenticated: (v, username = null) => set({ authenticated: v, username }),
       setAccessToken: (accessToken) => set({ accessToken }),
@@ -496,6 +516,23 @@ export const useVerseStore = create<VerseState>()(
         }),
       setPlayerPosition: (playerPosition) => set({ playerPosition }),
       setPlayerMoveInput: (playerMoveInput) => set({ playerMoveInput }),
+      setJoystickEnabled: (joystickEnabled) =>
+        set(
+          joystickEnabled
+            ? { joystickEnabled }
+            : { joystickEnabled, playerMoveInput: { x: 0, z: 0 } },
+        ),
+      toggleJoystickEnabled: () => {
+        const next = !get().joystickEnabled;
+        get().setJoystickEnabled(next);
+      },
+      setCameraViewOverride: (cameraViewOverride) => set({ cameraViewOverride }),
+      cycleCameraView: () =>
+        set((s) => {
+          const i = CAMERA_VIEW_CYCLE.indexOf(s.cameraViewOverride);
+          const next = CAMERA_VIEW_CYCLE[(i + 1) % CAMERA_VIEW_CYCLE.length];
+          return { cameraViewOverride: next };
+        }),
     }),
     {
       name: "agentverse-office-v2",
@@ -514,6 +551,8 @@ export const useVerseStore = create<VerseState>()(
         quests: s.quests,
         greetOnce: s.greetOnce,
         officeMood: s.officeMood,
+        joystickEnabled: s.joystickEnabled,
+        cameraViewOverride: s.cameraViewOverride,
       }),
     },
   ),

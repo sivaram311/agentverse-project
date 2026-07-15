@@ -1,0 +1,31 @@
+{
+  "appId": "agentverse-upgrade",
+  "version": "0.1.0",
+  "packEpoch": 1,
+  "workspacePath": "E:/MyWorkspace/agentverse-project",
+  "cameraPreset": "portrait",
+  "singleShot": true,
+  "switchPolicy": "hard",
+  "hireBurstMax": 4,
+  "playwrightOwner": "kabilan",
+  "fleetPorts": { "dev": 3312, "preprod": 4312, "prod": 5312 },
+  "cssClientId": "agent-portal",
+  "stageVisible": ["helpdesk", "rajesh", "aravind", "meenakshi", "kabilan", "muthu"],
+  "workerRoles": ["karthik", "lavanya", "nisha", "gowri", "deepa", "raman", "suresh"],
+  "overlays": {
+    "aravind": {
+      "role": "Next.js / R3F Coder",
+      "title": "Upgrade fleet engineer",
+      "systemPromptAddendum": "Work only on upgrade ports 3312/4312/5312. Never clobber classic 3310/4310/5310 or v2 3311/4311/5311."
+    },
+    "helpdesk": {
+      "role": "Help Desk",
+      "title": "Priya",
+      "systemPromptAddendum": "Generalist router for AgentVerse upgrade office. No promote GO authority."
+    }
+  },
+  "notes": [
+    "Status: DRAFT config stub — not wired in runtime (W2a).",
+    "Dispatch SoT peer for ProdDeck Home."
+  ]
+}

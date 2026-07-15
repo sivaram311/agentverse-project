@@ -32,8 +32,9 @@ Evidence: `H:\releases\agentverse-upgrade-0.3.1\`
 | **P2** | Fleet SoT in `SUPPORTED-VERSIONS` + MyAgent `workflow/deps/` | EM + docs | **DONE** — upgrade 0.3.1 Dispatch peer |
 | **P3** | Hygiene: git tag `v0.3.1`; DEEP-LINK-CONTRACT hosts | Docs | **DONE** — tag + upgrade hosts SoT |
 | **P4** | Defer | — | Cloud OS hard-outs · v2 · merge onto densify F/G |
+| **P5** | App-stage personas + parallel off-stage workers | Lead + crews | **W0 GO · W1 landed · W2a stubs · Q1 plan** — [ACTION-PLAN](./ACTION-PLAN-APP-PERSONAS.md) · [PROMOTE-PERSONA-TRAIN-Q1](./PROMOTE-PERSONA-TRAIN-Q1.md) · candidate **0.3.2** |
 
-**SemVer:** Call AV upgrade train **done at 0.3.1** after P0–P1 pass. Only cut **0.3.2** if phone E2E finds a real bug.
+**SemVer:** Call AV upgrade train **done at 0.3.1** after P0–P1 pass. Only cut **0.3.2** if phone E2E finds a real bug / after persona-train EM GO.
 
 ---
 
